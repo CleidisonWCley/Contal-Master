@@ -1,0 +1,598 @@
+{
+  "schema": "dilemas",
+  "versao": "1.0",
+  "idioma": "pt-BR",
+  "fonte": "NBC PA 11 – Revisão Externa de Qualidade pelos Pares (CFC, 8/12/2017, vigente desde 1/1/2019); Instruções aos Revisores (Anexo 2); Base de Conhecimento do jogo; provas EQT/QTG como apoio.",
+  "tipos": [
+    "conflito_interesse",
+    "confidencialidade",
+    "intimidacao",
+    "responsabilidade",
+    "procedimento",
+    "tipo_relatorio",
+    "prazo",
+    "organizacao"
+  ],
+  "consumidores": [
+    "desvio_logico",
+    "maleta_certa"
+  ],
+  "itens": [
+    {
+      "id": "DL-001",
+      "nivel": "facil",
+      "tema": "Independência",
+      "tipo": "conflito_interesse",
+      "referencia": "NBC PA 11, itens 22 e 23",
+      "cenario": "Carlos foi escalado para revisar a firma Horizonte e descobre que o irmão é sócio dela. O que fazer?",
+      "acao_correta": "Declarar o vínculo e se afastar",
+      "acoes_incorretas": [
+        {
+          "texto": "Conduzir a revisão normalmente",
+          "porque": "Revisar normalmente ignora a ameaça de familiaridade e a perda de imparcialidade."
+        },
+        {
+          "texto": "Revisar só metade dos trabalhos",
+          "porque": "Dividir o trabalho não elimina o conflito, apenas o esconde."
+        }
+      ],
+      "explicacao": "Parentesco próximo com sócio do revisado compromete a objetividade e é conflito de interesses: declarar e afastar-se.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-002",
+      "nivel": "facil",
+      "tema": "Conflito de interesses",
+      "tipo": "conflito_interesse",
+      "referencia": "Base do jogo: Dilema 7",
+      "cenario": "Durante a revisão, um cliente da firma Prisma oferece um presente caro à revisora Marina. O que ela faz?",
+      "acao_correta": "Recusar e documentar",
+      "acoes_incorretas": [
+        {
+          "texto": "Aceitar e agradecer",
+          "porque": "Aceitar cria dívida de gratidão e compromete a independência."
+        },
+        {
+          "texto": "Aceitar se for discreto",
+          "porque": "Discrição não afasta a ameaça; o problema é o vínculo, não a visibilidade."
+        }
+      ],
+      "explicacao": "Presentes e favores ameaçam a imparcialidade (interesse próprio). A conduta é recusar e documentar o fato.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-003",
+      "nivel": "facil",
+      "tema": "Confidencialidade",
+      "tipo": "confidencialidade",
+      "referencia": "NBC PA 11, item 21",
+      "cenario": "Em um evento, um colega pergunta a João se ele achou falhas graves na firma que revisou. Qual a conduta?",
+      "acao_correta": "Não comentar o caso",
+      "acoes_incorretas": [
+        {
+          "texto": "Citar as falhas sem dar o nome",
+          "porque": "Mesmo sem nome, falhas e conclusões da revisão são informação confidencial."
+        },
+        {
+          "texto": "Contar, pois a revisão acabou",
+          "porque": "A confidencialidade não termina com a conclusão da revisão."
+        }
+      ],
+      "explicacao": "O dever de sigilo vale em qualquer fase e permanece depois do fim dos trabalhos, mesmo sem citar nomes.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-004",
+      "nivel": "facil",
+      "tema": "Confidencialidade",
+      "tipo": "confidencialidade",
+      "referencia": "Base do jogo: Dilema 1",
+      "cenario": "O revisor descobre que um cliente da firma revisada procura novo auditor. Pode oferecer seus serviços?",
+      "acao_correta": "Não usar a informação",
+      "acoes_incorretas": [
+        {
+          "texto": "Ligar e oferecer serviços",
+          "porque": "Usar o que soube na revisão para fins comerciais viola o sigilo."
+        },
+        {
+          "texto": "Oferecer sem citar a revisão",
+          "porque": "Omitir a origem não muda o fato de a informação ser confidencial."
+        }
+      ],
+      "explicacao": "A informação foi obtida na revisão e é confidencial; usá-la para captar cliente é benefício próprio indevido.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-005",
+      "nivel": "facil",
+      "tema": "Plano de ação",
+      "tipo": "responsabilidade",
+      "referencia": "NBC PA 11, item 46",
+      "cenario": "O revisor entregou a carta de recomendações. Quem deve elaborar o plano de ação?",
+      "acao_correta": "O auditor-revisado",
+      "acoes_incorretas": [
+        {
+          "texto": "O auditor-revisor",
+          "porque": "O revisor aponta as falhas e emite o relatório, mas não escreve o plano do revisado."
+        },
+        {
+          "texto": "O CRE",
+          "porque": "O CRE analisa e aprova, não elabora o plano."
+        }
+      ],
+      "explicacao": "O revisado descreve como corrigirá as fragilidades; o revisor só encaminha o plano ao CRE.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-006",
+      "nivel": "facil",
+      "tema": "Acesso aos clientes",
+      "tipo": "procedimento",
+      "referencia": "Base do jogo: Dilema 4",
+      "cenario": "O revisor precisa ver os papéis de trabalho de um cliente selecionado. Quem obtém a autorização do cliente?",
+      "acao_correta": "O revisado obtém a autorização",
+      "acoes_incorretas": [
+        {
+          "texto": "Revisor acessa sem pedir",
+          "porque": "Sem autorização do cliente, o acesso aos papéis não é regular."
+        },
+        {
+          "texto": "O CRE pede ao cliente",
+          "porque": "A obtenção da autorização é responsabilidade do revisado, não do CRE."
+        }
+      ],
+      "explicacao": "Cabe ao revisado obter a aprovação de cada cliente selecionado; o revisor envia a confirmação de confidencialidade.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-007",
+      "nivel": "facil",
+      "tema": "Guarda de documentos",
+      "tipo": "procedimento",
+      "referencia": "NBC PA 11, item 28(g)",
+      "cenario": "Concluída a revisão, um colega sugere apagar todos os arquivos para evitar vazamentos. O que o revisor faz?",
+      "acao_correta": "Guardar por 7 anos, protegidos",
+      "acoes_incorretas": [
+        {
+          "texto": "Apagar tudo ao final",
+          "porque": "Descartar antes do prazo descumpre a norma e impede comprovar o trabalho."
+        },
+        {
+          "texto": "Enviar tudo ao cliente",
+          "porque": "Documentos de revisão não são enviados a clientes da firma revisada."
+        }
+      ],
+      "explicacao": "A documentação deve ser guardada por 7 anos desde a emissão do relatório, com segurança e sigilo.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-008",
+      "nivel": "facil",
+      "tema": "Tipos de relatório",
+      "tipo": "tipo_relatorio",
+      "referencia": "NBC PA 11, item 38(a)",
+      "cenario": "Sistema de qualidade bem projetado e cumprido, sem deficiências relevantes. Que relatório o revisor emite?",
+      "acao_correta": "Sistema de qualidade adequado",
+      "acoes_incorretas": [
+        {
+          "texto": "Com deficiências",
+          "porque": "Há deficiências relevantes? Não: então não cabe o relatório com deficiências."
+        },
+        {
+          "texto": "Sistema inadequado",
+          "porque": "O inadequado exige desconformidade com as normas, que não ocorreu."
+        }
+      ],
+      "explicacao": "Quando o sistema é adequadamente projetado e plenamente cumprido, o relatório é o de sistema adequado.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-009",
+      "nivel": "normal",
+      "tema": "Independência",
+      "tipo": "conflito_interesse",
+      "referencia": "NBC PA 11, item 23",
+      "cenario": "A revisora Lia tem ações de uma empresa cliente da firma revisada. Como proceder?",
+      "acao_correta": "Não revisar esse cliente",
+      "acoes_incorretas": [
+        {
+          "texto": "Revisar normalmente",
+          "porque": "Revisar o trabalho do cliente em que investe fere a independência."
+        },
+        {
+          "texto": "Sair da revisão inteira",
+          "porque": "Não é preciso deixar toda a revisão; basta não atuar nesse cliente."
+        }
+      ],
+      "explicacao": "Ter o investimento é permitido, mas ela não pode participar da revisão dos trabalhos desse cliente.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-010",
+      "nivel": "normal",
+      "tema": "Pressão indevida",
+      "tipo": "intimidacao",
+      "referencia": "Base do jogo: Dilema 4",
+      "cenario": "O sócio da firma revisada avisa: se apontarem muitas falhas, a firma do revisor perderá indicações. O que fazer?",
+      "acao_correta": "Recusar a pressão e documentar",
+      "acoes_incorretas": [
+        {
+          "texto": "Atenuar as falhas",
+          "porque": "Suavizar conclusões por medo de retaliação compromete a independência."
+        },
+        {
+          "texto": "Omitir as falhas leves",
+          "porque": "Omitir apontamentos para agradar é abrir mão do julgamento profissional."
+        }
+      ],
+      "explicacao": "É ameaça de intimidação: o revisor mantém a objetividade, não cede e documenta a situação.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-011",
+      "nivel": "normal",
+      "tema": "Independência",
+      "tipo": "conflito_interesse",
+      "referencia": "Base do jogo: Dilema 5",
+      "cenario": "Marina descobre que seu melhor amigo é sócio responsável pela firma revisada. O que fazer?",
+      "acao_correta": "Declarar e se afastar",
+      "acoes_incorretas": [
+        {
+          "texto": "Seguir sem avisar",
+          "porque": "Ocultar o vínculo agrava a situação e impede o tratamento adequado."
+        },
+        {
+          "texto": "Seguir com mais rigor",
+          "porque": "Rigor extra não elimina o conflito: a ameaça é a perda de imparcialidade."
+        }
+      ],
+      "explicacao": "Amizade íntima é ameaça de familiaridade, que reduz o ceticismo e a objetividade. Avaliar, documentar e se afastar.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-012",
+      "nivel": "normal",
+      "tema": "Restrição de acesso",
+      "tipo": "procedimento",
+      "referencia": "NBC PA 11, itens 33 e 34",
+      "cenario": "O revisado alega litígio para excluir um cliente da amostra. A equipe discorda da restrição. E agora?",
+      "acao_correta": "Avaliar o efeito e avisar o CRE",
+      "acoes_incorretas": [
+        {
+          "texto": "Aceitar sem registrar",
+          "porque": "Aceitar em silêncio deixa de documentar as razões da exclusão."
+        },
+        {
+          "texto": "Acessar sem autorização",
+          "porque": "Sem autorização do cliente o acesso é indevido."
+        }
+      ],
+      "explicacao": "A equipe avalia o efeito da restrição no trabalho e no relatório e envia ao CRE as alegações do revisado e sua avaliação.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-013",
+      "nivel": "normal",
+      "tema": "Tipos de relatório",
+      "tipo": "tipo_relatorio",
+      "referencia": "NBC PA 11, item 39",
+      "cenario": "O revisado não emitiu relatórios de auditoria no ano-base. Como isso entra no relatório da revisão?",
+      "acao_correta": "Não é limitação de escopo",
+      "acoes_incorretas": [
+        {
+          "texto": "Limitação de escopo",
+          "porque": "A ausência de trabalhos não impede o revisor de avaliar políticas e procedimentos."
+        },
+        {
+          "texto": "Sistema inadequado",
+          "porque": "Inadequado exige desconformidade com as normas, não ausência de trabalhos."
+        }
+      ],
+      "explicacao": "O item 39 estabelece que a falta de trabalhos de auditoria no ano-base não indica limitação de escopo.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-014",
+      "nivel": "normal",
+      "tema": "Tipos de relatório",
+      "tipo": "tipo_relatorio",
+      "referencia": "NBC PA 11, item 38(c)",
+      "cenario": "O revisor conclui que as políticas de qualidade do revisado não estão em conformidade com as NBC. Qual relatório?",
+      "acao_correta": "Sistema inadequado",
+      "acoes_incorretas": [
+        {
+          "texto": "Sistema adequado",
+          "porque": "Adequado supõe sistema projetado e cumprido sem deficiências relevantes."
+        },
+        {
+          "texto": "Com deficiências",
+          "porque": "Com deficiências trata de falhas que não tornam o sistema inadequado."
+        }
+      ],
+      "explicacao": "Políticas ou procedimentos em desconformidade com as normas levam ao relatório de sistema inadequado.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-015",
+      "nivel": "normal",
+      "tema": "Vazamento",
+      "tipo": "confidencialidade",
+      "referencia": "Base do jogo: Dilema 17",
+      "cenario": "Um analista envia, por engano, arquivo de clientes a um e-mail externo. Qual a conduta?",
+      "acao_correta": "Avisar o revisor de imediato",
+      "acoes_incorretas": [
+        {
+          "texto": "Apagar e não contar",
+          "porque": "Esconder o erro impede medidas de contenção."
+        },
+        {
+          "texto": "Esperar alguém reclamar",
+          "porque": "Esperar cobrança deixa as informações expostas por mais tempo."
+        }
+      ],
+      "explicacao": "Vazamentos devem ser comunicados de imediato às pessoas responsáveis para conter e corrigir.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-016",
+      "nivel": "normal",
+      "tema": "Prazos",
+      "tipo": "prazo",
+      "referencia": "NBC PA 11, itens 19 e 54",
+      "cenario": "A firma Prisma descumpriu prazos do CRE como revisada. Qual a consequência?",
+      "acao_correta": "Nova revisão no ano seguinte",
+      "acoes_incorretas": [
+        {
+          "texto": "Nenhuma consequência",
+          "porque": "A norma prevê efeitos objetivos para o descumprimento de prazos."
+        },
+        {
+          "texto": "Anulação de revisões passadas",
+          "porque": "A norma não prevê anular revisões passadas por esse motivo."
+        }
+      ],
+      "explicacao": "O descumprimento leva à revisão no ano subsequente e ao impedimento de atuar como revisor.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-017",
+      "nivel": "dificil",
+      "tema": "Independência",
+      "tipo": "conflito_interesse",
+      "referencia": "NBC PA 11, item 24",
+      "cenario": "A firma A revisou a B. Agora, B é indicada para revisar A. O que fazer?",
+      "acao_correta": "Vedar e escolher outro revisor",
+      "acoes_incorretas": [
+        {
+          "texto": "Aceitar após alguns anos",
+          "porque": "O intervalo de tempo não afasta a vedação."
+        },
+        {
+          "texto": "Aceitar com aval do cliente",
+          "porque": "Aval de cliente não autoriza o que a norma veda."
+        }
+      ],
+      "explicacao": "Revisões recíprocas são vedadas, não importa o intervalo entre elas. O revisado deve indicar outro revisor.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-018",
+      "nivel": "dificil",
+      "tema": "Limitação de escopo",
+      "tipo": "tipo_relatorio",
+      "referencia": "NBC PA 11, item 38(d)",
+      "cenario": "O revisado se recusa a dar informações e a participar das entrevistas. Qual o efeito no relatório?",
+      "acao_correta": "Relatório com limitação de escopo",
+      "acoes_incorretas": [
+        {
+          "texto": "Relatório adequado",
+          "porque": "Sem evidências suficientes, não se conclui que o sistema é adequado."
+        },
+        {
+          "texto": "O revisor faz o plano de ação",
+          "porque": "O plano de ação é sempre do revisado, nunca do revisor."
+        }
+      ],
+      "explicacao": "A recusa limita o trabalho a ponto de o revisor não concluir: cabe o relatório com limitação de escopo.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-019",
+      "nivel": "dificil",
+      "tema": "Autorrevisão",
+      "tipo": "conflito_interesse",
+      "referencia": "Base do jogo: Dilema 6",
+      "cenario": "O revisor Paulo participou, no passado, da auditoria de um cliente agora incluído na amostra. O que fazer?",
+      "acao_correta": "Não revisar esse trabalho",
+      "acoes_incorretas": [
+        {
+          "texto": "Revisar normalmente",
+          "porque": "Autorrevisão compromete a objetividade da conclusão."
+        },
+        {
+          "texto": "Revisar e não documentar",
+          "porque": "Deixar de documentar piora: conflitos devem ser registrados e tratados."
+        }
+      ],
+      "explicacao": "Ele estaria revisando trabalho do qual participou (autorrevisão); sem tratamento adequado, não deve revisá-lo.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-020",
+      "nivel": "dificil",
+      "tema": "Equipe revisora",
+      "tipo": "organizacao",
+      "referencia": "NBC PA 11, item 25(a)",
+      "cenario": "A revisão de firma com clientes do mercado financeiro foi planejada só com iniciantes. Qual a conduta correta?",
+      "acao_correta": "Alocar equipe experiente",
+      "acoes_incorretas": [
+        {
+          "texto": "Manter só iniciantes",
+          "porque": "Boa vontade não substitui experiência em trabalhos de similar complexidade."
+        },
+        {
+          "texto": "Deixar o revisado decidir",
+          "porque": "A composição adequada é responsabilidade do revisor, não do revisado."
+        }
+      ],
+      "explicacao": "A equipe precisa de experiência e recursos compatíveis com a complexidade dos trabalhos revisados.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-021",
+      "nivel": "dificil",
+      "tema": "Habilitação específica",
+      "tipo": "organizacao",
+      "referencia": "NBC PA 11, item 25(c)",
+      "cenario": "O revisado tem cliente regulado que exige habilitação própria. Quem verifica a habilitação da equipe revisora?",
+      "acao_correta": "O revisado verifica",
+      "acoes_incorretas": [
+        {
+          "texto": "O CRE verifica",
+          "porque": "O CRE administra o programa; a norma põe essa checagem no revisado."
+        },
+        {
+          "texto": "Ninguém, é dispensada",
+          "porque": "Não há dispensa: a habilitação é requisito para revisar o cliente regulado."
+        }
+      ],
+      "explicacao": "A equipe precisa ser habilitada para revisar essas entidades, mas a verificação cabe ao revisado.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-022",
+      "nivel": "dificil",
+      "tema": "Discordância",
+      "tipo": "procedimento",
+      "referencia": "Instruções CRE (Anexo 2), item 56",
+      "cenario": "Revisor e revisado discordam sobre o tipo de relatório ou itens da carta. Qual o encaminhamento?",
+      "acao_correta": "Registrar a discordância",
+      "acoes_incorretas": [
+        {
+          "texto": "O revisor cede",
+          "porque": "Ceder só para evitar conflito abre mão do julgamento do revisor."
+        },
+        {
+          "texto": "Omitir a divergência",
+          "porque": "Esconder a divergência impede o CRE de analisá-la."
+        }
+      ],
+      "explicacao": "Havendo discordância, o fato deve ser referenciado no documento do revisor e/ou do revisado.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-023",
+      "nivel": "dificil",
+      "tema": "Falha relevante",
+      "tipo": "procedimento",
+      "referencia": "Instruções CRE (Anexo 2), item 41",
+      "cenario": "Na revisão de um trabalho, surge indício de falha relevante do revisado. O que o revisor faz?",
+      "acao_correta": "Avisar quem tem autoridade",
+      "acoes_incorretas": [
+        {
+          "texto": "Ocultar até o relatório",
+          "porque": "Esperar o relatório impede que o revisado investigue e corrija a tempo."
+        },
+        {
+          "texto": "Avisar o cliente do revisado",
+          "porque": "Informações da revisão não vão ao cliente do revisado; há sigilo."
+        }
+      ],
+      "explicacao": "O revisor informa prontamente alguém com autoridade no revisado, que investiga e documenta as ações.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    },
+    {
+      "id": "DL-024",
+      "nivel": "dificil",
+      "tema": "Deficiências isoladas",
+      "tipo": "tipo_relatorio",
+      "referencia": "NBC PA 11, itens 41 e 42",
+      "cenario": "O revisor achou uma deficiência isolada e irrelevante. O que ele faz?",
+      "acao_correta": "Avaliar padrão e impacto",
+      "acoes_incorretas": [
+        {
+          "texto": "Emitir relatório inadequado",
+          "porque": "Inadequado exige desconformidade do sistema, não um erro isolado."
+        },
+        {
+          "texto": "Ignorar sem registrar",
+          "porque": "Todo apontamento deve ser registrado nos papéis de trabalho."
+        }
+      ],
+      "explicacao": "O revisor avalia padrão e impacto no sistema; se isolada e irrelevante, não modifica o relatório, mas registra o apontamento.",
+      "modos": [
+        "desvio_logico",
+        "maleta_certa"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1200 @@
+{
+  "schema": "quiz_auditoria",
+  "versao": "1.0",
+  "idioma": "pt-BR",
+  "fonte": "NBC PA 11 – Revisão Externa de Qualidade pelos Pares (CFC, 8/12/2017, vigente desde 1/1/2019); Instruções aos Revisores (Anexo 2); Base de Conhecimento do jogo; provas EQT/QTG como apoio.",
+  "consumidores": [
+    "show_do_bilhao",
+    "perseguicao"
+  ],
+  "itens": [
+    {
+      "id": "QA-001",
+      "nivel": "facil",
+      "tema": "Escolha do revisor",
+      "referencia": "NBC PA 11, item 15",
+      "enunciado": "Quem é responsável por selecionar o auditor-revisor?",
+      "alternativas": {
+        "A": "O CRE",
+        "B": "O auditor-revisado",
+        "C": "A CVM",
+        "D": "O cliente selecionado"
+      },
+      "resposta_correta": "B",
+      "explicacao": "Cabe ao revisado escolher o revisor, observando porte e experiência no mínimo equivalentes. O CRE administra o programa, mas não escolhe.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem seleciona o revisor?",
+        "correta": "Auditor-revisado",
+        "distratores": [
+          "CRE",
+          "CVM"
+        ]
+      }
+    },
+    {
+      "id": "QA-002",
+      "nivel": "facil",
+      "tema": "Plano de ação",
+      "referencia": "NBC PA 11, item 46",
+      "enunciado": "Após receber a carta de recomendações, quem elabora o plano de ação?",
+      "alternativas": {
+        "A": "O auditor-revisor",
+        "B": "O CRE",
+        "C": "O cliente selecionado",
+        "D": "O auditor-revisado"
+      },
+      "resposta_correta": "D",
+      "explicacao": "O plano de ação descreve como o revisado corrigirá as fragilidades apontadas. O revisor apenas o recebe e encaminha ao CRE.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem elabora o plano de ação?",
+        "correta": "Auditor-revisado",
+        "distratores": [
+          "Auditor-revisor",
+          "CRE"
+        ]
+      }
+    },
+    {
+      "id": "QA-003",
+      "nivel": "facil",
+      "tema": "Plano de ação",
+      "referencia": "NBC PA 11, item 46",
+      "enunciado": "Quem encaminha o plano de ação ao CRE?",
+      "alternativas": {
+        "A": "O auditor-revisado",
+        "B": "O auditor-revisor",
+        "C": "O CFC",
+        "D": "O cliente selecionado"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O revisado entrega o plano ao revisor, e é o revisor que faz o encaminhamento ao CRE, junto do relatório e da carta.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem encaminha o plano ao CRE?",
+        "correta": "Auditor-revisor",
+        "distratores": [
+          "Auditor-revisado",
+          "Cliente"
+        ]
+      }
+    },
+    {
+      "id": "QA-004",
+      "nivel": "facil",
+      "tema": "Administração do programa",
+      "referencia": "NBC PA 11, itens 6 e 7",
+      "enunciado": "Qual órgão administra o Programa de Revisão Externa de Qualidade?",
+      "alternativas": {
+        "A": "CVM",
+        "B": "CRE",
+        "C": "Susep",
+        "D": "Previc"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O CRE (Comitê Administrador da Revisão Externa de Qualidade) administra o programa. As atividades operacionais ficam a cargo do CFC.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem administra o programa?",
+        "correta": "CRE",
+        "distratores": [
+          "CVM",
+          "Susep"
+        ]
+      }
+    },
+    {
+      "id": "QA-005",
+      "nivel": "facil",
+      "tema": "Guarda de documentos",
+      "referencia": "NBC PA 11, item 28(g)",
+      "enunciado": "Por quanto tempo o revisor guarda a documentação da revisão?",
+      "alternativas": {
+        "A": "3 anos",
+        "B": "5 anos",
+        "C": "7 anos",
+        "D": "10 anos"
+      },
+      "resposta_correta": "C",
+      "explicacao": "A guarda é de 7 anos, contados da data de emissão do relatório de revisão. Descartar antes é descumprir a norma.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Prazo de guarda da documentação?",
+        "correta": "7 anos",
+        "distratores": [
+          "3 anos",
+          "5 anos"
+        ]
+      }
+    },
+    {
+      "id": "QA-006",
+      "nivel": "facil",
+      "tema": "Independência",
+      "referencia": "NBC PA 11, item 24",
+      "enunciado": "Qual é a regra sobre revisão recíproca entre auditores?",
+      "alternativas": {
+        "A": "Permitida com aval do CRE",
+        "B": "Vedada",
+        "C": "Permitida após 4 anos",
+        "D": "Permitida entre firmas iguais"
+      },
+      "resposta_correta": "B",
+      "explicacao": "Revisões recíprocas são vedadas: ocorrem quando o revisor foi revisado pelo atual revisado, sem importar o intervalo de tempo.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Revisão recíproca é...",
+        "correta": "Vedada",
+        "distratores": [
+          "Permitida",
+          "Opcional"
+        ]
+      }
+    },
+    {
+      "id": "QA-007",
+      "nivel": "facil",
+      "tema": "Composição do CRE",
+      "referencia": "NBC PA 11, item 8",
+      "enunciado": "Como o CRE é composto?",
+      "alternativas": {
+        "A": "4 do CFC e 4 do Ibracon",
+        "B": "8 do CFC",
+        "C": "4 do CFC e 4 da CVM",
+        "D": "2 do CFC e 6 do Ibracon"
+      },
+      "resposta_correta": "A",
+      "explicacao": "São 4 representantes do CFC e 4 do Ibracon. CVM, BCB, Susep e Previc podem participar apenas como observadores, sem voto.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Composição do CRE?",
+        "correta": "4 CFC e 4 Ibracon",
+        "distratores": [
+          "8 do CFC",
+          "4 CFC e 4 CVM"
+        ]
+      }
+    },
+    {
+      "id": "QA-008",
+      "nivel": "facil",
+      "tema": "Periodicidade",
+      "referencia": "NBC PA 11, item 14",
+      "enunciado": "Com que frequência mínima o auditor se submete à revisão pelos pares?",
+      "alternativas": {
+        "A": "Todo ano",
+        "B": "A cada 2 anos",
+        "C": "A cada 4 anos",
+        "D": "A cada 5 anos"
+      },
+      "resposta_correta": "C",
+      "explicacao": "A exigência é de pelo menos uma revisão a cada ciclo de quatro anos. Não é anual, salvo decisão específica do CRE.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Ciclo mínimo de revisão?",
+        "correta": "A cada 4 anos",
+        "distratores": [
+          "Todo ano",
+          "A cada 2 anos"
+        ]
+      }
+    },
+    {
+      "id": "QA-009",
+      "nivel": "facil",
+      "tema": "Prazos",
+      "referencia": "NBC PA 11, item 48",
+      "enunciado": "Qual o prazo máximo para o revisado elaborar o plano de ação?",
+      "alternativas": {
+        "A": "15 dias",
+        "B": "30 dias",
+        "C": "60 dias",
+        "D": "90 dias"
+      },
+      "resposta_correta": "B",
+      "explicacao": "São 30 dias, contados do recebimento do relatório e da carta de recomendações. Também valem os prazos fixados pelo CRE.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Prazo do plano de ação?",
+        "correta": "30 dias",
+        "distratores": [
+          "15 dias",
+          "90 dias"
+        ]
+      }
+    },
+    {
+      "id": "QA-010",
+      "nivel": "facil",
+      "tema": "Confidencialidade",
+      "referencia": "NBC PA 11, item 21",
+      "enunciado": "Quem integra a equipe revisora pode divulgar o que viu na revisão?",
+      "alternativas": {
+        "A": "Sim, após aprovar o relatório",
+        "B": "Sim, sem citar nomes",
+        "C": "Não, em nenhuma fase",
+        "D": "Sim, a outros auditores"
+      },
+      "resposta_correta": "C",
+      "explicacao": "É vedado divulgar qualquer informação obtida na revisão, em qualquer fase do trabalho. O sigilo permanece após o término.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Revisor pode divulgar o que viu?",
+        "correta": "Não, é sigilo",
+        "distratores": [
+          "Sim, sem nomes",
+          "Sim, ao fim"
+        ]
+      }
+    },
+    {
+      "id": "QA-011",
+      "nivel": "facil",
+      "tema": "Objetivo da revisão",
+      "referencia": "NBC PA 11, itens 1 e 2",
+      "enunciado": "A revisão pelos pares é, essencialmente, um processo de:",
+      "alternativas": {
+        "A": "Auditar as demonstrações dos clientes",
+        "B": "Acompanhar o controle de qualidade do auditor",
+        "C": "Fiscalizar honorários cobrados",
+        "D": "Julgar disputas entre auditores"
+      },
+      "resposta_correta": "B",
+      "explicacao": "É o acompanhamento do controle de qualidade dos trabalhos dos auditores independentes. Não reaudita os clientes do revisado.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "A revisão avalia o quê?",
+        "correta": "Controle de qualidade",
+        "distratores": [
+          "Clientes do revisado",
+          "Honorários"
+        ]
+      }
+    },
+    {
+      "id": "QA-012",
+      "nivel": "facil",
+      "tema": "Carta de recomendações",
+      "referencia": "NBC PA 11, item 45",
+      "enunciado": "Quem emite a carta de recomendações?",
+      "alternativas": {
+        "A": "O auditor-revisado",
+        "B": "O CRE",
+        "C": "O auditor-revisor",
+        "D": "O CFC"
+      },
+      "resposta_correta": "C",
+      "explicacao": "O revisor emite a carta, que é obrigatória e segue o modelo do CRE. Nela estão a relação de clientes selecionados e as recomendações.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem emite a carta?",
+        "correta": "Auditor-revisor",
+        "distratores": [
+          "Auditor-revisado",
+          "CRE"
+        ]
+      }
+    },
+    {
+      "id": "QA-013",
+      "nivel": "facil",
+      "tema": "Aprovação do relatório",
+      "referencia": "NBC PA 11, item 20",
+      "enunciado": "Quem decide se o relatório de revisão é aprovado?",
+      "alternativas": {
+        "A": "O auditor-revisor",
+        "B": "O auditor-revisado",
+        "C": "O CRE",
+        "D": "A CVM"
+      },
+      "resposta_correta": "C",
+      "explicacao": "O CRE analisa relatório, plano de ação e esclarecimentos e aprova, ou não, o relatório de revisão.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem aprova o relatório?",
+        "correta": "CRE",
+        "distratores": [
+          "Revisor",
+          "CVM"
+        ]
+      }
+    },
+    {
+      "id": "QA-014",
+      "nivel": "facil",
+      "tema": "Organização do trabalho",
+      "referencia": "NBC PA 11, item 28(b)",
+      "enunciado": "Quem supervisiona o trabalho dos membros da equipe revisora?",
+      "alternativas": {
+        "A": "O CRE",
+        "B": "O revisado",
+        "C": "O revisor",
+        "D": "O cliente"
+      },
+      "resposta_correta": "C",
+      "explicacao": "O revisor organiza, planeja, conduz e supervisiona os trabalhos da equipe. A delegação sem supervisão é falha de organização.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem supervisiona a equipe?",
+        "correta": "Auditor-revisor",
+        "distratores": [
+          "CRE",
+          "Revisado"
+        ]
+      }
+    },
+    {
+      "id": "QA-015",
+      "nivel": "facil",
+      "tema": "Tipos de relatório",
+      "referencia": "NBC PA 11, item 38",
+      "enunciado": "Quantos tipos de relatório de revisão a NBC PA 11 prevê?",
+      "alternativas": {
+        "A": "2",
+        "B": "3",
+        "C": "4",
+        "D": "5"
+      },
+      "resposta_correta": "C",
+      "explicacao": "São quatro: sistema adequado, com deficiências, inadequado e com limitação de escopo ao trabalho do revisor.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quantos tipos de relatório?",
+        "correta": "4 tipos",
+        "distratores": [
+          "2 tipos",
+          "6 tipos"
+        ]
+      }
+    },
+    {
+      "id": "QA-016",
+      "nivel": "normal",
+      "tema": "Tipos de relatório",
+      "referencia": "NBC PA 11, item 38(a)",
+      "enunciado": "O sistema foi bem projetado e cumprido, sem deficiências relevantes. Qual relatório?",
+      "alternativas": {
+        "A": "Sistema adequado",
+        "B": "Com deficiências",
+        "C": "Inadequado",
+        "D": "Limitação de escopo"
+      },
+      "resposta_correta": "A",
+      "explicacao": "Quando o revisor conclui que o sistema de controle de qualidade foi adequadamente projetado e está sendo plenamente cumprido, emite o relatório de sistema adequado.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Sistema bem cumprido: relatório?",
+        "correta": "Sistema adequado",
+        "distratores": [
+          "Inadequado",
+          "Limitação"
+        ]
+      }
+    },
+    {
+      "id": "QA-017",
+      "nivel": "normal",
+      "tema": "Tipos de relatório",
+      "referencia": "NBC PA 11, item 38(c)",
+      "enunciado": "Políticas de qualidade em desconformidade com as NBC. Qual relatório?",
+      "alternativas": {
+        "A": "Sistema adequado",
+        "B": "Com deficiências",
+        "C": "Limitação de escopo",
+        "D": "Sistema inadequado"
+      },
+      "resposta_correta": "D",
+      "explicacao": "Políticas ou procedimentos em desconformidade com as normas, ou seu descumprimento, levam ao relatório de sistema inadequado.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Políticas fora das normas: relatório?",
+        "correta": "Sistema inadequado",
+        "distratores": [
+          "Adequado",
+          "Com deficiências"
+        ]
+      }
+    },
+    {
+      "id": "QA-018",
+      "nivel": "normal",
+      "tema": "Tipos de relatório",
+      "referencia": "NBC PA 11, item 38(d)",
+      "enunciado": "Condições limitam o trabalho e o revisor não consegue concluir. Qual relatório?",
+      "alternativas": {
+        "A": "Sistema adequado",
+        "B": "Com deficiências",
+        "C": "Limitação de escopo",
+        "D": "Sistema inadequado"
+      },
+      "resposta_correta": "C",
+      "explicacao": "É o relatório com limitação de escopo ao trabalho do revisor: faltam condições de concluir sobre a revisão.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Revisor não consegue concluir?",
+        "correta": "Limitação de escopo",
+        "distratores": [
+          "Adequado",
+          "Inadequado"
+        ]
+      }
+    },
+    {
+      "id": "QA-019",
+      "nivel": "normal",
+      "tema": "Tipos de relatório",
+      "referencia": "NBC PA 11, item 39",
+      "enunciado": "O revisado não fez auditoria no ano-base. Isso configura:",
+      "alternativas": {
+        "A": "Limitação de escopo",
+        "B": "Ausência de limitação de escopo",
+        "C": "Cancelamento da revisão",
+        "D": "Sistema inadequado"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O item 39 diz que a ausência de trabalhos de auditoria no ano-base não indica limitação de escopo para o revisor.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Sem auditoria no ano-base?",
+        "correta": "Não é limitação",
+        "distratores": [
+          "É limitação",
+          "Cancela revisão"
+        ]
+      }
+    },
+    {
+      "id": "QA-020",
+      "nivel": "normal",
+      "tema": "Comunicação do CRE",
+      "referencia": "NBC PA 11, itens 20 e 38",
+      "enunciado": "O CRE faz comunicação específica ao CFC e à CVM nos relatórios:",
+      "alternativas": {
+        "A": "Adequado e com deficiências",
+        "B": "Todos os tipos",
+        "C": "Inadequado e limitação de escopo",
+        "D": "Somente adequado"
+      },
+      "resposta_correta": "C",
+      "explicacao": "A comunicação à Fiscalização do CFC e da CVM ocorre nos relatórios previstos nas alíneas (c) e (d) do item 38.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Comunica CFC/CVM em qual relatório?",
+        "correta": "Inadequado",
+        "distratores": [
+          "Adequado",
+          "Com deficiências"
+        ]
+      }
+    },
+    {
+      "id": "QA-021",
+      "nivel": "normal",
+      "tema": "Nova revisão",
+      "referencia": "NBC PA 11, item 19",
+      "enunciado": "Qual situação obriga o revisado a nova revisão no ano seguinte?",
+      "alternativas": {
+        "A": "Relatório adequado",
+        "B": "Relatório com deficiências",
+        "C": "Relatório inadequado",
+        "D": "Plano entregue no prazo"
+      },
+      "resposta_correta": "C",
+      "explicacao": "Relatório inadequado ou com limitação de escopo, não aprovação pelo CRE e descumprimento de prazos geram nova revisão no ano subsequente.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quando há nova revisão no ano seguinte?",
+        "correta": "Relatório inadequado",
+        "distratores": [
+          "Relatório adequado",
+          "Prazo cumprido"
+        ]
+      }
+    },
+    {
+      "id": "QA-022",
+      "nivel": "normal",
+      "tema": "Independência",
+      "referencia": "NBC PA 11, item 23",
+      "enunciado": "Membro da equipe revisora tem investimento em cliente do revisado. Ele:",
+      "alternativas": {
+        "A": "Nunca pode ser revisor",
+        "B": "Pode, mas não revisa esse cliente",
+        "C": "Revisa normalmente",
+        "D": "Revisa se avisar o CRE"
+      },
+      "resposta_correta": "B",
+      "explicacao": "É permitido ter o investimento, mas o membro não pode participar da revisão dos trabalhos desse cliente.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Investe em cliente do revisado?",
+        "correta": "Não revisa esse cliente",
+        "distratores": [
+          "Revisa normalmente",
+          "Sai de tudo"
+        ]
+      }
+    },
+    {
+      "id": "QA-023",
+      "nivel": "normal",
+      "tema": "Escolha do revisor",
+      "referencia": "NBC PA 11, item 15",
+      "enunciado": "Ao escolher o revisor, o revisado observa porte e experiência:",
+      "alternativas": {
+        "A": "Inferiores",
+        "B": "No mínimo equivalentes",
+        "C": "Idênticos em clientes",
+        "D": "Irrelevantes"
+      },
+      "resposta_correta": "B",
+      "explicacao": "A escolha deve respeitar porte e experiência no mínimo equivalentes aos do revisado, além dos impedimentos do item 26.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Porte do revisor deve ser...",
+        "correta": "No mínimo equivalente",
+        "distratores": [
+          "Menor",
+          "Irrelevante"
+        ]
+      }
+    },
+    {
+      "id": "QA-024",
+      "nivel": "normal",
+      "tema": "Seleção da amostra",
+      "referencia": "NBC PA 11, item 32",
+      "enunciado": "Quais clientes entram obrigatoriamente na amostra, se o revisado os tiver?",
+      "alternativas": {
+        "A": "Os escolhidos pelo revisado",
+        "B": "Os de menor porte",
+        "C": "Regulados por CVM, BCB, Susep e Previc",
+        "D": "Somente os sem litígio"
+      },
+      "resposta_correta": "C",
+      "explicacao": "O revisor deve incluir trabalhos de entidades reguladas pela CVM, BCB, Susep e Previc quando o revisado as tiver na carteira.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem entra na amostra por obrigação?",
+        "correta": "Clientes regulados",
+        "distratores": [
+          "Menores clientes",
+          "Sem litígio"
+        ]
+      }
+    },
+    {
+      "id": "QA-025",
+      "nivel": "normal",
+      "tema": "Restrição de acesso",
+      "referencia": "NBC PA 11, itens 33 e 34",
+      "enunciado": "O revisado exclui um cliente por litígio. O que a equipe faz?",
+      "alternativas": {
+        "A": "Aceita sem registro",
+        "B": "Avalia e documenta as razões",
+        "C": "Acessa mesmo assim",
+        "D": "Encerra a revisão"
+      },
+      "resposta_correta": "B",
+      "explicacao": "A equipe avalia e documenta as razões. Se discordar, considera o efeito no relatório e envia ao CRE as alegações e sua avaliação.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Cliente excluído por litígio: e agora?",
+        "correta": "Avaliar e documentar",
+        "distratores": [
+          "Ignorar",
+          "Acessar assim"
+        ]
+      }
+    },
+    {
+      "id": "QA-026",
+      "nivel": "normal",
+      "tema": "Escopo da revisão",
+      "referencia": "NBC PA 11, item 29",
+      "enunciado": "A revisão abrange, exclusivamente, aspectos de:",
+      "alternativas": {
+        "A": "Honorários e preços",
+        "B": "Atendimento às normas técnicas e profissionais",
+        "C": "Rentabilidade da firma",
+        "D": "Relação comercial com clientes"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O foco é o atendimento às NBC técnicas e profissionais do CFC e, quando aplicável, às normas de órgãos reguladores.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "A revisão foca em...",
+        "correta": "Normas técnicas",
+        "distratores": [
+          "Honorários",
+          "Lucro da firma"
+        ]
+      }
+    },
+    {
+      "id": "QA-027",
+      "nivel": "normal",
+      "tema": "Recurso",
+      "referencia": "NBC PA 11, item 56",
+      "enunciado": "Qual o prazo para recorrer de decisão do CRE?",
+      "alternativas": {
+        "A": "5 dias",
+        "B": "10 dias",
+        "C": "15 dias",
+        "D": "30 dias"
+      },
+      "resposta_correta": "C",
+      "explicacao": "O recurso é interposto ao próprio CRE em 15 dias após a notificação, e analisado por membro diferente do relator.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Prazo de recurso ao CRE?",
+        "correta": "15 dias",
+        "distratores": [
+          "5 dias",
+          "60 dias"
+        ]
+      }
+    },
+    {
+      "id": "QA-028",
+      "nivel": "normal",
+      "tema": "Prazos do programa",
+      "referencia": "NBC PA 11, itens 51 e 52",
+      "enunciado": "Até quando o CRE divulga a lista dos auditores selecionados?",
+      "alternativas": {
+        "A": "31 de janeiro",
+        "B": "28 de fevereiro",
+        "C": "31 de março",
+        "D": "30 de abril"
+      },
+      "resposta_correta": "B",
+      "explicacao": "A lista é divulgada até 28 de fevereiro. Já as guias de orientação são emitidas e atualizadas até 31 de março.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Lista de selecionados sai até...",
+        "correta": "28 de fevereiro",
+        "distratores": [
+          "31 de março",
+          "30 de abril"
+        ]
+      }
+    },
+    {
+      "id": "QA-029",
+      "nivel": "normal",
+      "tema": "Alcance",
+      "referencia": "NBC PA 11, item 4 (Revisão NBC 03)",
+      "enunciado": "A NBC PA 11 se aplica a auditores com registro:",
+      "alternativas": {
+        "A": "Só no CRC",
+        "B": "Na CVM e/ou no CNAI-PJ",
+        "C": "Só na Susep",
+        "D": "Em qualquer órgão"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O alcance, conforme alteração da Revisão NBC 03, abrange auditores registrados na CVM e/ou no CNAI-PJ.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "A norma vale para registro em...",
+        "correta": "CVM e/ou CNAI-PJ",
+        "distratores": [
+          "Só CRC",
+          "Só Susep"
+        ]
+      }
+    },
+    {
+      "id": "QA-030",
+      "nivel": "normal",
+      "tema": "Periodicidade",
+      "referencia": "NBC PA 11, item 14(a)",
+      "enunciado": "Auditor que obteve registro na CVM no ano anterior é:",
+      "alternativas": {
+        "A": "Dispensado do programa",
+        "B": "Incluído obrigatoriamente",
+        "C": "Incluído se quiser",
+        "D": "Incluído após 4 anos"
+      },
+      "resposta_correta": "B",
+      "explicacao": "Os registrados na CVM no ano anterior entram obrigatoriamente no programa daquele ano.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Novo registro na CVM entra?",
+        "correta": "Sim, obrigatoriamente",
+        "distratores": [
+          "Não entra",
+          "Só se pedir"
+        ]
+      }
+    },
+    {
+      "id": "QA-031",
+      "nivel": "dificil",
+      "tema": "Impedimentos do revisor",
+      "referencia": "NBC PA 11, item 26(b)",
+      "enunciado": "Qual último relatório de revisão IMPEDE o auditor de atuar como revisor?",
+      "alternativas": {
+        "A": "Sistema adequado",
+        "B": "Com deficiências",
+        "C": "Sistema inadequado",
+        "D": "Nenhum deles"
+      },
+      "resposta_correta": "C",
+      "explicacao": "Só os relatórios das alíneas (c) e (d) do item 38 impedem. O relatório com deficiências, sozinho, não é impedimento.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Qual relatório impede ser revisor?",
+        "correta": "Sistema inadequado",
+        "distratores": [
+          "Com deficiências",
+          "Adequado"
+        ]
+      }
+    },
+    {
+      "id": "QA-032",
+      "nivel": "dificil",
+      "tema": "Impedimentos do revisor",
+      "referencia": "NBC PA 11, item 26(i)",
+      "enunciado": "Para ser revisor, o auditor precisa ter feito ao menos uma auditoria nos últimos:",
+      "alternativas": {
+        "A": "1 ano",
+        "B": "2 anos",
+        "C": "3 anos",
+        "D": "4 anos"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O impedimento vale quando não houve nenhum trabalho de auditoria nos dois anos anteriores ao da revisão pretendida.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Auditoria recente exigida: quantos anos?",
+        "correta": "2 anos",
+        "distratores": [
+          "3 anos",
+          "5 anos"
+        ]
+      }
+    },
+    {
+      "id": "QA-033",
+      "nivel": "dificil",
+      "tema": "Impedimentos do revisor",
+      "referencia": "NBC PA 11, item 26(g)",
+      "enunciado": "Auditor que ainda não passou pela sua primeira revisão pelos pares:",
+      "alternativas": {
+        "A": "Pode ser revisor",
+        "B": "Não pode ser revisor",
+        "C": "Pode, com aval do CRE",
+        "D": "Pode, se for firma grande"
+      },
+      "resposta_correta": "B",
+      "explicacao": "Não ter sido submetido à primeira revisão pelos pares é hipótese de impedimento para atuar como revisor.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Nunca foi revisado: pode revisar?",
+        "correta": "Não pode",
+        "distratores": [
+          "Pode",
+          "Só com aval"
+        ]
+      }
+    },
+    {
+      "id": "QA-034",
+      "nivel": "dificil",
+      "tema": "Impedimentos do revisor",
+      "referencia": "NBC PA 11, item 26(e)",
+      "enunciado": "Revisor cujo relatório teve ressalva de limitação de escopo:",
+      "alternativas": {
+        "A": "Atua normalmente",
+        "B": "Fica impedido de revisar",
+        "C": "Revisa só firmas pequenas",
+        "D": "Revisa com aval do cliente"
+      },
+      "resposta_correta": "B",
+      "explicacao": "Existir, no relatório emitido pelo revisor, ressalva de limitação de escopo na execução dos seus trabalhos é impedimento.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Revisor com ressalva de limitação?",
+        "correta": "Fica impedido",
+        "distratores": [
+          "Atua normal",
+          "Só firma pequena"
+        ]
+      }
+    },
+    {
+      "id": "QA-035",
+      "nivel": "dificil",
+      "tema": "Definições",
+      "referencia": "NBC PA 11, item 5",
+      "enunciado": "O que caracteriza a revisão recíproca?",
+      "alternativas": {
+        "A": "Dois revisores na mesma firma",
+        "B": "O revisor ter sido revisado pelo atual revisado",
+        "C": "Revisar duas vezes o mesmo ano",
+        "D": "O revisor ser cliente do revisado"
+      },
+      "resposta_correta": "B",
+      "explicacao": "É a situação em que o revisor teve sua última revisão feita pelo atual revisado, não importando o intervalo entre as revisões.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Revisão recíproca é quando...",
+        "correta": "Revisor foi revisado pelo revisado",
+        "distratores": [
+          "Revisa duas vezes",
+          "Revisor é cliente"
+        ]
+      }
+    },
+    {
+      "id": "QA-036",
+      "nivel": "dificil",
+      "tema": "Definições",
+      "referencia": "NBC PA 11, item 5",
+      "enunciado": "Qual é o ano-base da revisão?",
+      "alternativas": {
+        "A": "O ano da indicação",
+        "B": "Ano anterior ao da indicação",
+        "C": "Dois anos após a indicação",
+        "D": "O ano do registro na CVM"
+      },
+      "resposta_correta": "B",
+      "explicacao": "É o ano anterior ao da indicação do revisado, ou o antecedente, caso ele não tenha realizado serviço de auditoria.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Ano-base da revisão?",
+        "correta": "Ano anterior à indicação",
+        "distratores": [
+          "Ano da indicação",
+          "Ano seguinte"
+        ]
+      }
+    },
+    {
+      "id": "QA-037",
+      "nivel": "dificil",
+      "tema": "Composição do CRE",
+      "referencia": "NBC PA 11, item 11",
+      "enunciado": "Representantes de CVM, BCB, Susep e Previc nas reuniões do CRE são:",
+      "alternativas": {
+        "A": "Membros com voto",
+        "B": "Observadores sem voto",
+        "C": "Relatores dos recursos",
+        "D": "Revisores adicionais"
+      },
+      "resposta_correta": "B",
+      "explicacao": "Participam como observadores, sem direito a voto, indicando previamente os nomes e sujeitos à confidencialidade do item 21.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Reguladores no CRE têm...",
+        "correta": "Observação, sem voto",
+        "distratores": [
+          "Voto de minerva",
+          "Voto pleno"
+        ]
+      }
+    },
+    {
+      "id": "QA-038",
+      "nivel": "dificil",
+      "tema": "Composição do CRE",
+      "referencia": "NBC PA 11, item 9",
+      "enunciado": "Qual o mandato dos representantes do CRE?",
+      "alternativas": {
+        "A": "1 ano",
+        "B": "2 anos",
+        "C": "3 anos, com até 2 reconduções",
+        "D": "5 anos, sem recondução"
+      },
+      "resposta_correta": "C",
+      "explicacao": "São nomeados por 3 anos, com no máximo duas reconduções, observada a renovação mínima de 25%.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Mandato no CRE?",
+        "correta": "3 anos",
+        "distratores": [
+          "1 ano",
+          "5 anos"
+        ]
+      }
+    },
+    {
+      "id": "QA-039",
+      "nivel": "dificil",
+      "tema": "Habilitação específica",
+      "referencia": "NBC PA 11, item 25(c)",
+      "enunciado": "Quem verifica a habilitação específica da equipe para clientes regulados?",
+      "alternativas": {
+        "A": "O CRE",
+        "B": "O revisor",
+        "C": "O auditor-revisado",
+        "D": "A CVM"
+      },
+      "resposta_correta": "C",
+      "explicacao": "A equipe precisa de habilitação para as entidades reguladas que revisar, mas a verificação cabe ao revisado.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Quem verifica a habilitação da equipe?",
+        "correta": "Auditor-revisado",
+        "distratores": [
+          "CRE",
+          "CVM"
+        ]
+      }
+    },
+    {
+      "id": "QA-040",
+      "nivel": "dificil",
+      "tema": "Descumprimento de prazos",
+      "referencia": "NBC PA 11, itens 54 e 55",
+      "enunciado": "Revisor ou revisado que descumpre prazos do CRE fica:",
+      "alternativas": {
+        "A": "Sem consequência",
+        "B": "Impedido de revisar e revisado no ano seguinte",
+        "C": "Apenas advertido",
+        "D": "Isento de nova revisão"
+      },
+      "resposta_correta": "B",
+      "explicacao": "Fica automaticamente impedido de atuar como revisor e se submete à revisão no ano subsequente, sem se eximir de pendências anteriores.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Perdeu o prazo do CRE: consequência?",
+        "correta": "Impedido e nova revisão",
+        "distratores": [
+          "Nenhuma",
+          "Só advertência"
+        ]
+      }
+    },
+    {
+      "id": "QA-041",
+      "nivel": "dificil",
+      "tema": "Deficiências isoladas",
+      "referencia": "NBC PA 11, itens 41 e 42",
+      "enunciado": "Deficiências isoladas e irrelevantes levam, sempre, a relatório modificado?",
+      "alternativas": {
+        "A": "Sim, sempre",
+        "B": "Não, conforme julgamento do revisor",
+        "C": "Sim, se houver carta",
+        "D": "Não, e nem se registram"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O revisor avalia padrão e impacto; se isoladas e irrelevantes, não há relatório modificado. Os apontamentos continuam registrados nos papéis.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Falha isolada e irrelevante: sempre modifica?",
+        "correta": "Não, julgamento",
+        "distratores": [
+          "Sim, sempre",
+          "Sim, se houver carta"
+        ]
+      }
+    },
+    {
+      "id": "QA-042",
+      "nivel": "dificil",
+      "tema": "Conteúdo do relatório",
+      "referencia": "NBC PA 11, item 37",
+      "enunciado": "Qual item NÃO consta do relatório do revisor?",
+      "alternativas": {
+        "A": "Escopo e limitações",
+        "B": "Carta de recomendações",
+        "C": "Opinião sobre as políticas de qualidade",
+        "D": "Parecer sobre as demonstrações dos clientes"
+      },
+      "resposta_correta": "D",
+      "explicacao": "O relatório traz escopo, carta, limitações do sistema de qualidade e opinião sobre políticas e procedimentos. Não opina sobre as demonstrações dos clientes.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "O que o relatório NÃO traz?",
+        "correta": "Parecer dos clientes",
+        "distratores": [
+          "Escopo",
+          "Opinião sobre políticas"
+        ]
+      }
+    },
+    {
+      "id": "QA-043",
+      "nivel": "dificil",
+      "tema": "Aspectos comerciais",
+      "referencia": "Instruções CRE (Anexo 2), item 15",
+      "enunciado": "Ao avaliar a supervisão de um trabalho, o revisor pode indagar sobre honorários do cliente?",
+      "alternativas": {
+        "A": "Sim, sempre",
+        "B": "Não, aspectos comerciais fora do escopo",
+        "C": "Sim, se o CRE pedir",
+        "D": "Sim, só de clientes regulados"
+      },
+      "resposta_correta": "B",
+      "explicacao": "A revisão trata dos aspectos profissionais, não dos comerciais. Pode considerar o tempo gasto, mas não os honorários cobrados.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Revisor pergunta honorários?",
+        "correta": "Não pode",
+        "distratores": [
+          "Pode",
+          "Só se quiser"
+        ]
+      }
+    },
+    {
+      "id": "QA-044",
+      "nivel": "dificil",
+      "tema": "Equipe revisora",
+      "referencia": "NBC PA 11, item 25(a)",
+      "enunciado": "Equipe só de iniciantes revisa firma com clientes complexos. Está:",
+      "alternativas": {
+        "A": "Adequada",
+        "B": "Inadequada: falta experiência compatível",
+        "C": "Adequada, se o revisado aceitar",
+        "D": "Adequada, se for numerosa"
+      },
+      "resposta_correta": "B",
+      "explicacao": "O revisor precisa de experiência técnica e recursos compatíveis, sobretudo em trabalhos de complexidade similar.",
+      "modos": [
+        "show_do_bilhao",
+        "perseguicao"
+      ],
+      "rapida": {
+        "enunciado": "Equipe iniciante em caso complexo?",
+        "correta": "Inadequada",
+        "distratores": [
+          "Adequada",
+          "Só se numerosa"
+        ]
+      }
+    }
+  ]
+}

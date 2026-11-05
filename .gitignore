@@ -1,0 +1,37 @@
+# ==========================================
+# CONTAL MASTER .gitignore
+# ==========================================
+
+# Exportações do jogo e executáveis compilados
+*.translation
+*.html
+*.pck
+*.zip
+*.tar.gz
+*.apk
+*.aab
+*.ipa
+*.exe
+*.dll
+*.so
+*.dylib
+*.dmg
+*.app
+*.iso
+
+# Configurações de exportação com chaves de assinatura ou senhas locais
+export_presets.cfg
+
+# Arquivos de editores e IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Arquivos temporários do sistema operacional
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+.godot/
+/android/

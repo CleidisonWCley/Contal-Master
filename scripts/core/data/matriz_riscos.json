@@ -1,0 +1,801 @@
+{
+  "schema": "matriz_riscos",
+  "versao": "1.0",
+  "idioma": "pt-BR",
+  "fonte": "NBC PA 11 – Revisão Externa de Qualidade pelos Pares (CFC, 8/12/2017, vigente desde 1/1/2019); Instruções aos Revisores (Anexo 2); Base de Conhecimento do jogo; provas EQT/QTG como apoio.",
+  "consumidores": [
+    "batalha_naval",
+    "roleta_risco"
+  ],
+  "batalha_naval": {
+    "ameacas": [
+      {
+        "id": "BN-001",
+        "nivel": "facil",
+        "tema": "Independência",
+        "ameaca": "Revisão recíproca",
+        "controle": "Indicar outro revisor",
+        "consequencia": "Vedação da norma; revisão não pode seguir.",
+        "explicacao": "Revisão recíproca é vedada: o revisor não pode ter sido revisado pelo atual revisado, sem limite de tempo.",
+        "referencia": "NBC PA 11, item 24"
+      },
+      {
+        "id": "BN-002",
+        "nivel": "facil",
+        "tema": "Confidencialidade",
+        "ameaca": "Divulgar falhas a terceiros",
+        "controle": "Manter o sigilo",
+        "consequencia": "Infração disciplinar e quebra de sigilo.",
+        "explicacao": "Membros do CRE e das equipes não divulgam informações obtidas na revisão, em nenhuma fase do trabalho.",
+        "referencia": "NBC PA 11, itens 21 e 60"
+      },
+      {
+        "id": "BN-003",
+        "nivel": "facil",
+        "tema": "Confidencialidade",
+        "ameaca": "Cliente captado pela revisão",
+        "controle": "Não usar a informação",
+        "consequencia": "Uso indevido de informação confidencial.",
+        "explicacao": "Informação da revisão não serve para conquistar clientes; isso é benefício próprio e viola o sigilo.",
+        "referencia": "Base do jogo, seção 3"
+      },
+      {
+        "id": "BN-004",
+        "nivel": "facil",
+        "tema": "Conflito de interesses",
+        "ameaca": "Presente de cliente",
+        "controle": "Recusar e documentar",
+        "consequencia": "Ameaça de interesse próprio.",
+        "explicacao": "Presentes e favores comprometem a imparcialidade. Recusa-se e registra-se o fato.",
+        "referencia": "Base do jogo, dilema 7"
+      },
+      {
+        "id": "BN-005",
+        "nivel": "facil",
+        "tema": "Independência",
+        "ameaca": "Parente sócio do revisado",
+        "controle": "Declarar e se afastar",
+        "consequencia": "Ameaça de familiaridade.",
+        "explicacao": "Parentesco próximo com sócio do revisado gera conflito de interesses e afasta o revisor.",
+        "referencia": "Base do jogo, dilema 2"
+      },
+      {
+        "id": "BN-006",
+        "nivel": "facil",
+        "tema": "Prazos",
+        "ameaca": "Plano de ação sem prazo",
+        "controle": "Entregar em até 30 dias",
+        "consequencia": "Risco de nova revisão no ano seguinte.",
+        "explicacao": "O revisado tem 30 dias, do recebimento do relatório e da carta, para elaborar o plano de ação.",
+        "referencia": "NBC PA 11, item 48"
+      },
+      {
+        "id": "BN-007",
+        "nivel": "facil",
+        "tema": "Guarda de documentos",
+        "ameaca": "Arquivos apagados cedo",
+        "controle": "Guardar por 7 anos",
+        "consequencia": "Descumprimento da norma.",
+        "explicacao": "O revisor guarda a documentação por sete anos, contados da emissão do relatório.",
+        "referencia": "NBC PA 11, item 28(g)"
+      },
+      {
+        "id": "BN-008",
+        "nivel": "facil",
+        "tema": "Acesso aos clientes",
+        "ameaca": "Acesso sem autorização",
+        "controle": "Obter aprovação do cliente",
+        "consequencia": "Acesso irregular aos papéis.",
+        "explicacao": "O revisado obtém aprovação de cada cliente selecionado, e o revisor envia confirmação de confidencialidade.",
+        "referencia": "Base do jogo, dilemas 4 e 5"
+      },
+      {
+        "id": "BN-009",
+        "nivel": "facil",
+        "tema": "Supervisão",
+        "ameaca": "Equipe sem supervisão",
+        "controle": "Supervisionar a equipe",
+        "consequencia": "Falha de organização do trabalho.",
+        "explicacao": "O revisor, ou o líder da equipe, supervisiona o trabalho dos membros da equipe revisora.",
+        "referencia": "NBC PA 11, item 28(b)"
+      },
+      {
+        "id": "BN-010",
+        "nivel": "facil",
+        "tema": "Planejamento",
+        "ameaca": "Revisão sem planejamento",
+        "controle": "Planejar antes de iniciar",
+        "consequencia": "Risco à qualidade da conclusão.",
+        "explicacao": "Organizar, planejar e conduzir os trabalhos é responsabilidade do revisor.",
+        "referencia": "NBC PA 11, item 28(a)"
+      },
+      {
+        "id": "BN-011",
+        "nivel": "facil",
+        "tema": "Comunicação",
+        "ameaca": "Resultados não discutidos",
+        "controle": "Discutir com a administração",
+        "consequencia": "Falha na comunicação dos achados.",
+        "explicacao": "O revisor comunica e discute os resultados com a administração do revisado antes de emitir relatório.",
+        "referencia": "NBC PA 11, itens 28(c) e 30(d)"
+      },
+      {
+        "id": "BN-012",
+        "nivel": "facil",
+        "tema": "Carta de recomendações",
+        "ameaca": "Carta não emitida",
+        "controle": "Emitir a carta obrigatória",
+        "consequencia": "Documentação incompleta.",
+        "explicacao": "A emissão da carta de recomendações pelo revisor é obrigatória e segue o modelo do CRE.",
+        "referencia": "NBC PA 11, item 45"
+      },
+      {
+        "id": "BN-013",
+        "nivel": "facil",
+        "tema": "Pressão indevida",
+        "ameaca": "Pressão por menos apontamentos",
+        "controle": "Recusar e documentar",
+        "consequencia": "Ameaça de intimidação.",
+        "explicacao": "Pressionar o revisor a apontar menos falhas ameaça a objetividade; ele mantém a conclusão e registra.",
+        "referencia": "Base do jogo, dilema 4"
+      },
+      {
+        "id": "BN-014",
+        "nivel": "facil",
+        "tema": "Independência",
+        "ameaca": "Amizade íntima com o sócio",
+        "controle": "Declarar e se afastar",
+        "consequencia": "Ameaça de familiaridade.",
+        "explicacao": "Amizade próxima reduz o ceticismo e a objetividade do revisor.",
+        "referencia": "Base do jogo, dilema 5"
+      },
+      {
+        "id": "BN-015",
+        "nivel": "facil",
+        "tema": "Plano de ação",
+        "ameaca": "Revisor elabora o plano",
+        "controle": "Revisado elabora o plano",
+        "consequencia": "Inversão de responsabilidades.",
+        "explicacao": "O plano de ação é do revisado; o revisor apenas o encaminha ao CRE.",
+        "referencia": "NBC PA 11, item 46"
+      },
+      {
+        "id": "BN-016",
+        "nivel": "normal",
+        "tema": "Independência",
+        "ameaca": "Ação em cliente do revisado",
+        "controle": "Não revisar esse cliente",
+        "consequencia": "Independência prejudicada nesse trabalho.",
+        "explicacao": "O membro pode ter o investimento, mas não pode revisar o trabalho do cliente em que investe.",
+        "referencia": "NBC PA 11, item 23"
+      },
+      {
+        "id": "BN-017",
+        "nivel": "normal",
+        "tema": "Autorrevisão",
+        "ameaca": "Revisar trabalho próprio",
+        "controle": "Afastar do trabalho",
+        "consequencia": "Ameaça de autorrevisão.",
+        "explicacao": "Quem participou do trabalho não deve revisá-lo sem tratamento adequado.",
+        "referencia": "Base do jogo, dilema 6"
+      },
+      {
+        "id": "BN-018",
+        "nivel": "normal",
+        "tema": "Restrição de acesso",
+        "ameaca": "Cliente exclui a amostra",
+        "controle": "Avaliar e documentar razões",
+        "consequencia": "Efeito possível no relatório.",
+        "explicacao": "Havendo restrição justificável, a equipe avalia e documenta as razões; se discordar, avalia o efeito no relatório.",
+        "referencia": "NBC PA 11, itens 33 e 34"
+      },
+      {
+        "id": "BN-019",
+        "nivel": "normal",
+        "tema": "Seleção da amostra",
+        "ameaca": "Cliente regulado fora da amostra",
+        "controle": "Incluir clientes regulados",
+        "consequencia": "Amostra incompleta.",
+        "explicacao": "A amostra inclui, obrigatoriamente, entidades reguladas por CVM, BCB, Susep e Previc, se houver.",
+        "referencia": "NBC PA 11, item 32"
+      },
+      {
+        "id": "BN-020",
+        "nivel": "normal",
+        "tema": "Habilitação",
+        "ameaca": "Equipe sem habilitação",
+        "controle": "Revisado confere habilitação",
+        "consequencia": "Impossibilidade de revisar o cliente.",
+        "explicacao": "Para clientes regulados com habilitação específica, a verificação cabe ao revisado.",
+        "referencia": "NBC PA 11, item 25(c)"
+      },
+      {
+        "id": "BN-021",
+        "nivel": "normal",
+        "tema": "Competência",
+        "ameaca": "Equipe sem experiência",
+        "controle": "Equipe compatível",
+        "consequencia": "Risco à qualidade da revisão.",
+        "explicacao": "A equipe precisa de experiência e recursos compatíveis com a complexidade dos trabalhos.",
+        "referencia": "NBC PA 11, item 25(a)"
+      },
+      {
+        "id": "BN-022",
+        "nivel": "normal",
+        "tema": "Tipo de relatório",
+        "ameaca": "Política fora das NBC",
+        "controle": "Relatório inadequado",
+        "consequencia": "Comunicação ao CFC e à CVM.",
+        "explicacao": "Políticas em desconformidade com as normas levam ao relatório de sistema inadequado.",
+        "referencia": "NBC PA 11, itens 20 e 38(c)"
+      },
+      {
+        "id": "BN-023",
+        "nivel": "normal",
+        "tema": "Limitação de escopo",
+        "ameaca": "Revisado não colabora",
+        "controle": "Relatório com limitação",
+        "consequencia": "Comunicação ao CFC e à CVM.",
+        "explicacao": "Quando o revisor não consegue concluir por limitação, emite relatório com limitação de escopo.",
+        "referencia": "NBC PA 11, itens 20 e 38(d)"
+      },
+      {
+        "id": "BN-024",
+        "nivel": "normal",
+        "tema": "Registro",
+        "ameaca": "Papéis sem justificativas",
+        "controle": "Registrar todos os apontamentos",
+        "consequencia": "Conclusão sem suporte.",
+        "explicacao": "O revisor registra apontamentos nos papéis, com justificativas do revisado e evidências.",
+        "referencia": "NBC PA 11, item 42"
+      },
+      {
+        "id": "BN-025",
+        "nivel": "normal",
+        "tema": "Ano-base",
+        "ameaca": "Ano-base errado",
+        "controle": "Usar o ano anterior à indicação",
+        "consequencia": "Revisão sobre período errado.",
+        "explicacao": "O ano-base é o anterior ao da indicação, ou o antecedente, sem auditoria feita.",
+        "referencia": "NBC PA 11, item 5"
+      },
+      {
+        "id": "BN-026",
+        "nivel": "normal",
+        "tema": "Escopo",
+        "ameaca": "Revisar honorários do cliente",
+        "controle": "Manter foco em normas",
+        "consequencia": "Revisão fora do escopo.",
+        "explicacao": "A revisão trata de aspectos profissionais, não comerciais, como honorários cobrados.",
+        "referencia": "NBC PA 11, item 29; Instruções, item 15"
+      },
+      {
+        "id": "BN-027",
+        "nivel": "normal",
+        "tema": "Vazamento",
+        "ameaca": "Arquivo enviado por engano",
+        "controle": "Comunicar de imediato",
+        "consequencia": "Risco de exposição de clientes.",
+        "explicacao": "Vazamentos devem ser comunicados na hora para conter e corrigir.",
+        "referencia": "Base do jogo, dilema 17"
+      },
+      {
+        "id": "BN-028",
+        "nivel": "normal",
+        "tema": "Armazenamento",
+        "ameaca": "Arquivos em pasta pública",
+        "controle": "Guardar com segurança",
+        "consequencia": "Risco de acesso indevido.",
+        "explicacao": "Sigilo exige cuidado também com armazenamento, não só com divulgação.",
+        "referencia": "Base do jogo, dilema 9"
+      },
+      {
+        "id": "BN-029",
+        "nivel": "normal",
+        "tema": "Prazos",
+        "ameaca": "Prazo do CRE perdido",
+        "controle": "Cumprir prazos do CRE",
+        "consequencia": "Impedimento e nova revisão.",
+        "explicacao": "Quem descumpre prazos fica impedido de ser revisor e se submete à revisão no ano seguinte.",
+        "referencia": "NBC PA 11, itens 19 e 54"
+      },
+      {
+        "id": "BN-030",
+        "nivel": "normal",
+        "tema": "Escolha do revisor",
+        "ameaca": "Revisor de porte inferior",
+        "controle": "Porte e experiência equivalentes",
+        "consequencia": "Indicação irregular.",
+        "explicacao": "O revisado escolhe revisor de porte e experiência no mínimo equivalentes.",
+        "referencia": "NBC PA 11, item 15"
+      },
+      {
+        "id": "BN-031",
+        "nivel": "dificil",
+        "tema": "Impedimento",
+        "ameaca": "Revisor com relatório inadequado",
+        "controle": "Escolher outro revisor",
+        "consequencia": "Revisor impedido de atuar.",
+        "explicacao": "Último relatório de revisão inadequado, ou com limitação, é hipótese de impedimento do revisor.",
+        "referencia": "NBC PA 11, item 26(b)"
+      },
+      {
+        "id": "BN-032",
+        "nivel": "dificil",
+        "tema": "Impedimento",
+        "ameaca": "Revisor sem auditoria em 2 anos",
+        "controle": "Exigir auditoria recente",
+        "consequencia": "Revisor impedido de atuar.",
+        "explicacao": "Sem nenhum trabalho de auditoria nos dois anos anteriores, o auditor não pode revisar.",
+        "referencia": "NBC PA 11, item 26(i)"
+      },
+      {
+        "id": "BN-033",
+        "nivel": "dificil",
+        "tema": "Impedimento",
+        "ameaca": "Registro suspenso na CVM",
+        "controle": "Verificar registros ativos",
+        "consequencia": "Revisor impedido de atuar.",
+        "explicacao": "Registro suspenso ou cancelado pela CVM ou CRC impede a atuação como revisor.",
+        "referencia": "NBC PA 11, item 26(a)"
+      },
+      {
+        "id": "BN-034",
+        "nivel": "dificil",
+        "tema": "Impedimento",
+        "ameaca": "Revisor nunca revisado",
+        "controle": "Exigir 1ª revisão feita",
+        "consequencia": "Revisor impedido de atuar.",
+        "explicacao": "Não ter passado pela primeira revisão pelos pares impede atuar como revisor.",
+        "referencia": "NBC PA 11, item 26(g)"
+      },
+      {
+        "id": "BN-035",
+        "nivel": "dificil",
+        "tema": "Registros",
+        "ameaca": "Profissional sem CNAI",
+        "controle": "Exigir registro no CNAI",
+        "consequencia": "Equipe não habilitada.",
+        "explicacao": "Todos os profissionais da revisão precisam de registro no CNAI.",
+        "referencia": "NBC PA 11, item 25(b)"
+      },
+      {
+        "id": "BN-036",
+        "nivel": "dificil",
+        "tema": "Revisão recíproca",
+        "ameaca": "Retribuição de revisões",
+        "controle": "Vedar e trocar o revisor",
+        "consequencia": "Vedação absoluta.",
+        "explicacao": "Não importa o intervalo entre as revisões: a reciprocidade é vedada.",
+        "referencia": "NBC PA 11, itens 5 e 24"
+      },
+      {
+        "id": "BN-037",
+        "nivel": "dificil",
+        "tema": "Tipo de relatório",
+        "ameaca": "Falha isolada e irrelevante",
+        "controle": "Avaliar padrão e impacto",
+        "consequencia": "Sem relatório modificado, mas registrado.",
+        "explicacao": "Deficiências isoladas e irrelevantes não implicam relatório modificado; o revisor avalia padrão e impacto.",
+        "referencia": "NBC PA 11, item 41"
+      },
+      {
+        "id": "BN-038",
+        "nivel": "dificil",
+        "tema": "Tipo de relatório",
+        "ameaca": "Sem trabalhos no ano-base",
+        "controle": "Não tratar como limitação",
+        "consequencia": "Sem limitação de escopo.",
+        "explicacao": "A ausência de auditoria no ano-base não indica limitação de escopo.",
+        "referencia": "NBC PA 11, item 39"
+      },
+      {
+        "id": "BN-039",
+        "nivel": "dificil",
+        "tema": "Comunicação",
+        "ameaca": "Falha relevante escondida",
+        "controle": "Informar quem tem autoridade",
+        "consequencia": "Revisado sem chance de investigar.",
+        "explicacao": "Indício de falha relevante é informado prontamente a alguém com autoridade no revisado.",
+        "referencia": "Instruções CRE, item 41"
+      },
+      {
+        "id": "BN-040",
+        "nivel": "dificil",
+        "tema": "Discordância",
+        "ameaca": "Divergência não registrada",
+        "controle": "Referenciar nos documentos",
+        "consequencia": "CRE sem visão da divergência.",
+        "explicacao": "Discordância sobre relatório ou carta deve ser referenciada nos documentos.",
+        "referencia": "Instruções CRE, item 56"
+      },
+      {
+        "id": "BN-041",
+        "nivel": "dificil",
+        "tema": "Recurso",
+        "ameaca": "Recurso fora do prazo",
+        "controle": "Recorrer em até 15 dias",
+        "consequencia": "Recurso não conhecido.",
+        "explicacao": "O recurso ao CRE cabe em 15 dias, com análise por membro diferente do relator.",
+        "referencia": "NBC PA 11, item 56"
+      },
+      {
+        "id": "BN-042",
+        "nivel": "dificil",
+        "tema": "Observadores",
+        "ameaca": "Regulador com voto no CRE",
+        "controle": "Observadores sem voto",
+        "consequencia": "Atuação além da norma.",
+        "explicacao": "CVM, BCB, Susep e Previc participam sem direito a voto e sob confidencialidade.",
+        "referencia": "NBC PA 11, item 11"
+      },
+      {
+        "id": "BN-043",
+        "nivel": "dificil",
+        "tema": "Periodicidade",
+        "ameaca": "Revisão fora do ciclo",
+        "controle": "Revisar a cada 4 anos",
+        "consequencia": "Descumprimento da periodicidade.",
+        "explicacao": "O auditor se submete à revisão ao menos uma vez a cada ciclo de quatro anos.",
+        "referencia": "NBC PA 11, item 14"
+      },
+      {
+        "id": "BN-044",
+        "nivel": "dificil",
+        "tema": "Ampliação de escopo",
+        "ameaca": "Falha relevante em um trabalho",
+        "controle": "Avaliar ampliar os testes",
+        "consequencia": "Risco de falha sistêmica.",
+        "explicacao": "Diante de falha relevante, avalia-se a ampliação do escopo para saber se é erro isolado ou deficiência do sistema.",
+        "referencia": "Instruções CRE, item 45"
+      },
+      {
+        "id": "BN-045",
+        "nivel": "dificil",
+        "tema": "Penalidades",
+        "ameaca": "Infração à NBC PA 11",
+        "controle": "Cumprir a norma",
+        "consequencia": "Infração disciplinar.",
+        "explicacao": "A inobservância da norma é infração disciplinar sujeita às penalidades do Art. 27 (c a g) do Decreto-Lei 9.295/46 e ao Código de Ética.",
+        "referencia": "NBC PA 11, item 60"
+      }
+    ]
+  },
+  "roleta_risco": {
+    "eventos": [
+      {
+        "id": "RR-001",
+        "nome": "Sigilo preservado",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "O revisor recusou comentar a revisão com um colega curioso.",
+        "aprendizado": "O sigilo vale em qualquer fase e permanece depois da revisão.",
+        "referencia": "NBC PA 11, item 21"
+      },
+      {
+        "id": "RR-002",
+        "nome": "Revisor independente",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "A revisora declarou o vínculo familiar e deixou o trabalho.",
+        "aprendizado": "Declarar e se afastar trata a ameaça de familiaridade e protege a objetividade.",
+        "referencia": "NBC PA 11, itens 22 e 23"
+      },
+      {
+        "id": "RR-003",
+        "nome": "Presente recusado",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "Um cliente ofereceu um presente e o revisor recusou e documentou.",
+        "aprendizado": "Recusar e registrar evita a ameaça de interesse próprio.",
+        "referencia": "Base do jogo, dilema 7"
+      },
+      {
+        "id": "RR-004",
+        "nome": "Plano no prazo",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "O revisado entregou o plano de ação dentro de 30 dias.",
+        "aprendizado": "Cumprir prazos evita impedimentos e nova revisão no ano seguinte.",
+        "referencia": "NBC PA 11, itens 48 e 54"
+      },
+      {
+        "id": "RR-005",
+        "nome": "Amostra completa",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "A amostra incluiu os clientes regulados por CVM, BCB, Susep e Previc.",
+        "aprendizado": "Clientes regulados entram obrigatoriamente na amostra.",
+        "referencia": "NBC PA 11, item 32"
+      },
+      {
+        "id": "RR-006",
+        "nome": "Equipe experiente",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "A equipe foi montada com experiência compatível à complexidade.",
+        "aprendizado": "Experiência e recursos compatíveis são requisito da revisão.",
+        "referencia": "NBC PA 11, item 25(a)"
+      },
+      {
+        "id": "RR-007",
+        "nome": "Equipe supervisionada",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "O líder revisou o trabalho dos analistas antes do relatório.",
+        "aprendizado": "Supervisão é responsabilidade do revisor ou do líder da equipe.",
+        "referencia": "NBC PA 11, item 28(b)"
+      },
+      {
+        "id": "RR-008",
+        "nome": "Autorização obtida",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "O revisado obteve a aprovação dos clientes selecionados.",
+        "aprendizado": "Sem aprovação do cliente, os papéis de trabalho não podem ser revistos.",
+        "referencia": "Base do jogo, dilema 4"
+      },
+      {
+        "id": "RR-009",
+        "nome": "Achados discutidos",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "O revisor discutiu os resultados com a administração antes do relatório.",
+        "aprendizado": "Comunicar e discutir resultados é dever do revisor.",
+        "referencia": "NBC PA 11, item 28(c)"
+      },
+      {
+        "id": "RR-010",
+        "nome": "Documentação guardada",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "O revisor guardou toda a documentação por sete anos.",
+        "aprendizado": "A guarda é de sete anos desde a emissão do relatório.",
+        "referencia": "NBC PA 11, item 28(g)"
+      },
+      {
+        "id": "RR-011",
+        "nome": "Limitação avaliada",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "A equipe avaliou e documentou a exclusão de um cliente em litígio.",
+        "aprendizado": "Restrições justificáveis exigem avaliação e registro das razões.",
+        "referencia": "NBC PA 11, item 33"
+      },
+      {
+        "id": "RR-012",
+        "nome": "Escopo respeitado",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "A revisão tratou só de normas, sem avaliar honorários de clientes.",
+        "aprendizado": "Aspectos comerciais ficam fora do escopo da revisão.",
+        "referencia": "NBC PA 11, item 29"
+      },
+      {
+        "id": "RR-013",
+        "nome": "Revisor bem escolhido",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "O revisado escolheu revisor de porte e experiência equivalentes.",
+        "aprendizado": "Quem escolhe é o revisado, observando os requisitos do item 15.",
+        "referencia": "NBC PA 11, item 15"
+      },
+      {
+        "id": "RR-014",
+        "nome": "Registros em dia",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "Todos os profissionais da equipe tinham registro no CNAI.",
+        "aprendizado": "A norma exige registro de todos os envolvidos na revisão.",
+        "referencia": "NBC PA 11, item 25(b)"
+      },
+      {
+        "id": "RR-015",
+        "nome": "Falha comunicada",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "O revisor informou quem tem autoridade sobre uma falha relevante.",
+        "aprendizado": "A comunicação imediata permite ao revisado investigar e corrigir.",
+        "referencia": "Instruções CRE, item 41"
+      },
+      {
+        "id": "RR-016",
+        "nome": "Relatório adequado",
+        "pratica": "good",
+        "forca": "high",
+        "descricao": "O revisor concluiu que o sistema era adequado e cumprido.",
+        "aprendizado": "O relatório de sistema adequado exige projeto e cumprimento pleno.",
+        "referencia": "NBC PA 11, item 38(a)"
+      },
+      {
+        "id": "RR-017",
+        "nome": "Divergência registrada",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "A discordância sobre a carta foi referenciada nos documentos.",
+        "aprendizado": "Discordâncias devem constar nos documentos de revisor e revisado.",
+        "referencia": "Instruções CRE, item 56"
+      },
+      {
+        "id": "RR-018",
+        "nome": "Ciclo cumprido",
+        "pratica": "good",
+        "forca": "low",
+        "descricao": "O auditor foi revisado dentro do ciclo de quatro anos.",
+        "aprendizado": "A revisão ocorre ao menos uma vez a cada quatro anos.",
+        "referencia": "NBC PA 11, item 14"
+      },
+      {
+        "id": "RR-019",
+        "nome": "Revisão recíproca",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "Duas firmas combinaram revisar uma à outra.",
+        "aprendizado": "Revisão recíproca é vedada e compromete a imparcialidade das duas.",
+        "referencia": "NBC PA 11, item 24"
+      },
+      {
+        "id": "RR-020",
+        "nome": "Cliente captado",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "O revisor ligou a um cliente da firma revisada para oferecer serviços.",
+        "aprendizado": "Usar informação da revisão em benefício próprio viola o sigilo.",
+        "referencia": "Base do jogo, dilema 1"
+      },
+      {
+        "id": "RR-021",
+        "nome": "Fala em rede social",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "Um membro da equipe postou que achou falhas sérias em uma firma.",
+        "aprendizado": "Mesmo sem citar nome, divulgar o que se viu na revisão é vedado.",
+        "referencia": "Base do jogo, dilema 3"
+      },
+      {
+        "id": "RR-022",
+        "nome": "Pressão cedida",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "O revisor suavizou apontamentos após ameaça de perder indicações.",
+        "aprendizado": "Ceder à intimidação compromete a objetividade e a conclusão.",
+        "referencia": "Base do jogo, dilema 4"
+      },
+      {
+        "id": "RR-023",
+        "nome": "Ação em cliente",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O revisor analisou o cliente em que tem investimento.",
+        "aprendizado": "Pode haver o investimento, mas não a revisão desse cliente.",
+        "referencia": "NBC PA 11, item 23"
+      },
+      {
+        "id": "RR-024",
+        "nome": "Amizade ocultada",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O revisor escondeu a amizade íntima com o sócio do revisado.",
+        "aprendizado": "Familiaridade reduz o ceticismo e deve ser declarada e tratada.",
+        "referencia": "Base do jogo, dilema 5"
+      },
+      {
+        "id": "RR-025",
+        "nome": "Autorrevisão",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O revisor avaliou um trabalho em que já havia atuado.",
+        "aprendizado": "Revisar o próprio trabalho é ameaça de autorrevisão.",
+        "referencia": "Base do jogo, dilema 6"
+      },
+      {
+        "id": "RR-026",
+        "nome": "Equipe sem líder",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O líder delegou tudo e não revisou o trabalho dos analistas.",
+        "aprendizado": "Falta de supervisão compromete a qualidade da revisão.",
+        "referencia": "NBC PA 11, item 28(b)"
+      },
+      {
+        "id": "RR-027",
+        "nome": "Prazo perdido",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "O revisado perdeu o prazo do CRE para entregar documentos.",
+        "aprendizado": "O descumprimento impede de ser revisor e gera nova revisão.",
+        "referencia": "NBC PA 11, itens 19 e 54"
+      },
+      {
+        "id": "RR-028",
+        "nome": "Arquivos expostos",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "Arquivos de clientes foram copiados para pasta pública na internet.",
+        "aprendizado": "Sigilo exige segurança no armazenamento, não só na divulgação.",
+        "referencia": "Base do jogo, dilema 9"
+      },
+      {
+        "id": "RR-029",
+        "nome": "Descarte precoce",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O revisor apagou a documentação logo após emitir o relatório.",
+        "aprendizado": "A guarda é obrigatória por sete anos.",
+        "referencia": "NBC PA 11, item 28(g)"
+      },
+      {
+        "id": "RR-030",
+        "nome": "Acesso sem aval",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "O revisor abriu papéis de um cliente sem aprovação dele.",
+        "aprendizado": "O revisado deve obter a aprovação de cada cliente selecionado.",
+        "referencia": "Base do jogo, dilema 4"
+      },
+      {
+        "id": "RR-031",
+        "nome": "Plano pelo revisor",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O revisor escreveu o plano de ação no lugar do revisado.",
+        "aprendizado": "O plano de ação é elaborado pelo revisado.",
+        "referencia": "NBC PA 11, item 46"
+      },
+      {
+        "id": "RR-032",
+        "nome": "Amostra sem regulados",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "A amostra deixou de fora clientes regulados pela Susep.",
+        "aprendizado": "Entidades reguladas devem integrar a amostra, se existirem.",
+        "referencia": "NBC PA 11, item 32"
+      },
+      {
+        "id": "RR-033",
+        "nome": "Equipe iniciante",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "Só iniciantes revisaram uma firma de grande complexidade.",
+        "aprendizado": "A equipe precisa de experiência compatível.",
+        "referencia": "NBC PA 11, item 25(a)"
+      },
+      {
+        "id": "RR-034",
+        "nome": "Foco em honorários",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O revisor questionou o honorário cobrado de um cliente.",
+        "aprendizado": "Aspectos comerciais não fazem parte do escopo.",
+        "referencia": "Instruções CRE, item 15"
+      },
+      {
+        "id": "RR-035",
+        "nome": "Falha relevante calada",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "O revisor soube de falha relevante e esperou o relatório para falar.",
+        "aprendizado": "Falhas relevantes são informadas prontamente a quem tem autoridade.",
+        "referencia": "Instruções CRE, item 41"
+      },
+      {
+        "id": "RR-036",
+        "nome": "Revisor impedido",
+        "pratica": "bad",
+        "forca": "high",
+        "descricao": "O revisado indicou revisor cujo último relatório foi inadequado.",
+        "aprendizado": "Esse é um impedimento previsto para atuar como revisor.",
+        "referencia": "NBC PA 11, item 26(b)"
+      },
+      {
+        "id": "RR-037",
+        "nome": "Quebra de ciclo",
+        "pratica": "bad",
+        "forca": "low",
+        "descricao": "O auditor deixou passar mais de quatro anos sem ser revisado.",
+        "aprendizado": "A revisão é exigida ao menos uma vez a cada ciclo de quatro anos.",
+        "referencia": "NBC PA 11, item 14"
+      }
+    ]
+  }
+}

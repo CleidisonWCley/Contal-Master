@@ -1,0 +1,148 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/menus/Settings.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/background/menus/menu_modo/game_modo.png" id="2"]
+
+[node name="Settings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.4)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 48
+
+[node name="CenterContainer" type="CenterContainer" parent="SafeArea"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="SafeArea/CenterContainer"]
+custom_minimum_size = Vector2(600, 470)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="SafeArea/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Title" type="Label" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "⚙ CONFIGURAÇÕES"
+horizontal_alignment = 1
+
+[node name="MusicRow" type="HBoxContainer" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MusicLabel" type="Label" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicRow"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🎵 Música"
+vertical_alignment = 1
+
+[node name="MusicSlider" type="HSlider" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicRow"]
+custom_minimum_size = Vector2(280, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.5
+
+[node name="SfxRow" type="HBoxContainer" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SfxLabel" type="Label" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SfxRow"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🔊 Efeitos"
+vertical_alignment = 1
+
+[node name="SfxSlider" type="HSlider" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SfxRow"]
+custom_minimum_size = Vector2(280, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="DifficultyRow" type="HBoxContainer" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DifficultyLabel" type="Label" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/DifficultyRow"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🎚 Dificuldade"
+vertical_alignment = 1
+
+[node name="DifficultyOption" type="OptionButton" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/DifficultyRow"]
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FullscreenToggle" type="Button" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🖥 Tela cheia: OFF"
+
+
+[node name="AnimationsToggle" type="Button" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "✨ Animações visuais: ON"
+
+[node name="ButtonRow" type="HBoxContainer" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+
+[node name="BtnVoltar" type="Button" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonRow"]
+custom_minimum_size = Vector2(170, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "↩ VOLTAR"

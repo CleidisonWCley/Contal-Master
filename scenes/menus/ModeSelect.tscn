@@ -1,0 +1,87 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/menus/ModeSelect.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/background/menus/menu_modo/game_modo.png" id="2"]
+
+[node name="ModeSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.35)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 48
+
+[node name="CenterContainer" type="CenterContainer" parent="SafeArea"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="SafeArea/CenterContainer"]
+custom_minimum_size = Vector2(560, 430)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="SafeArea/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "SELECIONE O MODO DE JOGO"
+horizontal_alignment = 1
+
+[node name="btnCampanha" type="Button" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(430, 92)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "🧭  MODO CAMPANHA\nJogue a jornada completa."
+
+[node name="btnLivre" type="Button" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(430, 92)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "🎮  MODO LIVRE\nEscolha um minigame direto."
+
+[node name="btnVoltar" type="Button" parent="SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(360, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "↩  VOLTAR"
