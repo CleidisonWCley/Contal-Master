@@ -1,373 +1,339 @@
 extends Control
+## Tela "Configuracoes" (UI/UX v4): secoes AUDIO / JOGO / TELA dentro de um painel unico.
+## - Sliders com valor em % ao lado; dificuldade em 3 botoes (cor + pontos 1/2/3, nunca so cor);
+## - interruptores com texto LIGADO/DESLIGADO; icones brancos no lugar dos emojis.
 
-const SETTINGS_PARTICLE_COUNT := 30
-const PANEL_BG_MAGIC := Color(0.035, 0.045, 0.105, 0.92)
-const PANEL_BORDER_MAGIC := Color(1.0, 0.84, 0.22, 0.82)
-const PANEL_BORDER_CYAN := Color(0.38, 0.92, 1.0, 0.58)
-const MUSIC_ACCENT := Color(1.0, 0.84, 0.22, 1.0)
-const SFX_ACCENT := Color(0.34, 0.92, 1.0, 1.0)
-const TEXT_MAIN := Color(1.0, 1.0, 1.0, 1.0)
-const TEXT_MUTED := Color(0.82, 0.86, 1.0, 1.0)
+const DIFFICULTY_KEYS := ["facil", "normal", "dificil"]
+const LABEL_WIDTH := 132.0
 
+var music_slider: HSlider
+var sfx_slider: HSlider
+var fullscreen_button: Button
+var animations_button: Button
+var back_button: Button
 
-@onready var music_slider: HSlider = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicRow/MusicSlider")
-@onready var sfx_slider: HSlider = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SfxRow/SfxSlider")
-@onready var fullscreen_button: Button = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FullscreenToggle")
-@onready var animations_button: Button = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/AnimationsToggle")
-@onready var difficulty_option: OptionButton = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/DifficultyRow/DifficultyOption")
-@onready var btn_back: Button = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonRow/BtnVoltar")
-@onready var safe_area: MarginContainer = get_node_or_null("SafeArea")
-@onready var panel: PanelContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer")
-@onready var inner_margin: MarginContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer")
-@onready var main_box: VBoxContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer")
-@onready var title_label: Label = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Title")
-@onready var music_label: Label = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicRow/MusicLabel")
-@onready var sfx_label: Label = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SfxRow/SfxLabel")
-@onready var difficulty_label: Label = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/DifficultyRow/DifficultyLabel")
-@onready var music_row: HBoxContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MusicRow")
-@onready var sfx_row: HBoxContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SfxRow")
-@onready var difficulty_row: HBoxContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/DifficultyRow")
-
-const DIFFICULTY_OPTIONS := [
-	{"label": "Fácil", "value": "facil"},
-	{"label": "Normal", "value": "normal"},
-	{"label": "Difícil", "value": "dificil"}
-]
-
-var particles: Array[Dictionary] = []
-var effects_canvas: Control
-var elapsed: float = 0.0
+var _safe_area: MarginContainer
+var _panel: PanelContainer
+var _content: VBoxContainer
+var _title_label: Label
+var _music_value: Label
+var _sfx_value: Label
+var _difficulty_buttons: Dictionary = {}   # key -> Button
+var _difficulty_parts: Dictionary = {}     # key -> {"pips": UiPips, "label": Label}
+var _scroll: ScrollContainer
+var _grabber: Texture2D
 
 func _ready() -> void:
-	randomize()
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("menu")
-	_apply_static_texts()
-	_apply_platform_visibility()
-	_apply_responsive_layout()
-	_prepare_effects_layer()
-	_setup_difficulty_options()
+	UiBackdrop.attach(self)
+	_grabber = UiKit.circle_texture(28, UiPalette.TEXT_ON_DARK)
+	_build_ui()
 	_load_current_settings()
-	_apply_button_styles()
-	_connect_signals()
-	_reset_particles()
+	_apply_responsive_layout()
+	back_button.call_deferred("grab_focus")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
-		_apply_platform_visibility()
 		_apply_responsive_layout()
-		_apply_button_styles()
-		if _animations_enabled():
-			_reset_particles()
 
-func _process(delta: float) -> void:
-	elapsed += delta
-	_apply_magic_motion()
-	if not _animations_enabled():
-		if effects_canvas != null:
-			effects_canvas.visible = false
-		return
-	if effects_canvas != null:
-		effects_canvas.visible = true
-	_update_particles(delta)
-	effects_canvas.queue_redraw()
+# ---------------------------------------------------------------- construcao
+func _build_ui() -> void:
+	_safe_area = MarginContainer.new()
+	_safe_area.name = "SafeArea"
+	_safe_area.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_safe_area)
 
-func _prepare_effects_layer() -> void:
-	if safe_area != null:
-		safe_area.z_index = 10
-	effects_canvas = Control.new()
-	effects_canvas.name = "SettingsEffectsCanvas"
-	effects_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
-	effects_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	effects_canvas.z_index = 2
-	effects_canvas.draw.connect(_on_effects_canvas_draw)
-	add_child(effects_canvas)
+	_scroll = ScrollContainer.new()
+	_scroll.name = "Scroll"
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_safe_area.add_child(_scroll)
 
-func _setup_difficulty_options() -> void:
-	if difficulty_option == null:
-		return
-	difficulty_option.clear()
-	for item in DIFFICULTY_OPTIONS:
-		difficulty_option.add_item(str(item["label"]))
-		difficulty_option.set_item_metadata(difficulty_option.get_item_count() - 1, item["value"])
+	var center := CenterContainer.new()
+	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scroll.add_child(center)
 
-func _load_current_settings() -> void:
-	if music_slider != null:
-		music_slider.value = SettingsManager.get_music_volume()
-	if sfx_slider != null:
-		sfx_slider.value = SettingsManager.get_sfx_volume()
-	_select_difficulty(SettingsManager.get_difficulty())
-	_update_fullscreen_button()
-	_update_animations_button()
+	_panel = PanelContainer.new()
+	_panel.name = "Panel"
+	_panel.add_theme_stylebox_override("panel", UiKit.panel_style(UiPalette.with_alpha(UiPalette.CARD, 0.95), UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.50), 28, 2, 16))
+	center.add_child(_panel)
 
-func _select_difficulty(value: String) -> void:
-	if difficulty_option == null:
-		return
-	for index in range(difficulty_option.get_item_count()):
-		if str(difficulty_option.get_item_metadata(index)) == value:
-			difficulty_option.select(index)
-			_update_difficulty_option_style(value)
-			return
-	difficulty_option.select(1)
-	_update_difficulty_option_style("normal")
+	var pad := UiKit.margin(42, 42, 30, 28)
+	_panel.add_child(pad)
 
-func _apply_button_styles() -> void:
-	_apply_panel_style()
-	_apply_text_styles()
-	_apply_slider_style(music_slider, MUSIC_ACCENT)
-	_apply_slider_style(sfx_slider, SFX_ACCENT)
-	_update_difficulty_option_style(SettingsManager.get_difficulty())
-	_update_fullscreen_button()
-	_update_animations_button()
-	ScreenTools.apply_button(btn_back, self, "mode_back", Vector2(210, 46), Vector2(180, 42), 17, 15)
-	if btn_back != null:
-		btn_back.text = "↩ VOLTAR"
+	_content = VBoxContainer.new()
+	_content.add_theme_constant_override("separation", 10)
+	pad.add_child(_content)
 
-func _apply_static_texts() -> void:
-	if title_label != null:
-		title_label.text = "⚙ CONFIGURAÇÕES"
-	if music_label != null:
-		music_label.text = "🎵 Música"
-	if sfx_label != null:
-		sfx_label.text = "🔊 Efeitos"
-	if difficulty_label != null:
-		difficulty_label.text = "🎚 Dificuldade"
-	if btn_back != null:
-		btn_back.text = "↩ VOLTAR"
+	var title_row: HBoxContainer = UiKit.screen_title("CONFIGURAÇÕES", 32, "settings")
+	_title_label = title_row.get_node("TitleLabel") as Label
+	_content.add_child(title_row)
 
-func _apply_panel_style() -> void:
-	if panel == null:
-		return
-	panel.add_theme_stylebox_override("panel", _make_panel_style(PANEL_BG_MAGIC, PANEL_BORDER_MAGIC, 28, 2))
+	# ---- ÁUDIO
+	_content.add_child(_make_section_header("ÁUDIO"))
+	var music_row: Array = _make_slider_row("music", "Música")
+	music_slider = music_row[0] as HSlider
+	_music_value = music_row[1] as Label
+	var sfx_row: Array = _make_slider_row("speaker", "Efeitos")
+	sfx_slider = sfx_row[0] as HSlider
+	_sfx_value = sfx_row[1] as Label
 
-func _apply_text_styles() -> void:
-	if title_label != null:
-		title_label.add_theme_color_override("font_color", Color(1.0, 0.92, 0.68, 1.0))
-		title_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.92))
-		title_label.add_theme_constant_override("shadow_offset_x", 2)
-		title_label.add_theme_constant_override("shadow_offset_y", 2)
-	for label in [music_label, sfx_label, difficulty_label]:
-		if label is Label:
-			(label as Label).add_theme_color_override("font_color", TEXT_MAIN)
-			(label as Label).add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.75))
-			(label as Label).add_theme_constant_override("shadow_offset_x", 1)
-			(label as Label).add_theme_constant_override("shadow_offset_y", 1)
+	# ---- JOGO
+	_content.add_child(_make_section_header("JOGO"))
+	_content.add_child(_make_difficulty_row())
 
-func _apply_slider_style(slider: HSlider, accent: Color) -> void:
-	if slider == null:
-		return
-	var rail: StyleBoxFlat = _make_slider_rail(Color(0.08, 0.08, 0.12, 0.86), Color(accent.r, accent.g, accent.b, 0.42), 8)
-	var fill: StyleBoxFlat = _make_slider_rail(Color(accent.r, accent.g, accent.b, 0.62), Color(accent.r, accent.g, accent.b, 0.92), 8)
+	# ---- TELA
+	_content.add_child(_make_section_header("TELA"))
+	var toggles := HBoxContainer.new()
+	toggles.add_theme_constant_override("separation", 12)
+	_content.add_child(toggles)
+	fullscreen_button = Button.new()
+	fullscreen_button.name = "FullscreenToggle"
+	fullscreen_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	toggles.add_child(fullscreen_button)
+	animations_button = Button.new()
+	animations_button.name = "AnimationsToggle"
+	animations_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	toggles.add_child(animations_button)
+
+	var back_holder := CenterContainer.new()
+	back_holder.add_theme_constant_override("separation", 0)
+	_content.add_child(UiKit.margin(0, 0, 4, 0))
+	_content.add_child(back_holder)
+	back_button = UiKit.back_button()
+	back_holder.add_child(back_button)
+
+	_connect_signals()
+
+## Cabecalho de secao: TITULO lilas + linha fina.
+func _make_section_header(text: String) -> VBoxContainer:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	box.add_child(UiKit.label(text, 15, UiPalette.HIGHLIGHT))
+	var line := Panel.new()
+	line.custom_minimum_size = Vector2(0, 2)
+	var style := StyleBoxFlat.new()
+	style.bg_color = UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.38)
+	line.add_theme_stylebox_override("panel", style)
+	box.add_child(line)
+	return box
+
+## Linha [icone] Rotulo ----slider---- 50%. Retorna [slider, rotulo_do_valor].
+func _make_slider_row(icon_name: String, text: String) -> Array:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	_content.add_child(row)
+
+	var label_box := HBoxContainer.new()
+	label_box.custom_minimum_size = Vector2(LABEL_WIDTH, 0)
+	label_box.add_theme_constant_override("separation", 12)
+	var icon := UiIcons.make_rect(icon_name, 24, UiPalette.TEXT_ON_DARK)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	label_box.add_child(icon)
+	var label: Label = UiKit.label(text, 19, UiPalette.TEXT_ON_DARK)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label_box.add_child(label)
+	row.add_child(label_box)
+
+	var slider := HSlider.new()
+	slider.min_value = 0.0
+	slider.max_value = 1.0
+	slider.step = 0.01
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	slider.custom_minimum_size = Vector2(160, 34)
+	_style_slider(slider)
+	row.add_child(slider)
+
+	var value_label: Label = UiKit.label("0%", 17, UiPalette.TEXT_ON_DARK, HORIZONTAL_ALIGNMENT_RIGHT)
+	value_label.custom_minimum_size = Vector2(58, 0)
+	value_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(value_label)
+	return [slider, value_label]
+
+func _style_slider(slider: HSlider) -> void:
+	var rail := StyleBoxFlat.new()
+	rail.bg_color = UiPalette.with_alpha(UiPalette.BG, 0.85)
+	rail.border_color = UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.30)
+	rail.set_border_width_all(1)
+	rail.set_corner_radius_all(6)
+	rail.content_margin_top = 4
+	rail.content_margin_bottom = 4
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = UiPalette.HIGHLIGHT
+	fill.set_corner_radius_all(6)
+	fill.content_margin_top = 4
+	fill.content_margin_bottom = 4
 	slider.add_theme_stylebox_override("slider", rail)
 	slider.add_theme_stylebox_override("grabber_area", fill)
 	slider.add_theme_stylebox_override("grabber_area_highlight", fill)
-	slider.add_theme_color_override("font_color", TEXT_MAIN)
+	slider.add_theme_icon_override("grabber", _grabber)
+	slider.add_theme_icon_override("grabber_highlight", _grabber)
+	slider.add_theme_icon_override("grabber_disabled", _grabber)
 
-func _apply_magic_motion() -> void:
-	var pulse: float = 0.5 + 0.5 * sin(elapsed * 2.0)
-	if title_label != null:
-		title_label.modulate = Color(1.0, 0.93 + pulse * 0.07, 0.72 + pulse * 0.16, 1.0)
-	if panel != null:
-		panel.modulate = Color(1.0, 1.0, 1.0, 0.96 + pulse * 0.04)
+func _make_difficulty_row() -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "DifficultyRow"
+	row.add_theme_constant_override("separation", 12)
 
-func _apply_platform_visibility() -> void:
-	if fullscreen_button == null:
-		return
+	var label_box := HBoxContainer.new()
+	label_box.custom_minimum_size = Vector2(LABEL_WIDTH + 14, 0)
+	label_box.add_theme_constant_override("separation", 12)
+	var icon := UiIcons.make_rect("sliders", 24, UiPalette.TEXT_ON_DARK)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	label_box.add_child(icon)
+	var label: Label = UiKit.label("Dificuldade", 19, UiPalette.TEXT_ON_DARK)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label_box.add_child(label)
+	row.add_child(label_box)
+
+	for key in DIFFICULTY_KEYS:
+		var button := Button.new()
+		button.name = "Difficulty_%s" % key
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.custom_minimum_size = Vector2(110, 46)
+		button.focus_mode = Control.FOCUS_ALL
+		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		button.tooltip_text = "Dificuldade %s" % ScoreManager.get_difficulty_label(key)
+		row.add_child(button)
+
+		# conteudo: pontos de nivel (1/2/3) + nome
+		var center := CenterContainer.new()
+		center.set_anchors_preset(Control.PRESET_FULL_RECT)
+		button.add_child(center)
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 8)
+		center.add_child(line)
+		var pips := UiPips.new()
+		pips.level = UiPalette.difficulty_level(key)
+		line.add_child(pips)
+		var name_label: Label = UiKit.label(ScoreManager.get_difficulty_label(key), 18, UiPalette.TEXT_ON_DARK)
+		line.add_child(name_label)
+		UiKit.ignore_mouse(center)
+
+		button.pressed.connect(_on_difficulty_pressed.bind(key))
+		_difficulty_buttons[key] = button
+		_difficulty_parts[key] = {"pips": pips, "label": name_label}
+	return row
+
+# ---------------------------------------------------------------- estado
+func _load_current_settings() -> void:
+	music_slider.set_value_no_signal(SettingsManager.get_music_volume())
+	sfx_slider.set_value_no_signal(SettingsManager.get_sfx_volume())
+	_update_volume_labels()
+	_refresh_difficulty_buttons()
+	_refresh_toggles()
 	fullscreen_button.visible = not ScreenTools.is_mobile_platform()
-	fullscreen_button.disabled = ScreenTools.is_mobile_platform()
 
+func _update_volume_labels() -> void:
+	_music_value.text = "%d%%" % int(round(music_slider.value * 100.0))
+	_sfx_value.text = "%d%%" % int(round(sfx_slider.value * 100.0))
+
+## Selecionado = preenchido na cor da dificuldade + texto escuro. Nao selecionado = so contorno.
+func _refresh_difficulty_buttons() -> void:
+	var current: String = DifficultyManager.get_difficulty()
+	for key in DIFFICULTY_KEYS:
+		var button: Button = _difficulty_buttons[key] as Button
+		var accent: Color = UiPalette.difficulty_color(key)
+		var selected: bool = key == current
+		var fill: Color = accent if selected else UiPalette.with_alpha(UiPalette.CARD_RAISED, 0.55)
+		var hover_fill: Color = accent.lightened(0.08) if selected else UiPalette.with_alpha(UiPalette.CARD_RAISED, 0.95)
+		var border: Color = UiPalette.TEXT_ON_DARK if selected else accent
+		button.add_theme_stylebox_override("normal", _option_style(fill, border))
+		button.add_theme_stylebox_override("hover", _option_style(hover_fill, UiPalette.TEXT_ON_DARK))
+		button.add_theme_stylebox_override("pressed", _option_style(accent.darkened(0.12), UiPalette.TEXT_ON_DARK))
+		button.add_theme_stylebox_override("focus", ButtonStyles.make_focus_ring(14))
+		var parts: Dictionary = _difficulty_parts[key]
+		var text_color: Color = UiPalette.TEXT_ON_BRIGHT if selected else UiPalette.TEXT_ON_DARK
+		(parts["label"] as Label).add_theme_color_override("font_color", text_color)
+		(parts["pips"] as UiPips).color = UiPalette.TEXT_ON_BRIGHT if selected else accent
+
+func _option_style(fill: Color, border: Color) -> StyleBoxFlat:
+	return UiKit.panel_style(fill, border, 14, 2, 4)
+
+func _refresh_toggles() -> void:
+	_set_toggle(fullscreen_button, "monitor", "Tela cheia", SettingsManager.is_fullscreen())
+	_set_toggle(animations_button, "sparkles", "Animações visuais", SettingsManager.animations_enabled())
+
+func _set_toggle(button: Button, icon_name: String, label: String, enabled: bool) -> void:
+	button.text = "%s: %s" % [label, "LIGADO" if enabled else "DESLIGADO"]
+	button.icon = UiIcons.texture(icon_name)
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.expand_icon = false
+	var height: float = 46.0 if ScreenTools.is_compact(self) else 54.0
+	ButtonStyles.apply(button, "ui_toggle_on" if enabled else "ui_ghost", Vector2(0, height), 17)
+
+# ---------------------------------------------------------------- layout
 func _apply_responsive_layout() -> void:
+	if _safe_area == null:
+		return
+	var view: Vector2 = ScreenTools.get_viewport_size(self)
 	var compact: bool = ScreenTools.is_compact(self)
-	ScreenTools.apply_safe_margins(safe_area, self, 48, 18)
-	ScreenTools.apply_inner_margins(inner_margin, self, 32, 18)
-	if panel != null:
-		panel.custom_minimum_size = ScreenTools.panel_size(self, Vector2(620, 500), Vector2(360, 510), 64.0, 64.0)
-	if main_box != null:
-		main_box.add_theme_constant_override("separation", 9 if compact else 13)
-	ScreenTools.apply_label_font(title_label, self, 30, 25)
-	ScreenTools.apply_label_font(music_label, self, 20, 16)
-	ScreenTools.apply_label_font(sfx_label, self, 20, 16)
-	ScreenTools.apply_label_font(difficulty_label, self, 20, 16)
-	if music_slider != null:
-		music_slider.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(300, 42), Vector2(220, 38))
-	if sfx_slider != null:
-		sfx_slider.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(300, 42), Vector2(220, 38))
+	var margin: int = 8 if compact else 24
+	_safe_area.add_theme_constant_override("margin_left", margin)
+	_safe_area.add_theme_constant_override("margin_right", margin)
+	_safe_area.add_theme_constant_override("margin_top", margin)
+	_safe_area.add_theme_constant_override("margin_bottom", margin)
+	_panel.custom_minimum_size.x = minf(745.0, maxf(300.0, view.x - 2.0 * margin - 20.0))
+	_content.add_theme_constant_override("separation", 7 if compact else 11)
+	ScreenTools.apply_label_font(_title_label, self, 32, 26)
+	for key in DIFFICULTY_KEYS:
+		(_difficulty_buttons[key] as Button).custom_minimum_size.y = 40.0 if compact else 48.0
+	_refresh_toggles()
+	ButtonStyles.apply(back_button, "ui_ghost", Vector2(222, 46 if compact else 54), 18)
 
+# ---------------------------------------------------------------- sinais
 func _connect_signals() -> void:
-	if music_slider != null and not music_slider.value_changed.is_connected(_on_music_volume_changed):
-		music_slider.value_changed.connect(_on_music_volume_changed)
-	if sfx_slider != null and not sfx_slider.value_changed.is_connected(_on_sfx_volume_changed):
-		sfx_slider.value_changed.connect(_on_sfx_volume_changed)
-	if difficulty_option != null and not difficulty_option.item_selected.is_connected(_on_difficulty_selected):
-		difficulty_option.item_selected.connect(_on_difficulty_selected)
-	if fullscreen_button != null and not fullscreen_button.pressed.is_connected(_on_fullscreen_pressed):
-		fullscreen_button.pressed.connect(_on_fullscreen_pressed)
-	if animations_button != null and not animations_button.pressed.is_connected(_on_animations_pressed):
-		animations_button.pressed.connect(_on_animations_pressed)
-	if btn_back != null and not btn_back.pressed.is_connected(_on_back_pressed):
-		btn_back.pressed.connect(_on_back_pressed)
+	music_slider.value_changed.connect(_on_music_volume_changed)
+	sfx_slider.value_changed.connect(_on_sfx_volume_changed)
+	fullscreen_button.pressed.connect(_on_fullscreen_pressed)
+	animations_button.pressed.connect(_on_animations_pressed)
+	back_button.pressed.connect(_on_back_pressed)
 
 func _on_music_volume_changed(value: float) -> void:
 	SettingsManager.set_music_volume(value)
+	_update_volume_labels()
 
 func _on_sfx_volume_changed(value: float) -> void:
 	SettingsManager.set_sfx_volume(value)
+	_update_volume_labels()
 	if has_node("/root/AudioManager"):
 		AudioManager.play_sfx("click")
 
-func _on_difficulty_selected(index: int) -> void:
-	if difficulty_option == null or index < 0:
-		return
-	var difficulty: String = str(difficulty_option.get_item_metadata(index))
-	DifficultyManager.set_difficulty(difficulty)
-	_update_difficulty_option_style(difficulty)
-	if has_node("/root/AudioManager"):
-		AudioManager.play_click()
+func _on_difficulty_pressed(key: String) -> void:
+	DifficultyManager.set_difficulty(key)
+	_refresh_difficulty_buttons()
+	_click()
 
 func _on_fullscreen_pressed() -> void:
 	if ScreenTools.is_mobile_platform():
 		return
 	SettingsManager.toggle_fullscreen()
-	_update_fullscreen_button()
-	if has_node("/root/AudioManager"):
-		AudioManager.play_click()
+	_refresh_toggles()
+	_click()
 
 func _on_animations_pressed() -> void:
 	SettingsManager.toggle_animations_enabled()
-	_update_animations_button()
-	if SettingsManager.animations_enabled():
-		_reset_particles()
-	if effects_canvas != null:
-		effects_canvas.visible = SettingsManager.animations_enabled()
-		effects_canvas.queue_redraw()
-	if has_node("/root/AudioManager"):
-		AudioManager.play_click()
-
-func _update_fullscreen_button() -> void:
-	_update_toggle_button(fullscreen_button, "🖥 Tela cheia", SettingsManager.is_fullscreen())
-
-func _update_animations_button() -> void:
-	_update_toggle_button(animations_button, "✨ Animações visuais", SettingsManager.animations_enabled())
-
-func _update_toggle_button(button: Button, label: String, value: bool) -> void:
-	var toggle_size: Vector2 = ScreenTools.button_size(self, Vector2(280, 48), Vector2(230, 44))
-	var toggle_font: int = ScreenTools.responsive_font(self, 18, 16)
-	ButtonStyles.apply_toggle(button, label, value, toggle_size, toggle_font)
-
-func _update_difficulty_option_style(value: String) -> void:
-	ButtonStyles.apply_difficulty(difficulty_option, value, ScreenTools.button_size(self, Vector2(220, 42), Vector2(190, 40)), ScreenTools.responsive_font(self, 17, 15))
+	_refresh_toggles()
+	_click()
 
 func _on_back_pressed() -> void:
-	if has_node("/root/AudioManager"):
-		AudioManager.play_click()
+	_click()
 	GameManager.go_to_main_menu()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
+	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		_on_back_pressed()
+	elif event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_F11 and not ScreenTools.is_mobile_platform():
 			SettingsManager.toggle_fullscreen()
-			_update_fullscreen_button()
+			_refresh_toggles()
 
-func _animations_enabled() -> bool:
-	return SettingsManager.animations_enabled()
-
-func _reset_particles() -> void:
-	particles.clear()
-	var viewport_size: Vector2 = get_viewport_rect().size
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		viewport_size = Vector2(1280, 720)
-	for i in range(SETTINGS_PARTICLE_COUNT):
-		particles.append({
-			"position": Vector2(randf_range(0.0, viewport_size.x), randf_range(0.0, viewport_size.y)),
-			"velocity": Vector2(randf_range(-16.0, 16.0), randf_range(-34.0, -12.0)),
-			"radius": randf_range(1.8, 4.8),
-			"alpha": randf_range(0.26, 0.76),
-			"wave": randf_range(0.0, TAU),
-			"kind": i % 2
-		})
-
-func _update_particles(delta: float) -> void:
-	var viewport_size: Vector2 = get_viewport_rect().size
-	for i in range(particles.size()):
-		var particle: Dictionary = particles[i]
-		var particle_pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
-		var velocity: Vector2 = _dict_vec2(particle, "velocity", Vector2.ZERO)
-		particle_pos += velocity * delta
-		particle_pos.x += sin(elapsed * 1.3 + float(particle.get("wave", 0.0))) * 18.0 * delta
-		if particle_pos.y < -32.0:
-			particle_pos.y = viewport_size.y + randf_range(20.0, 120.0)
-			particle_pos.x = randf_range(0.0, viewport_size.x)
-		particle["position"] = particle_pos
-		particles[i] = particle
-
-func _on_effects_canvas_draw() -> void:
-	if not _animations_enabled():
-		return
-	var viewport_size: Vector2 = get_viewport_rect().size
-	var pulse: float = (sin(elapsed * 2.1) + 1.0) * 0.5
-	effects_canvas.draw_rect(Rect2(Vector2.ZERO, viewport_size), Color(0.04, 0.08, 0.18, 0.045 + pulse * 0.025), true)
-	for particle in particles:
-		var particle_pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
-		var radius: float = float(particle.get("radius", 3.0))
-		var alpha: float = float(particle.get("alpha", 0.55))
-		var kind: int = int(particle.get("kind", 0))
-		var color: Color = Color(1.0, 0.82, 0.25, alpha)
-		if kind == 1:
-			color = Color(0.50, 0.78, 1.0, alpha * 0.72)
-		effects_canvas.draw_circle(particle_pos, radius, color)
-		effects_canvas.draw_arc(particle_pos, radius * 3.5, 0.0, TAU, 16, Color(color.r, color.g, color.b, alpha * 0.09), 1.4)
-
-func _make_panel_style(bg_color: Color, border_color: Color, radius: int = 24, border_width: int = 2) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = bg_color
-	style.border_color = border_color
-	style.border_width_left = border_width
-	style.border_width_top = border_width
-	style.border_width_right = border_width
-	style.border_width_bottom = border_width
-	style.set_corner_radius_all(radius)
-	style.content_margin_left = 14
-	style.content_margin_right = 14
-	style.content_margin_top = 12
-	style.content_margin_bottom = 12
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.42)
-	style.shadow_size = 12
-	return style
-
-func _make_slider_rail(bg_color: Color, border_color: Color, radius: int = 8) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = bg_color
-	style.border_color = border_color
-	style.border_width_left = 1
-	style.border_width_top = 1
-	style.border_width_right = 1
-	style.border_width_bottom = 1
-	style.set_corner_radius_all(radius)
-	style.content_margin_top = 3
-	style.content_margin_bottom = 3
-	style.shadow_color = Color(border_color.r, border_color.g, border_color.b, 0.20)
-	style.shadow_size = 4
-	return style
-
-func _make_toggle_style(bg_color: Color, border_color: Color, border_width: int = 2) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = bg_color
-	style.border_color = border_color
-	style.border_width_left = border_width
-	style.border_width_top = border_width
-	style.border_width_right = border_width
-	style.border_width_bottom = border_width
-	style.set_corner_radius_all(14)
-	style.content_margin_left = 18
-	style.content_margin_right = 18
-	style.content_margin_top = 8
-	style.content_margin_bottom = 8
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.28)
-	style.shadow_size = 6
-	return style
-
-func _dict_vec2(data: Dictionary, key: String, fallback: Vector2) -> Vector2:
-	var value: Variant = data.get(key, fallback)
-	if value is Vector2:
-		return value
-	return fallback
+func _click() -> void:
+	if has_node("/root/AudioManager"):
+		AudioManager.play_click()

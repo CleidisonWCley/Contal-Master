@@ -211,6 +211,7 @@ var _stretch_rows: Array = []
 func _ready() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("menu")
+	_select_first_free_minigame()
 	_build_ui()
 	_fill_free_minigame_chips()
 	_connect_signals()
@@ -219,6 +220,12 @@ func _ready() -> void:
 	_refresh_view()
 	if back_button != null:
 		back_button.call_deferred("grab_focus")
+
+func _select_first_free_minigame() -> void:
+	for key in ScoreManager.get_minigame_keys():
+		if not _is_free_mode_minigame_hidden(str(key)):
+			selected_free_minigame = str(key)
+			return
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
@@ -304,9 +311,7 @@ func _build_ui() -> void:
 	back_holder.name = "BackButtonHolder"
 	main_box.add_child(back_holder)
 
-	back_button = Button.new()
-	back_button.name = "BackButton"
-	back_button.text = "Voltar"
+	back_button = UiKit.back_button()
 	back_holder.add_child(back_button)
 
 func _make_header() -> Control:
@@ -760,7 +765,7 @@ func _apply_styles() -> void:
 	ButtonStyles.apply(save_nick_button, "ui_primary", Vector2(100, action_h), ScreenTools.responsive_font(self, 18, 16))
 	ButtonStyles.apply(cancel_nick_button, "ui_ghost", Vector2(110, action_h), ScreenTools.responsive_font(self, 18, 16))
 	ButtonStyles.apply(clear_free_button, "ui_ghost", Vector2(96, 40), ScreenTools.responsive_font(self, 16, 14))
-	ButtonStyles.apply(back_button, "ui_ghost", Vector2(240, 54 if not compact else 48), ScreenTools.responsive_font(self, 20, 18))
+	ButtonStyles.apply(back_button, "ui_ghost", Vector2(222, 52 if not compact else 46), 18)
 	_apply_free_chip_styles()
 
 func _apply_line_edit_style() -> void:
@@ -805,7 +810,7 @@ func _apply_free_chip_styles() -> void:
 		button.add_theme_color_override("font_pressed_color", selected_text)
 		button.add_theme_color_override("font_hover_pressed_color", selected_text)
 		button.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, UiPalette.FONT_BODY.x, UiPalette.FONT_BODY.y))
-		button.custom_minimum_size = Vector2(0, 46.0 if compact else 52.0)
+		button.custom_minimum_size = Vector2(0, 38.0 if compact else 42.0)
 
 func _update_free_chip_states() -> void:
 	for key in minigame_chip_buttons.keys():
@@ -915,15 +920,7 @@ func _play_click() -> void:
 # ---------------------------------------------------------------- estilo / helpers
 ## Dificuldade = cor da paleta + quantidade de pontos (1/2/3). Nunca so cor.
 func _difficulty_accent_color(key: String) -> Color:
-	match key:
-		DIFF_EASY_KEY:
-			return UiPalette.SECONDARY
-		DIFF_NORMAL_KEY:
-			return UiPalette.ACCENT_REWARDS
-		DIFF_HARD_KEY:
-			return UiPalette.ACCENT_ACHIEVEMENTS
-		_:
-			return UiPalette.HIGHLIGHT
+	return UiPalette.difficulty_color(key)
 
 func _difficulty_level(key: String) -> int:
 	match key:

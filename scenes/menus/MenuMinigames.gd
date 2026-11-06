@@ -1,319 +1,250 @@
 extends Control
-
-const FREE_PARTICLE_COUNT := 38
-const FREE_SYMBOLS := ["$", "⚓", "💼", "🚨", "🧩", "🛑", "🚗"]
-const PANEL_BG_MAGIC := Color(0.035, 0.045, 0.105, 0.92)
-const PANEL_BORDER_MAGIC := Color(1.0, 0.84, 0.22, 0.84)
-const TEXT_TITLE_MAGIC := Color(1.0, 0.92, 0.68, 1.0)
-const TEXT_MUTED_MAGIC := Color(0.82, 0.88, 1.0, 1.0)
-
-@onready var buttons: Array = [
-	get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox/BtnShow"),
-	get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox/BtnNaval"),
-	get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox/BtnMaleta"),
-	get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox/BtnPerseguicao"),
-	get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox/BtnForca"),
-	get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox/BtnStop"),
-	get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox/BtnDesvio")
-]
-@onready var btn_back: Button = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BtnVoltar")
-@onready var safe_area: MarginContainer = get_node_or_null("SafeArea")
-@onready var panel: PanelContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer")
-@onready var inner_margin: MarginContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer")
-@onready var main_box: VBoxContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer")
-@onready var cards_box: VBoxContainer = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CardsBox")
-@onready var title_label: Label = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Title")
-@onready var subtitle_label: Label = get_node_or_null("SafeArea/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Subtitle")
-
-var particles: Array[Dictionary] = []
-var effects_canvas: Control
-var elapsed: float = 0.0
+## Tela "Modo livre" (UI/UX v4.2): grade de cartoes de minigame com selo de icone,
+## descricao e recorde da dificuldade atual. Sem emojis: so icones de UiIcons.
+## A dificuldade pode ser trocada aqui mesmo (seletor no topo); os recordes dos cartoes acompanham.
+## A ORDEM dos cartoes precisa seguir GameManager.FREE_PHASE_KEYS (o indice inicia o minigame).
 
 const MINIGAME_CARD_DATA: Array[Dictionary] = [
-	{"icon": "$", "title": "Show do Bilhão", "description": "Responda e acumule pontos."},
-	{"icon": "⚓", "title": "Batalha Naval", "description": "Acerte posições por estratégia."},
-	{"icon": "💼", "title": "Maleta Certa", "description": "Escolha com cuidado e arrisque."},
-	{"icon": "🚨", "title": "Perseguição", "description": "Escape dos perigos e mantenha o controle."},
-	{"icon": "🧩", "title": "Forca Tecnica", "description": "Descubra termos técnicos."},
-	{"icon": "🛑", "title": "STOP", "description": "Pense rápido e complete categorias."},
-	{"icon": "🚗", "title": "Desvio Lógico", "description": "Desvie, escolha rotas e teste sua lógica."}
+	{"key": "show_do_bilhao", "title": "Show do Bilhão", "description": "Responda e acumule pontos."},
+	{"key": "batalha_naval", "title": "Batalha Naval", "description": "Acerte posições por estratégia."},
+	{"key": "maleta_certa", "title": "Maleta Certa", "description": "Escolha com cuidado e arrisque."},
+	{"key": "perseguicao", "title": "Perseguição", "description": "Escape dos perigos e mantenha o controle."},
+	{"key": "forca_tecnica", "title": "Força Técnica", "description": "Descubra termos técnicos."},
+	{"key": "stop", "title": "STOP", "description": "Pense rápido e complete categorias."},
+	{"key": "desvio_logico", "title": "Desvio Lógico", "description": "Desvie, escolha rotas e teste sua lógica."}
 ]
 
+var back_button: Button
+
+var _safe_area: MarginContainer
+var _main_box: VBoxContainer
+var _title_label: Label
+var _subtitle_label: Label
+var _difficulty_selector: DifficultySelector
+var _rows_box: VBoxContainer   # linhas de cartoes (cada linha e centralizada)
+var _card_buttons: Array[Button] = []
+var _card_titles: Array[Label] = []
+var _card_descriptions: Array[Label] = []
+var _card_records: Array[Label] = []
+var _card_badges: Array[Control] = []
+
 func _ready() -> void:
-	randomize()
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("menu")
-	_apply_card_labels()
-	_rebuild_card_rows()
+	UiBackdrop.attach(self)
+	_build_ui()
 	_apply_responsive_layout()
-	_prepare_effects_layer()
-	_reset_particles()
-	for index in range(buttons.size()):
-		var button: Button = buttons[index] as Button
-		if button != null and not button.pressed.is_connected(_on_minigame_pressed):
-			button.pressed.connect(_on_minigame_pressed.bind(index))
-		_connect_card_hover(button)
-	if btn_back != null and not btn_back.pressed.is_connected(_on_back_pressed):
-		btn_back.pressed.connect(_on_back_pressed)
-	_apply_button_styles()
+	if not _card_buttons.is_empty():
+		_card_buttons[0].call_deferred("grab_focus")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
-		_rebuild_card_rows()
 		_apply_responsive_layout()
-		_apply_button_styles()
-		if _animations_enabled():
-			_reset_particles()
 
-func _apply_card_labels() -> void:
-	if title_label != null:
-		title_label.text = "SELECIONE UM MINIGAME"
-	if subtitle_label != null:
-		subtitle_label.text = "Escolha um desafio do Modo Livre. A Roleta de Risco fica como bônus surpresa da campanha."
-	for index in range(buttons.size()):
-		var button: Button = buttons[index] as Button
-		if button == null or index >= MINIGAME_CARD_DATA.size():
-			continue
-		var data: Dictionary = MINIGAME_CARD_DATA[index]
-		button.text = "%s\n%s\n%s" % [str(data.get("icon", "?")), str(data.get("title", "Minigame")), str(data.get("description", ""))]
+# ---------------------------------------------------------------- construcao
+func _build_ui() -> void:
+	_safe_area = MarginContainer.new()
+	_safe_area.name = "SafeArea"
+	_safe_area.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_safe_area)
 
-func _rebuild_card_rows() -> void:
-	if cards_box == null:
+	var scroll := ScrollContainer.new()
+	scroll.name = "Scroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_safe_area.add_child(scroll)
+
+	# Folga interna: anel de foco / zoom dos cartoes nao podem ser cortados pelo scroll.
+	var inner_pad := UiKit.margin(10, 10, 10, 10)
+	inner_pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inner_pad.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.add_child(inner_pad)
+
+	_main_box = VBoxContainer.new()
+	_main_box.name = "MainBox"
+	_main_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_main_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_main_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	inner_pad.add_child(_main_box)
+
+	var title_row: HBoxContainer = UiKit.screen_title("SELECIONE UM MINIGAME", UiPalette.FONT_TITLE.x)
+	_title_label = title_row.get_node("TitleLabel") as Label
+	_main_box.add_child(title_row)
+
+	_subtitle_label = UiKit.label("Escolha um desafio do Modo Livre. A Roleta de Risco fica como bônus surpresa da campanha.", 16, UiPalette.TEXT_MUTED, HORIZONTAL_ALIGNMENT_CENTER)
+	_subtitle_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_main_box.add_child(_subtitle_label)
+
+	var selector_holder := CenterContainer.new()
+	_main_box.add_child(selector_holder)
+	_difficulty_selector = DifficultySelector.new()
+	_difficulty_selector.name = "DifficultySelector"
+	_difficulty_selector.font_px = 16
+	_difficulty_selector.v_pad = 6
+	selector_holder.add_child(_difficulty_selector)
+	_difficulty_selector.difficulty_selected.connect(_on_difficulty_selected)
+
+	_rows_box = VBoxContainer.new()
+	_rows_box.name = "CardsRows"
+	_rows_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_rows_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_rows_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_main_box.add_child(_rows_box)
+
+	var difficulty: String = DifficultyManager.get_difficulty()
+	for index in range(MINIGAME_CARD_DATA.size()):
+		_make_card(index, MINIGAME_CARD_DATA[index], difficulty)
+
+	var back_holder := CenterContainer.new()
+	_main_box.add_child(back_holder)
+	back_button = UiKit.back_button()
+	back_button.pressed.connect(_on_back_pressed)
+	back_holder.add_child(back_button)
+
+## Cartao: [selo] Titulo / descricao / Recorde.
+func _make_card(index: int, data: Dictionary, difficulty: String) -> void:
+	var key: String = str(data.get("key", ""))
+	var button := Button.new()
+	button.name = "Btn_%s" % key
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	button.tooltip_text = str(data.get("description", ""))
+	ButtonStyles.apply(button, "ui_card", Vector2(280, 190), 16)
+
+	var pad := UiKit.margin(16, 16, 14, 14)
+	pad.set_anchors_preset(Control.PRESET_FULL_RECT)
+	button.add_child(pad)
+
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	pad.add_child(column)
+
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 14)
+	column.add_child(head)
+
+	var badge: PanelContainer = UiKit.icon_badge(UiIcons.for_minigame(key), 62, UiPalette.PRIMARY, UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.55), 18, 0.52)
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(badge)
+
+	var title_label: Label = UiKit.label(str(data.get("title", "Minigame")), 21, UiPalette.TEXT_ON_DARK)
+	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	head.add_child(title_label)
+
+	var description_label: Label = UiKit.label(str(data.get("description", "")), 15, UiPalette.TEXT_MUTED)
+	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_child(description_label)
+
+	var record_label: Label = UiKit.label("Recorde: %s" % UiKit.format_points(ScoreManager.get_free_mode_best_score(key, difficulty)), 15, UiPalette.TEXT_ON_DARK)
+	column.add_child(record_label)
+
+	UiKit.ignore_mouse(pad)
+	button.pressed.connect(_on_minigame_pressed.bind(index))
+	button.mouse_entered.connect(_animate_card.bind(button, true))
+	button.mouse_exited.connect(_animate_card.bind(button, false))
+	button.focus_entered.connect(_animate_card.bind(button, true))
+	button.focus_exited.connect(_animate_card.bind(button, false))
+	_card_buttons.append(button)
+	_card_titles.append(title_label)
+	_card_descriptions.append(description_label)
+	_card_records.append(record_label)
+	_card_badges.append(badge)
+
+# ---------------------------------------------------------------- layout
+func _apply_responsive_layout() -> void:
+	if _safe_area == null or _difficulty_selector == null or back_button == null:
 		return
-	var old_children: Array[Node] = []
-	for child in cards_box.get_children():
-		old_children.append(child)
-	for button_item in buttons:
-		var button: Button = button_item as Button
-		if button != null and button.get_parent() != null:
-			button.get_parent().remove_child(button)
-	for child in old_children:
-		if child.get_parent() == cards_box:
-			cards_box.remove_child(child)
-		if child is HBoxContainer:
-			child.queue_free()
-	var pattern: Array[int] = _row_pattern()
-	var button_index: int = 0
-	for count in pattern:
-		if button_index >= buttons.size():
-			break
-		var row := HBoxContainer.new()
-		row.name = "CardsRow%d" % (cards_box.get_child_count() + 1)
-		row.alignment = BoxContainer.ALIGNMENT_CENTER
-		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_theme_constant_override("separation", 12 if ScreenTools.is_compact(self) else 16)
-		cards_box.add_child(row)
-		for i in range(count):
-			if button_index >= buttons.size():
-				break
-			var button: Button = buttons[button_index] as Button
-			if button != null:
-				row.add_child(button)
-			button_index += 1
+	var view: Vector2 = ScreenTools.get_viewport_size(self)
+	var compact: bool = ScreenTools.is_compact(self)
+	var margin_x: int = 6 if compact else 24
+	var margin_y: int = 2 if compact else 22
+	_safe_area.add_theme_constant_override("margin_left", margin_x)
+	_safe_area.add_theme_constant_override("margin_right", margin_x)
+	_safe_area.add_theme_constant_override("margin_top", margin_y)
+	_safe_area.add_theme_constant_override("margin_bottom", margin_y)
+	_main_box.add_theme_constant_override("separation", 8 if compact else 12)
+	var gap: int = 12 if compact else 16
+	_rows_box.add_theme_constant_override("separation", gap)
 
-func _row_pattern() -> Array[int]:
-	var viewport_width: float = get_viewport_rect().size.x
-	if viewport_width >= 1040.0:
-		return [4, 3]
-	if viewport_width >= 760.0:
-		return [3, 2, 2]
-	return [1, 1, 1, 1, 1, 1, 1]
+	var columns: int = 4
+	if view.x < 520.0:
+		columns = 1
+	elif view.x < 760.0:
+		columns = 2
+	elif view.x < 1040.0:
+		columns = 3
+	var available: float = maxf(220.0, view.x - 2.0 * margin_x - 20.0)
+	var card_width: float = clampf(floor((available - float(gap) * float(columns - 1)) / float(columns)), 200.0, 300.0)
 
-func _connect_card_hover(button: Button) -> void:
-	if button == null:
-		return
-	if not button.mouse_entered.is_connected(_on_card_mouse_entered):
-		button.mouse_entered.connect(_on_card_mouse_entered.bind(button))
-	if not button.mouse_exited.is_connected(_on_card_mouse_exited):
-		button.mouse_exited.connect(_on_card_mouse_exited.bind(button))
+	ScreenTools.apply_label_font(_title_label, self, UiPalette.FONT_TITLE.x, UiPalette.FONT_TITLE.y)
+	ScreenTools.apply_label_font(_subtitle_label, self, 16, 14)
+	_difficulty_selector.set_compact(view.x < 560.0)
+	var card_height: float = 150.0 if compact else 190.0
+	for i in range(_card_buttons.size()):
+		_card_buttons[i].custom_minimum_size = Vector2(card_width, card_height)
+		_card_titles[i].add_theme_font_size_override("font_size", 18 if compact else 21)
+		_card_descriptions[i].add_theme_font_size_override("font_size", 14 if compact else 15)
+		_card_records[i].add_theme_font_size_override("font_size", 14 if compact else 15)
+		var badge_size: float = 50.0 if compact else 62.0
+		_card_badges[i].custom_minimum_size = Vector2(badge_size, badge_size)
+	_layout_rows(columns, gap)
+	ButtonStyles.apply(back_button, "ui_ghost", Vector2(222, 46 if compact else 52), 18)
 
-func _on_card_mouse_entered(button: Button) -> void:
-	_animate_card(button, true)
+## Distribui os cartoes em linhas de `columns` itens; cada linha e centralizada,
+## entao a ultima (incompleta) fica centralizada: 4 em cima, 3 embaixo.
+func _layout_rows(columns: int, gap: int) -> void:
+	for row in _rows_box.get_children():
+		for card in row.get_children():
+			row.remove_child(card)
+		_rows_box.remove_child(row)
+		row.queue_free()
+	var row_box: HBoxContainer = null
+	for i in range(_card_buttons.size()):
+		if i % columns == 0:
+			row_box = HBoxContainer.new()
+			row_box.alignment = BoxContainer.ALIGNMENT_CENTER
+			row_box.add_theme_constant_override("separation", gap)
+			_rows_box.add_child(row_box)
+		row_box.add_child(_card_buttons[i])
 
-func _on_card_mouse_exited(button: Button) -> void:
-	_animate_card(button, false)
-
-func _animate_card(button: Button, hovered: bool) -> void:
-	if button == null or not _animations_enabled():
+func _animate_card(button: Button, raised: bool) -> void:
+	if not _animations_enabled():
 		return
 	button.pivot_offset = button.size * 0.5
 	var tween: Tween = create_tween()
 	tween.set_trans(Tween.TRANS_QUAD)
 	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(button, "scale", Vector2.ONE * (1.035 if hovered else 1.0), 0.10)
+	tween.tween_property(button, "scale", Vector2.ONE * (1.02 if raised else 1.0), 0.10)
 
-func _apply_button_styles() -> void:
-	_apply_panel_style()
-	_apply_text_styles()
-	var viewport_width: float = get_viewport_rect().size.x
-	var wide: bool = viewport_width >= 1040.0
-	var medium: bool = viewport_width >= 760.0 and viewport_width < 1040.0
-	var option_size: Vector2 = Vector2(220, 128) if wide else (Vector2(210, 118) if medium else Vector2(270, 92))
-	var option_font: int = ScreenTools.responsive_font(self, 16, 13)
-	for index in range(buttons.size()):
-		var button: Button = buttons[index] as Button
-		if button != null:
-			ButtonStyles.apply(button, "minigame_card_gold" if index == 0 else "minigame_card", option_size, option_font)
-			button.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ScreenTools.apply_button(btn_back, self, "magic_back", Vector2(250, 46), Vector2(220, 42), 17, 15)
-
-func _apply_responsive_layout() -> void:
-	var compact: bool = ScreenTools.is_compact(self)
-	ScreenTools.apply_safe_margins(safe_area, self, 38, 14)
-	ScreenTools.apply_inner_margins(inner_margin, self, 26, 14)
-	if panel != null:
-		panel.custom_minimum_size = ScreenTools.panel_size(self, Vector2(1040, 610), Vector2(340, 600), 56.0, 48.0)
-	if main_box != null:
-		main_box.add_theme_constant_override("separation", 8 if compact else 14)
-	if cards_box != null:
-		cards_box.add_theme_constant_override("separation", 10 if compact else 14)
-	ScreenTools.apply_label_font(title_label, self, 30, 24)
-	ScreenTools.apply_label_font(subtitle_label, self, 17, 14)
-
-func _apply_panel_style() -> void:
-	if panel == null:
-		return
-	panel.add_theme_stylebox_override("panel", _make_magic_panel_style(PANEL_BG_MAGIC, PANEL_BORDER_MAGIC, 28, 2))
-
-func _apply_text_styles() -> void:
-	if title_label != null:
-		title_label.add_theme_color_override("font_color", TEXT_TITLE_MAGIC)
-		title_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.92))
-		title_label.add_theme_constant_override("shadow_offset_x", 2)
-		title_label.add_theme_constant_override("shadow_offset_y", 2)
-	if subtitle_label != null:
-		subtitle_label.add_theme_color_override("font_color", TEXT_MUTED_MAGIC)
-		subtitle_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.80))
-		subtitle_label.add_theme_constant_override("shadow_offset_x", 1)
-		subtitle_label.add_theme_constant_override("shadow_offset_y", 1)
-
-func _apply_magic_motion() -> void:
-	var pulse: float = 0.5 + 0.5 * sin(elapsed * 2.0)
-	if title_label != null:
-		title_label.modulate = Color(1.0, 0.93 + pulse * 0.07, 0.72 + pulse * 0.16, 1.0)
-	if panel != null:
-		panel.modulate = Color(1.0, 1.0, 1.0, 0.96 + pulse * 0.04)
-
-func _process(delta: float) -> void:
-	elapsed += delta
-	if not _animations_enabled():
-		if effects_canvas != null:
-			effects_canvas.visible = false
-		if panel != null:
-			panel.modulate = Color.WHITE
-		if title_label != null:
-			title_label.modulate = Color.WHITE
-		return
-	_apply_magic_motion()
-	if effects_canvas != null:
-		effects_canvas.visible = true
-	_update_particles(delta)
-	effects_canvas.queue_redraw()
-
-func _prepare_effects_layer() -> void:
-	if safe_area != null:
-		safe_area.z_index = 10
-	effects_canvas = Control.new()
-	effects_canvas.name = "FreeModeEffectsCanvas"
-	effects_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
-	effects_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	effects_canvas.z_index = 2
-	effects_canvas.draw.connect(_on_effects_canvas_draw)
-	add_child(effects_canvas)
+# ---------------------------------------------------------------- acoes
+## Troca de dificuldade: atualiza o "Recorde" de cada cartao para a dificuldade escolhida.
+func _on_difficulty_selected(_key: String) -> void:
+	var difficulty: String = DifficultyManager.get_difficulty()
+	for i in range(_card_records.size()):
+		var minigame_key: String = str(MINIGAME_CARD_DATA[i].get("key", ""))
+		_card_records[i].text = "Recorde: %s" % UiKit.format_points(ScoreManager.get_free_mode_best_score(minigame_key, difficulty))
 
 func _on_minigame_pressed(index: int) -> void:
-	if has_node("/root/AudioManager"):
-		AudioManager.play_click()
+	_click()
 	GameManager.start_free_minigame(index)
 
 func _on_back_pressed() -> void:
+	_click()
+	GameManager.open_mode_select()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		_on_back_pressed()
+
+func _click() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
-	GameManager.open_mode_select()
 
 func _animations_enabled() -> bool:
 	return not has_node("/root/SettingsManager") or SettingsManager.animations_enabled()
-
-func _reset_particles() -> void:
-	particles.clear()
-	var viewport_size: Vector2 = get_viewport_rect().size
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		viewport_size = Vector2(1280, 720)
-	for i in range(FREE_PARTICLE_COUNT):
-		particles.append({
-			"position": Vector2(randf_range(0.0, viewport_size.x), randf_range(0.0, viewport_size.y)),
-			"speed": randf_range(12.0, 38.0),
-			"font_size": randi_range(18, 34),
-			"alpha": randf_range(0.18, 0.58),
-			"wave": randf_range(0.0, TAU),
-			"symbol": FREE_SYMBOLS[i % FREE_SYMBOLS.size()]
-		})
-
-func _update_particles(delta: float) -> void:
-	var viewport_size: Vector2 = get_viewport_rect().size
-	for i in range(particles.size()):
-		var particle: Dictionary = particles[i]
-		var particle_pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
-		particle_pos.y -= float(particle.get("speed", 22.0)) * delta
-		particle_pos.x += sin(elapsed * 1.0 + float(particle.get("wave", 0.0))) * 16.0 * delta
-		if particle_pos.y < -36.0:
-			particle_pos.y = viewport_size.y + randf_range(20.0, 120.0)
-			particle_pos.x = randf_range(0.0, viewport_size.x)
-		particle["position"] = particle_pos
-		particles[i] = particle
-
-func _on_effects_canvas_draw() -> void:
-	if not _animations_enabled():
-		return
-	var viewport_size: Vector2 = get_viewport_rect().size
-	var pulse: float = (sin(elapsed * 2.2) + 1.0) * 0.5
-	effects_canvas.draw_rect(Rect2(Vector2.ZERO, viewport_size), Color(0.05, 0.03, 0.12, 0.040 + pulse * 0.020), true)
-	for particle in particles:
-		var particle_pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
-		var alpha: float = float(particle.get("alpha", 0.42))
-		var font_size: int = int(particle.get("font_size", 24))
-		var symbol: String = str(particle.get("symbol", "$"))
-		var color: Color = _symbol_color(symbol, alpha)
-		effects_canvas.draw_string(get_theme_default_font(), particle_pos, symbol, HORIZONTAL_ALIGNMENT_CENTER, -1.0, font_size, color)
-
-func _symbol_color(symbol: String, alpha: float) -> Color:
-	match symbol:
-		"$":
-			return Color(1.0, 0.82, 0.18, alpha)
-		"⚓":
-			return Color(0.35, 0.78, 1.0, alpha)
-		"💼":
-			return Color(1.0, 0.58, 0.22, alpha)
-		"🚨":
-			return Color(1.0, 0.26, 0.20, alpha)
-		"🧩":
-			return Color(0.70, 1.0, 0.70, alpha)
-		"🛑":
-			return Color(1.0, 0.22, 0.22, alpha)
-		"🚗":
-			return Color(0.80, 0.92, 1.0, alpha)
-		_:
-			return Color(0.74, 1.0, 0.74, alpha)
-
-func _make_magic_panel_style(bg_color: Color, border_color: Color, radius: int = 24, border_width: int = 2) -> StyleBoxFlat:
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = bg_color
-	style.border_color = border_color
-	style.border_width_left = border_width
-	style.border_width_top = border_width
-	style.border_width_right = border_width
-	style.border_width_bottom = border_width
-	style.set_corner_radius_all(radius)
-	style.content_margin_left = 14
-	style.content_margin_right = 14
-	style.content_margin_top = 12
-	style.content_margin_bottom = 12
-	style.shadow_color = Color(0.0, 0.0, 0.0, 0.46)
-	style.shadow_size = 14
-	return style
-
-func _dict_vec2(data: Dictionary, key: String, fallback: Vector2) -> Vector2:
-	var value: Variant = data.get(key, fallback)
-	if value is Vector2:
-		return value
-	return fallback

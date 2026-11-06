@@ -200,16 +200,27 @@ static func _palette(variant: String) -> Dictionary:
 		"option":
 			return _button_palette(FREE_OPTION, FREE_OPTION_HOVER, FREE_OPTION.darkened(0.14), WHITE, 12, 2)
 		# ---- Paleta Contal Master (acessivel). menu_* = semitransparentes sobre o cenario.
+		# Letras e icones SEMPRE brancos: a cor de fundo e escurecida ate o branco ter contraste.
 		"menu_play":
-			return _accessible_palette(UiPalette.PRIMARY, UiPalette.MENU_BUTTON_ALPHA, 18)
+			return _white_text_palette(UiPalette.PRIMARY, UiPalette.MENU_BUTTON_ALPHA, 18)
 		"menu_settings":
-			return _accessible_palette(UiPalette.SECONDARY, UiPalette.MENU_BUTTON_ALPHA, 18)
+			return _white_text_palette(UiPalette.SECONDARY, UiPalette.MENU_BUTTON_ALPHA, 18)
 		"menu_scores":
-			return _accessible_palette(UiPalette.ACCENT_REWARDS, UiPalette.MENU_BUTTON_ALPHA, 18)
+			return _white_text_palette(UiPalette.ACCENT_REWARDS, UiPalette.MENU_BUTTON_ALPHA, 18)
 		"menu_achievements":
-			return _accessible_palette(UiPalette.ACCENT_ACHIEVEMENTS, UiPalette.MENU_BUTTON_ALPHA, 18)
+			return _white_text_palette(UiPalette.ACCENT_ACHIEVEMENTS, UiPalette.MENU_BUTTON_ALPHA, 18)
 		"menu_exit":
 			return _accessible_palette(UiPalette.CARD, UiPalette.MENU_BUTTON_ALPHA, 18, UiPalette.HIGHLIGHT)
+		# ---- Cartoes grandes (Modo de jogo) e cartoes de lista (Modo livre).
+		"mode_card_primary":
+			return _white_text_palette(UiPalette.PRIMARY, 0.97, 26, 4.5)
+		"mode_card_secondary":
+			return _white_text_palette(UiPalette.SECONDARY, 0.97, 26, 4.5)
+		"ui_card":
+			return _list_card_palette()
+		# Interruptor ligado (preenchido em lilas, texto escuro por contraste).
+		"ui_toggle_on":
+			return _accessible_palette(UiPalette.HIGHLIGHT, 1.0, 12, UiPalette.TEXT_ON_DARK)
 		# ---- Dentro de cartoes (fundo solido): opacidade total.
 		"ui_primary":
 			return _accessible_palette(UiPalette.PRIMARY, 1.0, 12)
@@ -254,6 +265,26 @@ static func _accessible_palette(base: Color, alpha: float, radius: int, border_o
 		"border_width": 2,
 		"accessible": true
 	}
+
+## Paleta de botao com texto BRANCO: escurece a cor-base so o necessario para o branco ficar legivel.
+static func _white_text_palette(base: Color, alpha: float, radius: int, min_ratio: float = 4.8) -> Dictionary:
+	var fill: Color = UiPalette.fill_for_white_text(base, alpha, min_ratio)
+	var palette: Dictionary = _accessible_palette(fill, alpha, radius)
+	palette["border"] = UiPalette.with_alpha(base.lightened(0.32), 0.95)
+	palette["hover"] = UiPalette.with_alpha(fill.lightened(0.06), 1.0)
+	palette["pressed"] = UiPalette.with_alpha(UiPalette.fill_for_white_text(UiPalette.HIGHLIGHT, 1.0, min_ratio), 1.0)
+	palette["text"] = UiPalette.TEXT_ON_DARK
+	palette["text_hover"] = UiPalette.TEXT_ON_DARK
+	palette["text_pressed"] = UiPalette.TEXT_ON_DARK
+	return palette
+
+## Cartao de lista (minigames): fundo CARD_RAISED quase opaco, borda lilas, realce no hover.
+static func _list_card_palette() -> Dictionary:
+	var palette: Dictionary = _accessible_palette(UiPalette.CARD_RAISED, 0.97, 20, UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.55))
+	palette["hover"] = UiPalette.with_alpha(UiPalette.CARD_RAISED.lightened(0.10), 1.0)
+	palette["pressed"] = UiPalette.with_alpha(UiPalette.CARD_RAISED.darkened(0.22), 1.0)
+	palette["text_pressed"] = UiPalette.TEXT_ON_DARK
+	return palette
 
 static func _make_style(bg_color: Color, border_color: Color, radius: int = 14, border_width: int = 2) -> StyleBoxFlat:
 	var style: StyleBoxFlat = StyleBoxFlat.new()

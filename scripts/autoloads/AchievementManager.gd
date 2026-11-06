@@ -16,6 +16,10 @@ const FREE_MODE_REQUIRED_KEYS := [
 ]
 const DIFFICULTY_KEYS := ["facil", "normal", "dificil"]
 
+# Rank (insignia) por quantidade de conquistas. Platina = todas. Usado pelo rank e pela meta do painel.
+const RANK_SILVER_AT := 5
+const RANK_GOLD_AT := 9
+
 const ACHIEVEMENTS := [
 	{
 		"id": "primeiro_passo",
@@ -84,6 +88,7 @@ const ACHIEVEMENTS := [
 		"id": "boas_praticas",
 		"title": "Boas Práticas São Essenciais!",
 		"description": "Passe pela primeira vez por uma Roleta de Risco.",
+		"secret": true,
 		"icon": "roulette",
 		"icon_path": Paths.ACH_BOAS_PRATICAS
 	},
@@ -178,15 +183,18 @@ func get_total_count() -> int:
 
 
 func get_insignia_name() -> String:
-	var count: int = get_unlocked_count()
+	return get_insignia_name_for_count(get_unlocked_count())
+
+## Insignia para uma contagem qualquer de conquistas (usada na animacao de progresso).
+func get_insignia_name_for_count(count: int) -> String:
 	var total: int = get_total_count()
 	if count <= 0:
 		return "Sem insígnia"
 	if count >= total:
 		return "Platina"
-	if count >= 9:
+	if count >= RANK_GOLD_AT:
 		return "Ouro"
-	if count >= 5:
+	if count >= RANK_SILVER_AT:
 		return "Prata"
 	return "Bronze"
 
@@ -199,9 +207,9 @@ func get_rank() -> String:
 		return "Sem rank"
 	if count >= get_total_count():
 		return "Platina"
-	if count >= 9:
+	if count >= RANK_GOLD_AT:
 		return "Ouro"
-	if count >= 5:
+	if count >= RANK_SILVER_AT:
 		return "Prata"
 	return "Bronze"
 
@@ -214,6 +222,92 @@ func get_rank_icon() -> String:
 			return "medal"
 		_:
 			return "lock"
+
+## Pontos de rank mostrados na barra do painel: [{"name": "Prata", "count": 5}, ...].
+func get_rank_thresholds() -> Array:
+	return [
+		{"name": "Prata", "count": RANK_SILVER_AT},
+		{"name": "Ouro", "count": RANK_GOLD_AT},
+		{"name": "Platina", "count": get_total_count()}
+	]
+
+## Proximo rank para uma contagem de conquistas: {"name", "count", "remaining"}. Vazio se ja e Platina.
+func get_next_rank(count: int = -1) -> Dictionary:
+	var current: int = get_unlocked_count() if count < 0 else count
+	var steps: Array = [{"name": "Bronze", "count": 1}]
+	steps.append_array(get_rank_thresholds())
+	for step in steps:
+		var step_data: Dictionary = step as Dictionary
+		var needed: int = int(step_data.get("count", 0))
+		if current < needed:
+			return {"name": str(step_data.get("name", "")), "count": needed, "remaining": needed - current}
+	return {}
+
+## Conquista secreta: o cartao bloqueado mostra "???" em vez do titulo.
+func is_secret(achievement_id: String) -> bool:
+	return bool(get_achievement(achievement_id).get("secret", false))
+
+## Data/hora de desbloqueio salva no unlock() ("2026-11-05 14:30:00"). Vazio se nao desbloqueada.
+func get_unlocked_at(achievement_id: String) -> String:
+	_ensure_data_shape()
+	var unlocked: Dictionary = _data.get("unlocked", {})
+	var entry: Variant = unlocked.get(achievement_id, null)
+	if entry is Dictionary:
+		return str((entry as Dictionary).get("unlocked_at", ""))
+	return ""
+
+## Andamento de conquistas que tem uma medida natural (calculado dos recordes; nao precisa de contadores novos).
+## Retorna {"current": int, "target": int, "text": String} ou {} quando a conquista e de evento unico.
+func get_progress(achievement_id: String) -> Dictionary:
+	if not has_node("/root/ScoreManager"):
+		return {}
+	match achievement_id:
+		"profissional_dedicado":
+			var done: int = 0
+			var total: int = FREE_MODE_REQUIRED_KEYS.size() * DIFFICULTY_KEYS.size()
+			for minigame_key in FREE_MODE_REQUIRED_KEYS:
+				for difficulty_key in DIFFICULTY_KEYS:
+					if ScoreManager.has_free_mode_record(str(minigame_key), str(difficulty_key)):
+						done += 1
+			return {"current": done, "target": total, "text": "%d/%d" % [done, total]}
+		"ultrapassando_sistema":
+			var best: int = mini(ScoreManager.get_campaign_total_score("dificil"), PLATINUM_SCORE_HARD)
+			var best_text: String = UiKit.format_points(best).replace(" pts", "")
+			return {"current": best, "target": PLATINUM_SCORE_HARD, "text": "%s / %s" % [best_text, UiKit.format_points(PLATINUM_SCORE_HARD)]}
+	return {}
+
+# ---- "Vistas" (v4.2): o que o jogador ja viu na tela de Conquistas -------------------------------
+## Quantas conquistas desbloqueadas ja foram vistas na tela de Conquistas.
+func get_seen_count() -> int:
+	_ensure_data_shape()
+	var seen: Array = _data.get("seen", [])
+	var unlocked: Dictionary = _data.get("unlocked", {})
+	var count: int = 0
+	for id in seen:
+		if unlocked.has(str(id)):
+			count += 1
+	return count
+
+## Desbloqueada desde a ultima visita a tela de Conquistas (selo "NOVA").
+func is_new(achievement_id: String) -> bool:
+	_ensure_data_shape()
+	var unlocked: Dictionary = _data.get("unlocked", {})
+	var seen: Array = _data.get("seen", [])
+	return unlocked.has(achievement_id) and not seen.has(achievement_id)
+
+## Chamado ao sair da tela de Conquistas: tudo o que esta desbloqueado passa a contar como visto.
+func mark_all_seen() -> void:
+	_ensure_data_shape()
+	var unlocked: Dictionary = _data.get("unlocked", {})
+	var seen: Array = _data.get("seen", [])
+	var changed: bool = false
+	for id in unlocked.keys():
+		if not seen.has(str(id)):
+			seen.append(str(id))
+			changed = true
+	if changed:
+		_data["seen"] = seen
+		_save_data()
 
 func get_all_achievements() -> Array:
 	return ACHIEVEMENTS.duplicate(true)
@@ -274,6 +368,14 @@ func _load_data() -> void:
 			var parsed: Variant = JSON.parse_string(file.get_as_text())
 			if parsed is Dictionary:
 				_data = parsed as Dictionary
+				# v4.2: saves antigos nao tem "seen". O que ja estava desbloqueado conta como visto,
+				# assim ninguem recebe selo "NOVA" nem animacao de rank por conquistas antigas.
+				if not _data.has("seen"):
+					var old_seen: Array = []
+					var old_unlocked: Variant = _data.get("unlocked", {})
+					if old_unlocked is Dictionary:
+						old_seen = (old_unlocked as Dictionary).keys()
+					_data["seen"] = old_seen
 	_ensure_data_shape()
 	_save_data()
 
@@ -289,10 +391,13 @@ func _ensure_data_shape() -> void:
 		_data = _default_data()
 	if not _data.has("unlocked") or not (_data["unlocked"] is Dictionary):
 		_data["unlocked"] = {}
+	if not _data.has("seen") or not (_data["seen"] is Array):
+		_data["seen"] = []
 
 func _default_data() -> Dictionary:
 	return {
-		"unlocked": {}
+		"unlocked": {},
+		"seen": []
 	}
 
 func _prepare_notification_layer() -> void:
