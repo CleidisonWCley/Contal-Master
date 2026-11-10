@@ -12,8 +12,10 @@ config_version=5
 
 config/name="ContalMaster"
 config/version="0.9.2.1"
-run/main_scene="res://scenes/menus/MainMenu.tscn"
+run/main_scene="res://scenes/loading/LoadingScreen.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
+boot_splash/bg_color=Color(0.25662142, 0.14212537, 0.42546546, 1)
+boot_splash/image="uid://cmp14rltfrr3c"
 config/icon="res://assets/contalmaster_icon.png"
 
 [autoload]

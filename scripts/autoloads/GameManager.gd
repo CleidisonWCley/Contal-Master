@@ -284,6 +284,7 @@ func _load_phase(phase: Dictionary) -> void:
 	_change_scene(str(phase.get("scene", MAIN_MENU_SCENE)))
 
 func _change_scene(scene_path: String) -> void:
-	var result: Error = get_tree().change_scene_to_file(scene_path)
+	# V0.13: minigames e cutscenes passam pela tela de Loading (SceneLoader decide); menus trocam direto.
+	var result: Error = SceneLoader.change_scene(get_tree(), scene_path)
 	if result != OK:
 		push_error("Falha ao carregar cena %s. Código: %s" % [scene_path, result])

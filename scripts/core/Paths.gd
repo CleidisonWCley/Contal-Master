@@ -6,6 +6,7 @@ class_name Paths
 
 # ---- CENAS -------------------------------------------------------
 const SCENE_MAIN_MENU := "res://scenes/menus/MainMenu.tscn"
+const SCENE_LOADING := "res://scenes/loading/LoadingScreen.tscn"
 const SCENE_MODE_SELECT := "res://scenes/menus/ModeSelect.tscn"
 const SCENE_SETTINGS := "res://scenes/menus/Settings.tscn"
 const SCENE_SCORE := "res://scenes/menus/ScoreMenu.tscn"
@@ -117,7 +118,6 @@ const BG_DL_NOITE := "res://assets/background/minegames/desviologico/background_
 # ---- ICONES ------------------------------------------------------
 const ICON_LOCK := "res://assets/icons/cadeado.png"
 const ICON_TROPHY := "res://assets/icons/trofeu.png"
-const ICON_PLAY := "res://assets/icons/play.png"
 const ICON_MONEY := "res://assets/icons/money.png"
 const ICON_NAVAL := "res://assets/icons/naval.png"
 const ICON_SUITCASE := "res://assets/icons/mala.png"

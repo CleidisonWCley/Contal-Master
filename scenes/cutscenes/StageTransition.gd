@@ -21,7 +21,7 @@ const ICON_PATHS := {
 	"perseguicao": Paths.ICON_LOCK,
 	"forca_tecnica": Paths.ICON_LOCK,
 	"stop": Paths.ICON_STOP,
-	"desvio_logico": Paths.ICON_PLAY
+	"desvio_logico": Paths.ICONS_UI_DIR + "icon_car.svg"  # V0.13: o play.png era PRETO (sumia no fundo escuro)
 }
 
 const STYLE_MAP := {
