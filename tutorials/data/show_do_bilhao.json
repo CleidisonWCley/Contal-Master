@@ -1,0 +1,58 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "show_do_bilhao",
+  "host": "priscila",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "3 quadros. Pedagogia fica na novel da transicao.",
+  "steps": [
+    {
+      "id": "como_jogar",
+      "kind": "mecanica",
+      "speaker": "priscila",
+      "title": "Uma alternativa",
+      "text": "Leia o enunciado e clique em UMA alternativa. A resposta trava no clique, então pense antes. São {rounds} perguntas.",
+      "modes": [
+        "campaign"
+      ],
+      "targets": [
+        "options_box"
+      ]
+    },
+    {
+      "id": "como_jogar_livre",
+      "kind": "mecanica",
+      "speaker": "priscila",
+      "title": "Uma alternativa",
+      "text": "Sou a Priscila, da checagem normativa. Leia o enunciado e clique em UMA alternativa: a resposta trava no clique. São {rounds} perguntas valendo recorde.",
+      "modes": [
+        "free"
+      ],
+      "targets": [
+        "options_box"
+      ]
+    },
+    {
+      "id": "tempo",
+      "kind": "pontuacao",
+      "speaker": "priscila",
+      "title": "Rapidez com precisão",
+      "text": "O relógio corre enquanto você pensa: responda rápido para ganhar mais pontos. Acerto vale até {correct}; erro tira {wrong}.",
+      "targets": [
+        "score_label",
+        "difficulty_label"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "kind": "estrategia",
+      "speaker": "priscila",
+      "title": "Elimine primeiro",
+      "text": "Descarte o que está claramente errado e só então decida. Precisão antes de pressa!",
+      "targets": [
+        "question_panel"
+      ]
+    }
+  ]
+}

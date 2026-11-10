@@ -226,6 +226,14 @@ func has_campaign_record(difficulty: String) -> bool:
 	var difficulty_key := _normalize_difficulty(difficulty)
 	return campaign.has(difficulty_key)
 
+## True se ja existe QUALQUER campanha concluida e registrada (em qualquer dificuldade).
+## Libera o botao "Pular" dos tutoriais na campanha (V0.10.1).
+func has_any_campaign_record() -> bool:
+	for difficulty_key in DIFFICULTY_KEYS:
+		if has_campaign_record(str(difficulty_key)):
+			return true
+	return false
+
 func get_campaign_record(difficulty: String) -> Dictionary:
 	_ensure_data_shape()
 	var scores: Dictionary = _data.get("scores", {})
@@ -328,11 +336,26 @@ func _load_records() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
 		if file != null:
-			var parsed: Variant = JSON.parse_string(file.get_as_text())
+			var text: String = file.get_as_text()
+			file.close()
+			var parsed: Variant = JSON.parse_string(text)
 			if parsed is Dictionary:
 				_data = parsed as Dictionary
+			elif text.strip_edges() != "":
+				# Save ilegivel (JSON quebrado): guarda uma copia ANTES de recriar o arquivo, para nao perder o progresso.
+				_backup_unreadable_save(text)
 	_ensure_data_shape()
 	_save_records()
+
+func _backup_unreadable_save(text: String) -> void:
+	var backup_path: String = SAVE_PATH + ".corrompido.bak"
+	var backup := FileAccess.open(backup_path, FileAccess.WRITE)
+	if backup == null:
+		push_warning("Save ilegível e sem permissão para guardar cópia em %s" % backup_path)
+		return
+	backup.store_string(text)
+	backup.close()
+	push_warning("Save de pontuação ilegível: cópia guardada em %s" % backup_path)
 
 func _save_records() -> void:
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)

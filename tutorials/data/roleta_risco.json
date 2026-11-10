@@ -1,0 +1,58 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "roleta_risco",
+  "host": "julios",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "3 quadros.",
+  "steps": [
+    {
+      "id": "como_jogar",
+      "kind": "mecanica",
+      "speaker": "julios",
+      "title": "Gire e encare",
+      "text": "Aperte o botão e a roleta decide por você. Sem escolha, sem estratégia: é um giro só.",
+      "modes": [
+        "campaign"
+      ],
+      "targets": [
+        "spin_button"
+      ]
+    },
+    {
+      "id": "como_jogar_livre",
+      "kind": "mecanica",
+      "speaker": "julios",
+      "title": "Gire e encare",
+      "text": "Julios. Aperte o botão e a roleta decide por você. Sem escolha, um giro só, e o resultado conta para o seu recorde.",
+      "modes": [
+        "free"
+      ],
+      "targets": [
+        "spin_button"
+      ]
+    },
+    {
+      "id": "pontuacao",
+      "kind": "pontuacao",
+      "speaker": "julios",
+      "title": "Bônus ou prejuízo",
+      "text": "Setor bom soma pontos, setor ruim tira. No fim você vê o que fazer na vida real. Aprender é o prêmio.",
+      "targets": [
+        "score_label",
+        "status_label"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "kind": "estrategia",
+      "speaker": "julios",
+      "title": "Aqui a sorte manda",
+      "text": "Competência não gira a roleta. Mas leia a lição: o que cai aqui cai na sua mesa de auditor. Coragem... ou tolice.",
+      "targets": [
+        "spin_button"
+      ]
+    }
+  ]
+}

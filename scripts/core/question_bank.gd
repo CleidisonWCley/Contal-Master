@@ -2,8 +2,6 @@ extends RefCounted
 ## ContaLMaster - Banco de perguntas (tema: Revisão Externa de Qualidade pelos Pares, NBC PA 11).
 ##
 ## Le os 4 JSONs em res://scripts/core/data/ e entrega cada item JA NO FORMATO que
-## cada minigame atual espera (mesmos nomes de campo do antigo DynamicQuestionBank),
-## entao as cenas quase nao mudam. API publica compativel:
 ##   pick_rounds(minigame, difficulty, count) -> Array[Dictionary]
 ##   get_bank(minigame, difficulty)           -> Array[Dictionary]
 ## Extras novos:

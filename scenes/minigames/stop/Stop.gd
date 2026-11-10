@@ -126,7 +126,14 @@ func _ready() -> void:
 	_on_score_changed(ScoreManager.get_score())
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("musica_stop")
-	_start_question(0)
+	await _start_question(0)
+	# V0.10: tutorial do Cleiton depois da 1a letra sorteada; o relogio da rodada so comeca depois dele.
+	input_locked = true
+	await TutorialManager.play(self, "stop")
+	if not is_inside_tree():
+		return
+	round_start_msec = Time.get_ticks_msec()
+	input_locked = false
 
 func _process(delta: float) -> void:
 	if not _animations_enabled():

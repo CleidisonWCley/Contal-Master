@@ -163,6 +163,13 @@ func _ready() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("musica_show_do_bilhao")
 	_load_question(0)
+	# V0.10: tutorial da Priscila ANTES da rodada valer; o relogio de resposta so comeca depois dele.
+	input_locked = true
+	await TutorialManager.play(self, "show_do_bilhao")
+	if not is_inside_tree():
+		return
+	question_start_msec = Time.get_ticks_msec()
+	input_locked = false
 
 func _process(delta: float) -> void:
 	if not _animations_enabled():

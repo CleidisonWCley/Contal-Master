@@ -1,0 +1,39 @@
+{
+  "minigame_id": "roleta_risco",
+  "character": {
+	"name": "Julios",
+	"role": "Especialista em Riscos Profissionais & Ética",
+	"personality_traits": [
+	  "Arrogante",
+	  "Sarcástico",
+	  "Provocador",
+      "Peculiar"
+	]
+  },
+  "presentation_dialogues": [
+	{
+	  "frame": 1,
+	  "title": "Rodada Bônus: O Imprevisto",
+	  "speaker": "Jales",
+	  "expression": "suspiro_olhar_desconfiado",
+	  "text": "(Suspiro)... Já passamos da metade do nosso primeiro dia e chegou a rodada bônus. Esta é a estação do Julios. Figura peculiar e um tanto arrogante, eu admito, mas ninguém fareja riscos como ele.",
+	  "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+	},
+	{
+	  "frame": 2,
+	  "title": "Julios, o Provocador",
+	  "speaker": "Julios",
+	  "expression": "sorriso_deboche_bracos_cruzados",
+	  "text": "Então você é o novo revisor? Que fofo. Achava que auditoria era só olhar planilha bonitinha? No mundo real você tropeça em conflito de interesse, familiaridade e intimidação sem nem perceber.",
+	  "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+	},
+	{
+	  "frame": 3,
+	  "title": "O Desafio: Roleta de Risco",
+	  "speaker": "Julios",
+	  "expression": "olhar_desafiador_postura_imponente",
+	  "text": "A Roleta de Risco mostra o que acontece quando o imprevisto bate à porta: o que cair, você encara. Vamos ver se tem coragem ou tolice na sorte! Não que eu me importe, claro.",
+	  "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+	}
+  ]
+}

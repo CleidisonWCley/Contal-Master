@@ -1,0 +1,58 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "maleta_certa",
+  "host": "tiago",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "3 quadros.",
+  "steps": [
+    {
+      "id": "como_jogar",
+      "kind": "mecanica",
+      "speaker": "tiago",
+      "title": "Abra a maleta certa",
+      "text": "Cada maleta guarda uma resposta para o cenário. Clique na que traz a conduta correta. São {rounds} desafios.",
+      "modes": [
+        "campaign"
+      ],
+      "targets": [
+        "options_box"
+      ]
+    },
+    {
+      "id": "como_jogar_livre",
+      "kind": "mecanica",
+      "speaker": "tiago",
+      "title": "Abra a maleta certa",
+      "text": "Oi, eu sou o Tiago! Cada maleta guarda uma resposta para o cenário: clique na correta. São {rounds} desafios valendo recorde.",
+      "modes": [
+        "free"
+      ],
+      "targets": [
+        "options_box"
+      ]
+    },
+    {
+      "id": "tempo",
+      "kind": "pontuacao",
+      "speaker": "tiago",
+      "title": "Quanto mais rápido, melhor",
+      "text": "Enquanto o tempo corre, quanto mais rápido você acertar, mais pontos leva. Acerto vale até {correct}; erro tira {wrong}.",
+      "targets": [
+        "score_label",
+        "difficulty_label"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "kind": "estrategia",
+      "speaker": "tiago",
+      "title": "Ache a pista",
+      "text": "Dica: procure no cenário o fato que muda tudo, como um vínculo ou uma limitação. Bora lá!",
+      "targets": [
+        "problem_label"
+      ]
+    }
+  ]
+}

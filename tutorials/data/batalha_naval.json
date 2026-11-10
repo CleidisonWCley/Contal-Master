@@ -1,0 +1,77 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "batalha_naval",
+  "host": "anderson",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "4 quadros (mecanica + contador + pontuacao + estrategia). Seta aponta para D3 (indice 13 de cell_buttons) piscando em vermelho.",
+  "steps": [
+    {
+      "id": "como_jogar",
+      "kind": "mecanica",
+      "speaker": "anderson",
+      "title": "Dispare no tabuleiro",
+      "text": "Clique numa célula para disparar. Achou ameaça? Você vê o controle certo. Água? Segue a busca, é só tentar outra!",
+      "modes": [
+        "campaign"
+      ],
+      "targets": [
+        "grid_container"
+      ],
+      "card": "top",
+      "pointer_target": {
+        "member": "cell_buttons",
+        "index": 13
+      }
+    },
+    {
+      "id": "como_jogar_livre",
+      "kind": "mecanica",
+      "speaker": "anderson",
+      "title": "Dispare no tabuleiro",
+      "text": "Eae! Anderson aqui. Clique numa célula para disparar: ameaça mostra o controle certo, água é só tentar outra. Vale recorde!",
+      "modes": [
+        "free"
+      ],
+      "targets": [
+        "grid_container"
+      ],
+      "card": "top",
+      "pointer_target": {
+        "member": "cell_buttons",
+        "index": 13
+      }
+    },
+    {
+      "id": "contador",
+      "kind": "mecanica",
+      "speaker": "anderson",
+      "title": "Quantas faltam?",
+      "text": "O contador mostra as ameaças encontradas: são {threats} no nível {difficulty}. A rodada acaba quando você achar todas.",
+      "targets": [
+        "threat_counter_label"
+      ]
+    },
+    {
+      "id": "pontuacao",
+      "kind": "pontuacao",
+      "speaker": "anderson",
+      "title": "Mira afiada",
+      "text": "Cada ameaça vale {correct} pontos e cada tiro na água tira {wrong}. Não há relógio, mas chutar à toa sai caro.",
+      "targets": [
+        "score_label"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "kind": "estrategia",
+      "speaker": "anderson",
+      "title": "Varredura, não loteria",
+      "text": "Dispare espalhado, em xadrez, em vez de agrupar. Achou uma ameaça? Leia o controle com calma, é o aprendizado!",
+      "targets": [
+        "grid_container"
+      ]
+    }
+  ]
+}

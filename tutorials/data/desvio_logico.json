@@ -1,0 +1,134 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "desvio_logico",
+  "host": "natalia",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "Intro 3 quadros (campanha e livre). left/right = coach durante o treino mecanico; go = modal ANTES do carro acelerar (botao Continuar); decision = dica na 1a bifurcacao (Continuar fecha).",
+  "steps": [
+    {
+      "id": "carro_sozinho",
+      "kind": "mecanica",
+      "speaker": "natalia",
+      "title": "O carro anda sozinho",
+      "text": "Aqui você não acelera nem freia: o carro anda sozinho. Seu trabalho é só dizer para qual lado ele vai.",
+      "modes": [
+        "campaign"
+      ],
+      "target_rect": [
+        0.0,
+        0.18,
+        1.0,
+        0.78
+      ],
+      "pointer": "none",
+      "phase": "intro"
+    },
+    {
+      "id": "carro_sozinho_livre",
+      "kind": "mecanica",
+      "speaker": "natalia",
+      "title": "O carro anda sozinho",
+      "text": "Que alegria ter você na pista! O carro anda sozinho: você só escolhe o lado, e cada ponto vale para o seu recorde.",
+      "modes": [
+        "free"
+      ],
+      "target_rect": [
+        0.0,
+        0.18,
+        1.0,
+        0.78
+      ],
+      "pointer": "none",
+      "phase": "intro"
+    },
+    {
+      "id": "lados",
+      "kind": "mecanica",
+      "speaker": "natalia",
+      "title": "Esquerda ou direita",
+      "text": "Clique na metade ESQUERDA ou DIREITA da tela para desviar. Na bifurcação, esquerda é a Rota A e direita é a Rota B.",
+      "target_rect": [
+        0.0,
+        0.3,
+        1.0,
+        0.66
+      ],
+      "pointer": "none",
+      "phase": "intro"
+    },
+    {
+      "id": "vamos_praticar",
+      "kind": "pronto",
+      "speaker": "natalia",
+      "title": "Vamos praticar",
+      "text": "Agora um treino rápido: dois carros, um de cada lado. Estou aqui ao seu lado, torcendo por você!",
+      "pointer": "none",
+      "phase": "intro"
+    },
+    {
+      "id": "treino_esquerda",
+      "kind": "mecanica",
+      "speaker": "natalia",
+      "title": "Primeiro desvio",
+      "text": "O carro vem pela direita, então vá para a esquerda: clique no lado esquerdo da tela.",
+      "target_rect": [
+        0.0,
+        0.3,
+        0.5,
+        0.55
+      ],
+      "card": "top",
+      "pointer": "arrow_left",
+      "phase": "left",
+      "outline": false
+    },
+    {
+      "id": "treino_direita",
+      "kind": "mecanica",
+      "speaker": "natalia",
+      "title": "Agora o outro lado",
+      "text": "Muito bem! Agora o carro vem pela esquerda, então vá para a direita: clique no lado direito da tela.",
+      "target_rect": [
+        0.5,
+        0.3,
+        0.5,
+        0.55
+      ],
+      "card": "top",
+      "pointer": "arrow_right",
+      "phase": "right",
+      "outline": false
+    },
+    {
+      "id": "largada",
+      "kind": "pronto",
+      "speaker": "natalia",
+      "title": "Largada!",
+      "text": "Treino concluído! Quando você apertar Continuar, o carro acelera sozinho. Respire fundo... vamos acelerar!!!",
+      "pointer": "none",
+      "phase": "go",
+      "next_label": "Continuar"
+    },
+    {
+      "id": "escolha_rota",
+      "kind": "estrategia",
+      "speaker": "natalia",
+      "title": "Escolha a rota",
+      "text": "Leia a pergunta e compare as rotas. Clique na ESQUERDA para a Rota A ou na DIREITA para a Rota B. Sem pressa: aqui vale raciocinar!",
+      "target_rect": [
+        0.0,
+        0.3,
+        1.0,
+        0.6
+      ],
+      "card": "top",
+      "pointer": "none",
+      "phase": "decision",
+      "card_y": 0.34,
+      "outline": false,
+      "skip_label": "Continuar"
+    }
+  ]
+}

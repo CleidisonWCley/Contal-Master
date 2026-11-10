@@ -1,0 +1,192 @@
+{
+  "schema": "final_narrative",
+  "version": 3,
+  "notes": "Roteiro da cutscene final (V0.12). Ordem: farewell (Jales, escritorio a noite) -> meeting_call (Natalia chama) -> [corte p/ corredor, 012_corredor] corridor (Natalia, sprite natalia_2, 2 quadros de apoio) -> [corte p/ sala de reuniao] cast_thanks (elenco aparece um a um agradecendo) -> [corte] Ariel mostra o score (tier.ariel) -> score sobe -> tier.jales (fala final) -> creditos -> cena final (11_cena_creditos, cortina dourada, titulo e 'Obrigado por jogar') -> GAME OVER -> menu. O campo 'title' dos quadros NAO e mais exibido (a caixa mostra so o nome e a fala); pode ficar no JSON como anotacao. 'backgrounds' mapeia cada bloco para um id de Paths.CUTSCENE_BG_FINAL; o chao e a posicao da caixa de cada cenario ficam em Paths.CUTSCENE_FLOOR. 'tiers' vai do melhor para o pior; vale o primeiro cujo min_ratio <= pontos/referencia. A referencia e calculada por dificuldade (ver CutsceneFinal.gd).",
+  "backgrounds": {
+    "farewell": "escritorio_noite",
+    "meeting_call": "escritorio_noite",
+    "corridor": "corredor",
+    "cast_thanks": "sala_reuniao",
+    "ariel_intro": "sala_reuniao",
+    "score": "sala_reuniao",
+    "jales_closing": "sala_reuniao",
+    "credits": "sala_reuniao",
+    "finale": "cena_creditos"
+  },
+  "finale": {
+    "title": "CONTAL MASTER",
+    "thanks": "Obrigado por jogar!",
+    "subtitle": "A equipe ContalMaster agradece a sua jornada."
+  },
+  "farewell": [
+    {
+      "speaker": "jales",
+      "title": "Missão cumprida",
+      "text": "Chegamos ao fim da nossa jornada! Percorremos as oito estações lado a lado, em dois dias intensos, e, sinceramente, foi um prazer ter você na equipe."
+    },
+    {
+      "speaker": "jales",
+      "title": "Uma família",
+      "text": "Cada especialista deixou um pouco do que sabe com você. É isso que faz da ContalMaster uma família, e a partir de hoje você faz parte dela."
+    }
+  ],
+  "meeting_call": [
+    {
+      "speaker": "natalia",
+      "show": [
+        "jales",
+        "natalia"
+      ],
+      "title": "Sala de reunião",
+      "text": "Jales, o pessoal já está todo reunido! Ei, venha comigo, a equipe inteira está esperando você na sala de reunião. Ninguém quis começar sem você, sabia?"
+    },
+    {
+      "speaker": "natalia",
+      "show": [
+        "natalia"
+      ],
+      "title": "Venha comigo",
+      "text": "Vamos? Eu te acompanho até lá. E não fique nervoso: hoje o assunto é só agradecer. Estou muito orgulhosa de você!"
+    }
+  ],
+  "corridor": [
+    {
+      "speaker": "natalia",
+      "show": [
+        "natalia"
+      ],
+      "title": "Respire fundo",
+      "text": "Enquanto caminhamos até a sala, respire fundo e olhe para trás. Ontem você começou aprendendo a norma e hoje termina tomando decisões éticas."
+    },
+    {
+      "speaker": "natalia",
+      "show": [
+        "natalia"
+      ],
+      "title": "O que você leva daqui",
+      "text": "Errar fez parte do caminho: cada tropeço virou uma lição que você não esquece. E o que você leva daqui vai além de pontos: é um jeito de pensar com rigor, cuidado e coragem."
+    }
+  ],
+  "cast_thanks": [
+    {
+      "speaker": "jales",
+      "title": "A equipe reunida",
+      "text": "Pessoal, nosso revisor chegou! Vamos dar a ele as boas-vindas que merece."
+    },
+    {
+      "speaker": "priscila",
+      "title": "A Norma",
+      "text": "Cada prazo e cada ciclo da norma, você respeitou. Obrigada por levar a precisão a sério. É isso que sustenta uma revisão."
+    },
+    {
+      "speaker": "anderson",
+      "title": "As Evidências",
+      "text": "Eae, navegador! Você varreu o mapa inteiro e não deixou nenhuma falha afundar a gente. Valeu demais!"
+    },
+    {
+      "speaker": "tiago",
+      "title": "O Parecer",
+      "text": "Eu aprendi um monte te vendo trabalhar! Obrigado por mostrar que um parecer bem pensado faz toda a diferença."
+    },
+    {
+      "speaker": "julios",
+      "title": "O Imprevisto",
+      "text": "Tá, tá... você girou a roleta e encarou o risco. Admito que não foi tolice. Não conte pra ninguém que eu disse isso."
+    },
+    {
+      "speaker": "ariel",
+      "title": "O Prazo",
+      "text": "Você manteve a calma com o relógio correndo. Respeito. Obrigado por jogar com a gente."
+    },
+    {
+      "speaker": "aline",
+      "title": "A Terminologia",
+      "text": "Hmpf. Seu vocabulário melhorou a olhos vistos. Fico... satisfeita. Não se acostume com o elogio."
+    },
+    {
+      "speaker": "cleiton",
+      "title": "O Controle",
+      "text": "Foi uma honra revisar papéis ao seu lado. Obrigado pela seriedade e pela gentileza com que você jogou."
+    },
+    {
+      "speaker": "natalia",
+      "title": "A Ética",
+      "text": "E obrigada por cada escolha cuidadosa. Foi um prazer te guiar até aqui, de coração."
+    },
+    {
+      "speaker": "jales",
+      "title": "Todos juntos",
+      "text": "Em nome de toda a equipe ContalMaster: obrigado por jogar e por superar cada desafio com a gente!"
+    }
+  ],
+  "ariel_intro": {
+    "speaker": "ariel",
+    "title": "O placar"
+  },
+  "tiers": [
+    {
+      "id": "mestre",
+      "min_ratio": 0.8,
+      "title": "Mestre da Revisão",
+      "ariel": "Antes que alguém saia: eu anotei tudo, ponto por ponto. Prepare-se, essa pontuação chamou a atenção até do Julios.",
+      "jales": [
+        {
+          "title": "Que desempenho!",
+          "text": "Você dominou as oito estações com precisão de veterano. Se a revisão de amanhã dependesse só de você, eu dormiria tranquilo."
+        },
+        {
+          "title": "Sempre dá para ir além",
+          "text": "Mas quem é bom continua estudando. Que tal tentar o nível Difícil e superar o seu próprio recorde? Nós estaremos aqui. Obrigado, de coração."
+        }
+      ]
+    },
+    {
+      "id": "solido",
+      "min_ratio": 0.55,
+      "title": "Revisor de Confiança",
+      "ariel": "Antes que alguém saia: eu anotei tudo, ponto por ponto. Vamos ver como foi a sua jornada.",
+      "jales": [
+        {
+          "title": "Ótimo trabalho!",
+          "text": "Seu desempenho foi sólido e mostrou que você entende o que está fazendo. Dá para confiar em você numa revisão."
+        },
+        {
+          "title": "Falta pouco",
+          "text": "Ainda existem pontos para lapidar e você sabe quais são: treine os minigames em que tropeçou no modo livre e volte para a campanha. A ContalMaster te espera!"
+        }
+      ]
+    },
+    {
+      "id": "evolucao",
+      "min_ratio": 0.3,
+      "title": "Revisor em Evolução",
+      "ariel": "Antes que alguém saia: eu anotei tudo. Vamos olhar o placar com calma, porque cada ponto aqui conta uma história.",
+      "jales": [
+        {
+          "title": "Você chegou ao fim!",
+          "text": "E isso já diz muito sobre você. Teve acertos bonitos e alguns tropeços, e todo auditor passa por isso no começo."
+        },
+        {
+          "title": "Vamos de novo?",
+          "text": "Que tal rever no modo livre os minigames mais difíceis e tentar a campanha outra vez? Cada rodada afia o seu raciocínio. Estou torcendo por você!"
+        }
+      ]
+    },
+    {
+      "id": "recomeco",
+      "min_ratio": 0.0,
+      "title": "Revisor em Formação",
+      "ariel": "Sem pressa. O placar mostra onde estamos hoje, e é daqui que a gente começa. Eu anotei tudo.",
+      "jales": [
+        {
+          "title": "Olhe só onde você chegou",
+          "text": "Você terminou a jornada, e muita gente nem chega até aqui. Isso exige coragem, e coragem é a base de um bom auditor."
+        },
+        {
+          "title": "O começo de tudo",
+          "text": "A pontuação de hoje é só o ponto de partida. Treine no modo livre, tente o nível Fácil e volte quando quiser. A gente acredita em você!"
+        }
+      ]
+    }
+  ]
+}

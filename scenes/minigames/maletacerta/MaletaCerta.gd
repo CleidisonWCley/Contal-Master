@@ -91,6 +91,13 @@ func _ready() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("musica_maleta_certa")
 	_load_challenge(0)
+	# V0.10: tutorial do Tiago ANTES da rodada; o relogio do desafio so comeca depois dele.
+	input_locked = true
+	await TutorialManager.play(self, "maleta_certa")
+	if not is_inside_tree():
+		return
+	challenge_start_msec = Time.get_ticks_msec()
+	input_locked = false
 
 func _process(delta: float) -> void:
 	if not _animations_enabled():

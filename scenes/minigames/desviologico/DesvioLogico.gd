@@ -5,6 +5,7 @@ var traffic: DLTraffic = DLTraffic.new(self)
 var sideprops: DLSideProps = DLSideProps.new(self)
 var engineaudio: DLEngineAudio = DLEngineAudio.new(self)
 var waterfx: DLWaterFX = DLWaterFX.new(self)
+var tutorial: DLTutorial = DLTutorial.new(self)
 var difficulty: String = "normal"
 var questions: Array = []
 var current_round: int = 0
@@ -17,11 +18,6 @@ var correct_count: int = 0
 var local_points: int = 0
 var input_locked: bool = false
 var obstacle_data: Array = []
-var tutorial_arrow_textures: Dictionary = {}
-var tutorial_alpha: float = 0.0
-var tutorial_direction: int = DLConfig.LANE_CENTER
-var tutorial_message: String = ""
-var tutorial_submessage: String = ""
 var acceleration_elapsed: float = 0.0
 var acceleration_duration: float = 2.30
 var acceleration_ratio: float = 1.0
@@ -74,7 +70,6 @@ var score_hud: Control
 var pause_button: Button
 var pause_layer: Control
 var pause_menu: MinigamePause
-var tutorial_layer: Control
 var fade_rect: ColorRect
 func _ready() -> void:
 	randomize()
@@ -114,8 +109,6 @@ func _process(delta: float) -> void:
 		road_layer.queue_redraw()
 	if side_props_layer != null:
 		side_props_layer.queue_redraw()
-	if tutorial_layer != null:
-		tutorial_layer.queue_redraw()
 	if route_progress_hud != null:
 		route_progress_hud.queue_redraw()
 	if score_hud != null:
@@ -158,11 +151,15 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
+		if tutorial.is_point_over_ui(mouse_event.position):
+			return
 		if _is_gameplay_pointer(mouse_event.position):
 			_handle_pointer(mouse_event.position)
 			get_viewport().set_input_as_handled()
 	elif event is InputEventScreenTouch and event.pressed:
 		var touch_event: InputEventScreenTouch = event as InputEventScreenTouch
+		if tutorial.is_point_over_ui(touch_event.position):
+			return
 		if _is_gameplay_pointer(touch_event.position):
 			_handle_pointer(touch_event.position)
 			get_viewport().set_input_as_handled()
@@ -210,7 +207,7 @@ func _build_scene() -> void:
 	add_child(side_props_layer)
 
 	sideprops._load_side_prop_textures()
-	_load_tutorial_arrow_textures()
+	tutorial.load_textures()
 
 	obstacles_layer = Control.new()
 	obstacles_layer.name = "Obstacles"
@@ -247,7 +244,6 @@ func _build_hud() -> void:
 	_build_question_panel()
 	_build_status_panel()
 	_build_damage_hud()
-	_build_tutorial_layer()
 	_build_pause_button()
 
 func _build_route_progress_hud() -> void:
@@ -434,16 +430,6 @@ func _build_damage_hud() -> void:
 	damage_hud.draw.connect(_on_damage_hud_draw)
 	hud_layer.add_child(damage_hud)
 
-func _build_tutorial_layer() -> void:
-	tutorial_layer = Control.new()
-	tutorial_layer.name = "TutorialLayer"
-	tutorial_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	tutorial_layer.z_index = 58
-	tutorial_layer.visible = false
-	tutorial_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tutorial_layer.draw.connect(_on_tutorial_layer_draw)
-	hud_layer.add_child(tutorial_layer)
-
 func _build_pause_button() -> void:
 	# Botao + overlay de pause PADRONIZADOS (mesmo componente de todos os minigames).
 	# O Desvio Logico congela a simulacao por conta propria (gameplay_paused), sem pausar a arvore.
@@ -598,11 +584,6 @@ func _build_fade_layer() -> void:
 	fade_rect.z_index = 90
 	add_child(fade_rect)
 
-func _load_tutorial_arrow_textures() -> void:
-	tutorial_arrow_textures.clear()
-	tutorial_arrow_textures["left"] = _load_texture(str(DLConfig.TUTORIAL_ARROW_SPRITES["left"]))
-	tutorial_arrow_textures["right"] = _load_texture(str(DLConfig.TUTORIAL_ARROW_SPRITES["right"]))
-
 func _prepare_questions() -> void:
 	questions = DynamicQuestionBank.pick_rounds("desvio_logico", difficulty, DLConfig.TOTAL_ROUNDS)
 	if questions.is_empty():
@@ -663,7 +644,7 @@ func _start_round(index: int) -> void:
 	status_label.text = "Cenário: %s. Alterne entre esquerda/direita até a decisão." % _stage_name(index)
 	_fade_from_black()
 	if current_round == 0:
-		_start_tutorial_sequence()
+		tutorial.start_sequence()
 	else:
 		_begin_real_drive_after_tutorial()
 
@@ -681,8 +662,6 @@ func _begin_real_drive_after_tutorial() -> void:
 	car_visual_bob = 0.0
 	_reset_car_lane_tilt()
 	_set_car_sprite("reto")
-	if tutorial_layer != null:
-		tutorial_layer.visible = false
 	if pause_button != null:
 		pause_button.visible = true
 	_update_drive_timer_label()
@@ -718,120 +697,11 @@ func _complete_acceleration_start() -> void:
 	status_label.text = "Bionix em velocidade de rota. Desvie até a decisão técnica."
 	engineaudio._start_engine_loop_audio()
 
-func _start_tutorial_sequence() -> void:
-	state = DLConfig.STATE_TUTORIAL_INTRO
-	input_locked = true
-	traffic._reset_traffic_wave_distribution()
-	drive_elapsed = 0.0
-	traffic.next_spawn_time = traffic._first_spawn_delay()
-	if pause_button != null:
-		pause_button.visible = false
-	_show_tutorial_intro()
-	await get_tree().create_timer(2.0).timeout
-	if state != DLConfig.STATE_TUTORIAL_INTRO:
-		return
-	if _animations_enabled():
-		var tween := create_tween()
-		tween.tween_property(self, "tutorial_alpha", 0.0, 0.42)
-		await tween.finished
-	else:
-		tutorial_alpha = 0.0
-	_start_tutorial_left()
-
-func _show_tutorial_intro() -> void:
-	tutorial_direction = DLConfig.LANE_CENTER
-	tutorial_message = "MINIGAME DESVIO LÓGICO"
-	tutorial_submessage = "Clique na metade esquerda para desviar à esquerda. Clique na metade direita para desviar à direita."
-	tutorial_alpha = 1.0
-	if tutorial_layer != null:
-		tutorial_layer.visible = true
-		tutorial_layer.queue_redraw()
-	status_label.text = "Tutorial rápido: use esquerda e direita para desviar dos carros."
-
-func _start_tutorial_left() -> void:
-	state = DLConfig.STATE_TUTORIAL_LEFT
-	input_locked = false
-	current_lane = DLConfig.LANE_RIGHT
-	_set_car_sprite("reto")
-	_reset_car_lane_tilt()
-	_layout_car(false)
-	_clear_obstacles()
-	tutorial_direction = DLConfig.LANE_LEFT
-	tutorial_message = "DESVIE PARA A ESQUERDA"
-	tutorial_submessage = "Carro vindo pela direita. Clique no lado esquerdo da tela."
-	tutorial_alpha = 1.0
-	_spawn_tutorial_car(DLConfig.LANE_RIGHT)
-	status_label.text = "Tutorial: clique à esquerda para escapar do carro à direita."
-	if tutorial_layer != null:
-		tutorial_layer.visible = true
-		tutorial_layer.queue_redraw()
-
-func _start_tutorial_right() -> void:
-	state = DLConfig.STATE_TUTORIAL_RIGHT
-	input_locked = false
-	current_lane = DLConfig.LANE_LEFT
-	_set_car_sprite("reto")
-	_reset_car_lane_tilt()
-	_layout_car(false)
-	_clear_obstacles()
-	tutorial_direction = DLConfig.LANE_RIGHT
-	tutorial_message = "DESVIE PARA A DIREITA"
-	tutorial_submessage = "Carro vindo pela esquerda. Clique no lado direito da tela."
-	tutorial_alpha = 1.0
-	_spawn_tutorial_car(DLConfig.LANE_LEFT)
-	status_label.text = "Tutorial: clique à direita para escapar do carro à esquerda."
-	if tutorial_layer != null:
-		tutorial_layer.visible = true
-		tutorial_layer.queue_redraw()
-
-func _handle_tutorial_input(lane: int) -> void:
-	if state == DLConfig.STATE_TUTORIAL_LEFT:
-		if lane != DLConfig.LANE_LEFT:
-			status_label.text = "Clique no lado esquerdo para desviar desse carro."
-			return
-		_move_to_lane(DLConfig.LANE_LEFT)
-		input_locked = true
-		_clear_obstacles()
-		await get_tree().create_timer(0.35).timeout
-		if state == DLConfig.STATE_TUTORIAL_LEFT:
-			_start_tutorial_right()
-	elif state == DLConfig.STATE_TUTORIAL_RIGHT:
-		if lane != DLConfig.LANE_RIGHT:
-			status_label.text = "Clique no lado direito para desviar desse carro."
-			return
-		_move_to_lane(DLConfig.LANE_RIGHT)
-		input_locked = true
-		_clear_obstacles()
-		await get_tree().create_timer(0.35).timeout
-		if state == DLConfig.STATE_TUTORIAL_RIGHT:
-			_finish_tutorial_sequence()
-
-func _finish_tutorial_sequence() -> void:
-	_clear_obstacles()
-	tutorial_alpha = 0.0
-	if tutorial_layer != null:
-		tutorial_layer.visible = false
-	_reset_car_lane_tilt()
-	_set_car_sprite("reto")
-	_begin_real_drive_after_tutorial()
-
-func _spawn_tutorial_car(lane: int) -> void:
-	var viewport_height: float = maxf(get_viewport_rect().size.y, 720.0)
-	var y: float = viewport_height * 0.370
-	traffic._spawn_npc_at(lane, y, true, 0.34)
-	if obstacle_data.size() > 0:
-		var data: Dictionary = obstacle_data[obstacle_data.size() - 1]
-		data["tutorial"] = true
-		data["grace"] = 9999.0
-		data["collision_y"] = viewport_height * 9.0
-		data["speed"] = _obstacle_speed() * 0.34
-		obstacle_data[obstacle_data.size() - 1] = data
-
 func _is_tutorial_state() -> bool:
-	return state == DLConfig.STATE_TUTORIAL_INTRO or state == DLConfig.STATE_TUTORIAL_LEFT or state == DLConfig.STATE_TUTORIAL_RIGHT
+	return tutorial.is_active_state()
 
 func _is_tutorial_car_state() -> bool:
-	return state == DLConfig.STATE_TUTORIAL_LEFT or state == DLConfig.STATE_TUTORIAL_RIGHT
+	return tutorial.is_car_state()
 
 func _set_background(index: int) -> void:
 	var path: String = DLConfig.BACKGROUNDS[clampi(index, 0, DLConfig.BACKGROUNDS.size() - 1)]
@@ -961,6 +831,7 @@ func _enter_decision_phase() -> void:
 	question_label.text = str(q.get("pergunta", "Escolha o melhor caminho técnico."))
 	_set_car_sprite("reto")
 	_layout_car(false)
+	tutorial.on_decision_phase()
 
 func _on_choice_pressed(choice: String) -> void:
 	if state != DLConfig.STATE_DECISION or input_locked:
@@ -969,6 +840,7 @@ func _on_choice_pressed(choice: String) -> void:
 
 func _resolve_choice(choice: String) -> void:
 	input_locked = true
+	tutorial.on_choice_made()
 	state = DLConfig.STATE_TURN_EXIT
 	last_turn_choice = choice
 	last_route_damage_loss = 0.0
@@ -1148,7 +1020,7 @@ func _handle_lane_or_choice(lane: int) -> void:
 		_show_center_hint()
 		return
 	if state == DLConfig.STATE_TUTORIAL_LEFT or state == DLConfig.STATE_TUTORIAL_RIGHT:
-		_handle_tutorial_input(lane)
+		tutorial.handle_input(lane)
 	elif state == DLConfig.STATE_DRIVE:
 		_move_to_lane(lane)
 	elif state == DLConfig.STATE_DECISION:
@@ -1785,49 +1657,6 @@ func _canvas_item_global_position(node: Node) -> Vector2:
 	var adjusted_y: float = raw_pos.y * scale_y
 
 	return Vector2(adjusted_x, adjusted_y)
-
-func _on_tutorial_layer_draw() -> void:
-	if tutorial_layer == null or not tutorial_layer.visible or tutorial_alpha <= 0.01:
-		return
-	var viewport_size: Vector2 = get_viewport_rect().size
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		return
-	var font: Font = get_theme_default_font()
-	var pulse: float = 0.5 + 0.5 * sin(road_time * 8.0)
-	var card_w: float = minf(viewport_size.x * 0.86, 920.0)
-	var card_h: float = 168.0 if state == DLConfig.STATE_TUTORIAL_INTRO else 142.0
-	var card_pos: Vector2 = Vector2((viewport_size.x - card_w) * 0.5, viewport_size.y * 0.135)
-	var card_rect: Rect2 = Rect2(card_pos, Vector2(card_w, card_h))
-	tutorial_layer.draw_rect(card_rect, Color(0.01, 0.025, 0.060, 0.46 * tutorial_alpha), true)
-	tutorial_layer.draw_rect(card_rect, Color(0.0, 0.92, 1.0, 0.72 * tutorial_alpha), false, 2.0)
-	if state == DLConfig.STATE_TUTORIAL_INTRO:
-		tutorial_layer.draw_string(font, card_pos + Vector2(0.0, 38.0), tutorial_message, HORIZONTAL_ALIGNMENT_CENTER, card_w, 28, Color(0.74, 0.98, 1.0, tutorial_alpha))
-		var arrow_y: float = card_pos.y + 86.0
-		_draw_tutorial_arrow(Vector2(card_pos.x + card_w * 0.24 - pulse * 8.0, arrow_y), DLConfig.LANE_LEFT, 1.0, tutorial_alpha)
-		_draw_tutorial_arrow(Vector2(card_pos.x + card_w * 0.76 + pulse * 8.0, arrow_y), DLConfig.LANE_RIGHT, 1.0, tutorial_alpha)
-		tutorial_layer.draw_string(font, card_pos + Vector2(card_w * 0.36, 95.0), "faixa centro", HORIZONTAL_ALIGNMENT_CENTER, card_w * 0.28, 18, Color(1.0, 0.92, 0.45, tutorial_alpha))
-		tutorial_layer.draw_string(font, card_pos + Vector2(28.0, 136.0), "clique para seguir para esquerda", HORIZONTAL_ALIGNMENT_LEFT, card_w * 0.43, 17, Color(0.96, 0.98, 1.0, tutorial_alpha))
-		tutorial_layer.draw_string(font, card_pos + Vector2(card_w * 0.54, 136.0), "clique para seguir para direita", HORIZONTAL_ALIGNMENT_RIGHT, card_w * 0.43, 17, Color(0.96, 0.98, 1.0, tutorial_alpha))
-	else:
-		var arrow_offset: float = (-pulse * 10.0) if tutorial_direction == DLConfig.LANE_LEFT else (pulse * 10.0)
-		_draw_tutorial_arrow(Vector2(card_pos.x + card_w * 0.50 + arrow_offset, card_pos.y + 50.0), tutorial_direction, 1.28, tutorial_alpha)
-		tutorial_layer.draw_string(font, card_pos + Vector2(0.0, 88.0), tutorial_message, HORIZONTAL_ALIGNMENT_CENTER, card_w, 25, Color(1.0, 0.92, 0.45, tutorial_alpha))
-		tutorial_layer.draw_string(font, card_pos + Vector2(20.0, 121.0), tutorial_submessage, HORIZONTAL_ALIGNMENT_CENTER, card_w - 40.0, 17, Color(0.95, 0.98, 1.0, tutorial_alpha))
-
-func _draw_tutorial_arrow(center: Vector2, direction: int, scale_value: float, alpha: float) -> void:
-	var key: String = "left" if direction == DLConfig.LANE_LEFT else "right"
-	var texture: Texture2D = tutorial_arrow_textures.get(key, null)
-	var size_value: Vector2 = Vector2(180.0, 54.0) * scale_value
-	if texture != null:
-		tutorial_layer.draw_texture_rect(texture, Rect2(center - size_value * 0.5, size_value), false, Color(1.0, 1.0, 1.0, alpha))
-		return
-	var direction_sign: float = -1.0 if direction == DLConfig.LANE_LEFT else 1.0
-	var start: Vector2 = center - Vector2(direction_sign * -68.0, 0.0) * scale_value
-	var finish: Vector2 = center + Vector2(direction_sign * 68.0, 0.0) * scale_value
-	tutorial_layer.draw_line(start, finish, Color(0.0, 0.92, 1.0, alpha), 7.0 * scale_value)
-	var tip: Vector2 = finish
-	tutorial_layer.draw_line(tip, tip - Vector2(direction_sign * 26.0, 18.0) * scale_value, Color(0.0, 0.92, 1.0, alpha), 7.0 * scale_value)
-	tutorial_layer.draw_line(tip, tip - Vector2(direction_sign * 26.0, -18.0) * scale_value, Color(0.0, 0.92, 1.0, alpha), 7.0 * scale_value)
 
 func _on_road_layer_draw() -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size

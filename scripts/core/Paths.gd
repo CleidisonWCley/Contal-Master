@@ -25,8 +25,79 @@ const SCENE_DESVIO_LOGICO := "res://scenes/minigames/desviologico/DesvioLogico.t
 
 # ---- BACKGROUNDS - menus e cutscenes -----------------------------
 const BG_MENU_MAIN := "res://assets/background/menus/menu_inicial/main_clean.png"
-const BG_CUTSCENE_INTRO := "res://assets/background/cutcines/curtcine_intro.png"
-const BG_CUTSCENE_FINAL := "res://assets/background/cutcines/curtcine_final.png"
+
+# ---- BACKGROUNDS - cutscenes numeradas (V0.11) --------------------
+# 00      = introducao do jogo (dia 1, manha)
+# 01..07  = transicao de novel de cada minigame do DIA 1 (Show do Bilhao ate STOP)
+# 08      = transicao do Desvio Logico: DIA 2, garagem de manha
+# 09..11  = fechamento: escritorio a noite -> sala de reuniao -> cena final dos creditos
+const CUT_DIR := "res://assets/background/cutcines/"
+const BG_CUT_00_ESCRITORIO := CUT_DIR + "00_escritorio.png"
+const BG_CUT_00_RECEPCAO := CUT_DIR + "00_recepcao.png"
+const BG_CUT_01_SHOW_BILHAO := CUT_DIR + "01_show_bilhao.png"
+const BG_CUT_02_BATALHA_NAVAL := CUT_DIR + "02_batalha_naval.png"
+const BG_CUT_03_MALETA_CERTA := CUT_DIR + "03_maleta_certa.png"
+const BG_CUT_04_ROLETA_RISCO := CUT_DIR + "04_roleta_risco.png"
+const BG_CUT_05_PERSEGUICAO := CUT_DIR + "05_perseguicao.png"
+const BG_CUT_06_FORCA_TECNICA := CUT_DIR + "06_forca_tecnica.png"
+const BG_CUT_07_STOP := CUT_DIR + "07_stop.png"
+const BG_CUT_08_DESVIO_LOGICO := CUT_DIR + "08_desvio_logico.png"
+const BG_CUT_09_ESCRITORIO := CUT_DIR + "09_escritorio.png"
+const BG_CUT_10_SALA_REUNIAO := CUT_DIR + "10_sala_reuniao.png"
+const BG_CUT_11_CENA_CREDITOS := CUT_DIR + "11_cena_creditos.png"
+## V0.12: corredor entre o escritorio e a sala de reuniao (novel de apoio da Natalia). O arquivo se chama 012_corredor.png.
+const BG_CUT_12_CORREDOR := CUT_DIR + "012_corredor.png"
+
+## Background de novel de cada minigame da campanha (chave = key de GameManager.PHASES).
+const CUTSCENE_BG_BY_PHASE := {
+	"show_do_bilhao": BG_CUT_01_SHOW_BILHAO,
+	"batalha_naval": BG_CUT_02_BATALHA_NAVAL,
+	"maleta_certa": BG_CUT_03_MALETA_CERTA,
+	"roleta_risco": BG_CUT_04_ROLETA_RISCO,
+	"perseguicao": BG_CUT_05_PERSEGUICAO,
+	"forca_tecnica": BG_CUT_06_FORCA_TECNICA,
+	"stop": BG_CUT_07_STOP,
+	"desvio_logico": BG_CUT_08_DESVIO_LOGICO
+}
+
+## Introducao: a chave "background" de cada pagina de intro.json escolhe um destes ids.
+const CUTSCENE_BG_INTRO := {
+	"recepcao": BG_CUT_00_RECEPCAO,
+	"escritorio": BG_CUT_00_ESCRITORIO
+}
+
+## Fechamento: a chave "background" de cada bloco da cutscene final escolhe um destes ids.
+const CUTSCENE_BG_FINAL := {
+	"escritorio_noite": BG_CUT_09_ESCRITORIO,
+	"corredor": BG_CUT_12_CORREDOR,
+	"sala_reuniao": BG_CUT_10_SALA_REUNIAO,
+	"cena_creditos": BG_CUT_11_CENA_CREDITOS
+}
+
+## cenario do final, como fracao da altura da tela (0 = topo, 1 = base).
+## Os personagens (sprites "_2", corpo inteiro) sao posicionados com os PES nessa linha, para nao flutuar.
+##   front = linha dos pes de quem esta sozinho ou na fileira da frente; back = fileira de tras (elenco reunido).
+##   ppm / row_ppm = escala (fracao da altura da tela POR METRO de altura do personagem, ver CharacterHeights) sozinho / no
+##   elenco. V0.11.1: a caixa de dialogo fica SEMPRE embaixo (padrao das novels) e cobre parte das pernas e dos pes.
+const CUTSCENE_FLOOR := {
+	"escritorio_noite": {"front": 1.05, "back": 1.05, "ppm": 0.55, "row_ppm": 0.40},
+	"corredor":         {"front": 1.05, "back": 1.05, "ppm": 0.58, "row_ppm": 0.40},
+	"sala_reuniao": {"front": 0.76, "back": 0.68, "ppm": 0.30, "row_ppm": 0.265}
+}
+
+##TAMANHO DAS NOVELS (sprites "_1"). >>> E AQUI QUE SE AJUSTA O TAMANHO DOS PERSONAGENS NAS NOVELS <<<
+## Todos usam a MESMA escala em metros (ver CharacterHeights.gd), entao so 2 numeros mandam:
+##   "ppm"     = TAMANHO: fracao da altura da tela POR METRO de altura do personagem.
+##               0.32 = pequeno/longe (1,80 m ocupa 58% da tela) | 0.50 = medio | 0.62 = grande (cintura para cima) | 0.70 = bem perto.
+##   "visible" = QUANTO DO CORPO do mais alto aparece ACIMA do quadro de dialogo (0.50 = ate a cintura, 0.65 = ate o joelho,
+##               1.0 = corpo inteiro). O resto do corpo continua la, escondido ATRAS do quadro (nada e apagado).
+##   "top_margin" = folga minima acima da cabeca do mais alto (fracao da tela). Se "ppm" + "visible" fizerem a cabeca
+##               passar do topo, o codigo reduz o tamanho de TODOS na mesma proporcao.
+## Vale para as novels das transicoes e para o Jales na introducao.
+const NOVEL_LAYOUT := {"ppm": 0.62, "visible": 0.50, "top_margin": 0.03, "compact_factor": 0.92}
+
+## shader de desfoque suave aplicado ao fundo das novels (efeito Godot, sem imagem).
+const SHADER_NOVEL_BLUR := "res://assets/shaders/novel_blur.gdshader"
 
 # ---- BACKGROUNDS - minigames -------------------------------------
 const BG_BATALHA_NAVAL := "res://assets/background/minegames/batalhanaval/background_batalha_naval.png"
@@ -85,9 +156,49 @@ const INSIGNIA_SILVER := "res://assets/insignias/prata_conquist.png"
 const INSIGNIA_GOLD := "res://assets/insignias/ouro_conquist.png"
 const INSIGNIA_PLATINUM := "res://assets/insignias/platina_conquist.png"
 
-# ---- SPRITES -----------------------------------------------------
-# Mascote Jales (substituiu o antigo pascal.png). Cutscenes usam so a versao "receptivo" (recortada, fundo transparente).
-const SPRITE_JALES_RECEPTIVO := "res://assets/sprites/jales-receptivo-transparente.png"
+# ---- SPRITES - Personagens (tutoriais e apresentacoes dos minigames) ---------
+# ATENCAO: as pastas Priscilla / Ariel / Cleiton / Natalia comecam com MAIUSCULA no disco (Linux/Android diferenciam).
+const CHAR_JALES_1 := "res://assets/sprites/personagens/jales/jales_1.png"
+const CHAR_JALES := CHAR_JALES_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_PRISCILA_1 := "res://assets/sprites/personagens/Priscilla/priscila_1.png"
+const CHAR_PRISCILA := CHAR_PRISCILA_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_ANDERSON_1 := "res://assets/sprites/personagens/anderson/anderson_1.png"
+const CHAR_ANDERSON := CHAR_ANDERSON_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_TIAGO_1 := "res://assets/sprites/personagens/tiago/tiago_1.png"
+const CHAR_TIAGO := CHAR_TIAGO_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_JULIOS_1 := "res://assets/sprites/personagens/julios/julios_1.png"
+const CHAR_JULIOS := CHAR_JULIOS_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_ARIEL_1 := "res://assets/sprites/personagens/Ariel/ariel_1.png"
+const CHAR_ARIEL := CHAR_ARIEL_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_CLEITON_1 := "res://assets/sprites/personagens/Cleiton/cleiton_1.png"
+const CHAR_CLEITON := CHAR_CLEITON_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_ALINE_1 := "res://assets/sprites/personagens/aline/aline_1.png"
+const CHAR_ALINE := CHAR_ALINE_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+const CHAR_NATALIA_1 := "res://assets/sprites/personagens/Natalia/natalia_1.png"
+const CHAR_NATALIA := CHAR_NATALIA_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
+
+## REGRA DE NUMERACAO DOS SPRITES: "_1" = corpo inteiro das NOVELS (transicoes dos minigames e introducao);
+## "_2" = corpo inteiro da CENA FINAL; "_3" = recorte da cintura para cima dos TUTORIAIS.
+## variantes dos sprites. "_2" = corpo inteiro (cena final, equipe reunida). "_3" = recorte da cintura para cima
+## (novels e tutoriais) e e usado INTEIRO, sem recorte por codigo, para nao perder nenhum detalhe do desenho.
+const CHAR_JALES_2 := "res://assets/sprites/personagens/jales/jales_2.png"
+const CHAR_PRISCILA_2 := "res://assets/sprites/personagens/Priscilla/priscila_2.png"
+const CHAR_ANDERSON_2 := "res://assets/sprites/personagens/anderson/anderson_2.png"
+const CHAR_TIAGO_2 := "res://assets/sprites/personagens/tiago/tiago_2.png"
+const CHAR_JULIOS_2 := "res://assets/sprites/personagens/julios/julios_2.png"
+const CHAR_ARIEL_2 := "res://assets/sprites/personagens/Ariel/ariel_2.png"
+const CHAR_CLEITON_2 := "res://assets/sprites/personagens/Cleiton/cleiton_2.png"
+const CHAR_ALINE_2 := "res://assets/sprites/personagens/aline/aline_2.png"
+const CHAR_NATALIA_2 := "res://assets/sprites/personagens/Natalia/natalia_2.png"
+const CHAR_JALES_3 := "res://assets/sprites/personagens/jales/jales_3.png"
+const CHAR_PRISCILA_3 := "res://assets/sprites/personagens/Priscilla/priscila_3.png"
+const CHAR_ANDERSON_3 := "res://assets/sprites/personagens/anderson/anderson_3.png"
+const CHAR_TIAGO_3 := "res://assets/sprites/personagens/tiago/tiago_3.png"
+const CHAR_JULIOS_3 := "res://assets/sprites/personagens/julios/julios_3.png"
+const CHAR_ARIEL_3 := "res://assets/sprites/personagens/Ariel/ariel_3.png"
+const CHAR_CLEITON_3 := "res://assets/sprites/personagens/Cleiton/cleiton_3.png"
+const CHAR_ALINE_3 := "res://assets/sprites/personagens/aline/aline_3.png"
+const CHAR_NATALIA_3 := "res://assets/sprites/personagens/Natalia/natalia_3.png"
 
 # ---- SPRITES - Desvio Logico -------------------------------------
 const DL_CAR_STRAIGHT := "res://assets/sprites/desvio_logico/carro_desvio_reto.png"
@@ -106,6 +217,37 @@ const DL_PROP_SIGN := "res://assets/sprites/desvio_logico/props/placa_bifurcacao
 const DL_PROP_CYCLIST := "res://assets/sprites/desvio_logico/props/ciclista_lateral.png"
 const DL_TUTORIAL_ARROW_LEFT := "res://assets/sprites/desvio_logico/tutorial_seta_esquerda.png"
 const DL_TUTORIAL_ARROW_RIGHT := "res://assets/sprites/desvio_logico/tutorial_seta_direita.png"
+
+# ---- DIALOGOS / NARRATIVA (V0.10.1) -------------------------------
+const DIALOGUES_DIR := "res://scripts/data/dialogues/"
+const DIALOGUE_INTRO := "res://scripts/data/dialogues/intro.json"
+const DIALOGUE_FINAL := "res://scripts/data/dialogues/final.json"
+## Apresentacao (3 quadros: Jales + anfitriao) exibida na transicao antes de cada minigame da campanha.
+const DIALOGUE_MINIGAMES := {
+	"show_do_bilhao": "res://scripts/data/dialogues/show_do_bilhao.json",
+	"batalha_naval": "res://scripts/data/dialogues/batalha_naval.json",
+	"maleta_certa": "res://scripts/data/dialogues/maleta_certa.json",
+	"roleta_risco": "res://scripts/data/dialogues/roleta_risco.json",
+	"perseguicao": "res://scripts/data/dialogues/perseguicao.json",
+	"forca_tecnica": "res://scripts/data/dialogues/forca.json",
+	"stop": "res://scripts/data/dialogues/stop.json",
+	"desvio_logico": "res://scripts/data/dialogues/desvio_logico.json"
+}
+
+# ---- TUTORIAIS DOS MINIGAMES (V0.10) -----------------------------
+const TUTORIALS_DIR := "res://tutorials/"
+const TUTORIAL_OVERLAY_SCENE := "res://tutorials/TutorialOverlay.tscn"
+const TUTORIAL_DATA_DIR := "res://tutorials/data/"
+const TUTORIAL_DATA := {
+	"show_do_bilhao": "res://tutorials/data/show_do_bilhao.json",
+	"batalha_naval": "res://tutorials/data/batalha_naval.json",
+	"maleta_certa": "res://tutorials/data/maleta_certa.json",
+	"roleta_risco": "res://tutorials/data/roleta_risco.json",
+	"perseguicao": "res://tutorials/data/perseguicao.json",
+	"forca_tecnica": "res://tutorials/data/forca_tecnica.json",
+	"stop": "res://tutorials/data/stop.json",
+	"desvio_logico": "res://tutorials/data/desvio_logico.json"
+}
 
 # ---- MUSICAS -----------------------------------------------------
 const MUSIC_MENU := "res://assets/sounds/musica/music_menu.ogg"

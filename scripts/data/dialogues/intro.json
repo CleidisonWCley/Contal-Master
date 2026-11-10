@@ -1,0 +1,30 @@
+[
+  {
+	"frame_id": 1,
+	"character_id": "jales",
+	"background": "recepcao",
+	"title": "Bem-vindo ao ContalMaster!",
+	"body": "Olá! Que bom ter você aqui! Sou o Jales, líder da equipe ContalMaster. Aqui a gente trabalha com muito rigor, mas cuida uns dos outros como uma família."
+  },
+  {
+	"frame_id": 2,
+	"character_id": "jales",
+	"background": "recepcao",
+	"title": "A revisão pelos pares",
+	"body": "Daqui a dois dias, outra firma vai revisar o nosso controle de qualidade: a revisão pelos pares da NBC PA 11. Se passarmos, a ContalMaster ganhamos o selo de excelência."
+  },
+  {
+	"frame_id": 3,
+	"character_id": "jales",
+	"background": "escritorio",
+	"title": "Por que você?",
+	"body": "Preciso de um olhar novo para percorrer a firma comigo nestes dois dias. Em cada estação, um especialista vai te desafiar. Aprender a interpretar cenários é a melhor preparação para uma revisão de verdade."
+  },
+  {
+	"frame_id": 4,
+	"character_id": "jales",
+	"background": "escritorio",
+	"title": "Sua jornada começa agora",
+	"body": "São 8 especialistas. Hoje iremos passar por sete deles; amanhã cedo veremos a última, e então a equipe irá se reunir para ver seu desempenho. Eu estarei por perto o tempo todo não se preocupe. Vamos começar?"
+  }
+]

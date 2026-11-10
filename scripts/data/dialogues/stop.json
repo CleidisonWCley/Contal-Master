@@ -1,0 +1,39 @@
+{
+  "minigame_id": "stop",
+  "character": {
+    "name": "Cleiton",
+    "role": "Auditor Sênior & Especialista em Controle Normativo",
+    "personality_traits": [
+      "Gentil",
+      "Muito Sério",
+      "Pragmático",
+      "Focado"
+    ]
+  },
+  "presentation_dialogues": [
+    {
+      "frame": 1,
+      "title": "Sétima Estação: O Controle",
+      "speaker": "Jales",
+      "expression": "amigavel_respeitoso",
+      "text": "Estamos na reta final do nosso primeiro dia! Auditores de excelência dominam os conceitos com precisão imediata. Quero te apresentar o Cleiton: ele é muito gentil, mas não brinca em serviço quando o assunto é técnica.",
+      "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+    },
+    {
+      "frame": 2,
+      "title": "Cleiton, Controle Normativo",
+      "speaker": "Cleiton",
+      "expression": "postura_firme_sorriso_gentil",
+      "text": "Olá, muito prazer. Sou o Cleiton. Na nossa rotina de avaliação de papéis de trabalho não há espaço para hesitação: o vocabulário normativo precisa estar rigorosamente na ponta da língua.",
+      "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+    },
+    {
+      "frame": 3,
+      "title": "O Desafio: STOP",
+      "speaker": "Cleiton",
+      "expression": "olhar_focado_serio",
+      "text": "Por isso o STOP: sua agilidade mental será testada com órgãos, normas e documentos. Respire fundo, mantenha o foco e o Selo do Controle será seu. Eu explico como funciona.",
+      "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+    }
+  ]
+}

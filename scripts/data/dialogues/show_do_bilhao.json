@@ -1,0 +1,39 @@
+{
+  "minigame_id": "show_do_bilhao",
+  "character": {
+    "name": "Priscila",
+    "role": "Líder de Checagem Normativa & Compliance",
+    "personality_traits": [
+      "Rigorosa",
+      "Analítica",
+      "Perfeccionista",
+      "Incentivadora"
+    ]
+  },
+  "presentation_dialogues": [
+    {
+      "frame": 1,
+      "title": "Primeira Estação: A Norma",
+      "speaker": "Jales",
+      "expression": "amigavel_confiante",
+      "text": "Primeira estação do nosso primeiro dia! A revisão pelos pares, daqui a dois dias, começa pela norma, e quem cuida dela é a Priscila, nossa líder de checagem normativa. Ela não perdoa 'achismo'... mas torce por cada um de nós.",
+      "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+    },
+    {
+      "frame": 2,
+      "title": "Prazer, Priscila",
+      "speaker": "Priscila",
+      "expression": "postura_firme_olhar_atento",
+      "text": "Prazer em conhecê-lo! Sou a Priscila e cuido do que não pode falhar: prazos, ciclos e órgãos da NBC PA 11. O talento não substitui a precisão, mas com dedicação você chega lá.",
+      "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+    },
+    {
+      "frame": 3,
+      "title": "O Desafio: Show do Bilhão",
+      "speaker": "Priscila",
+      "expression": "sorriso_desafiador",
+      "text": "Por isso criamos o Show do Bilhão: um quiz direto sobre as regras formais, sem espaço para achismos. Acertando, você conquista o Selo da Norma. Vou te mostrar como funciona e depois é com você!",
+      "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+    }
+  ]
+}

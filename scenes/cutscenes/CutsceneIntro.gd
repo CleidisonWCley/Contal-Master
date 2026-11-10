@@ -1,44 +1,43 @@
 extends Control
 
-const BACKGROUND_PATH := Paths.BG_CUTSCENE_INTRO
-const JALES_PATH := Paths.SPRITE_JALES_RECEPTIVO
+## V0.11: a introducao usa os cenarios 00_* (recepcao e escritorio). Cada pagina de intro.json escolhe o seu
+## pela chave "background" (ids em Paths.CUTSCENE_BG_INTRO); a troca entre eles e um crossfade.
+const DEFAULT_BACKGROUND_ID := "recepcao"
+const BACKGROUND_FADE_SECONDS := 0.9
+const JALES_PATH := Paths.CHAR_JALES_1  # V0.11.1: sprite "_1" (antes sem numero) = novels e introducao
 const PARTICLE_COUNT := 42
 const TYPE_SPEED := 0.018
 
-const SCRIPT_PAGES := [
+const DEFAULT_SCRIPT_PAGES := [
 	{
-		"title": "Bem-vindo ao 	Contal Master",
-		"body": "Olá! Seja muito bem-vindo, sou Jales o Apresentador da Contal Master, e terei o prazer de acompanhar você nesta experiência de aprendizagem."
+		"background": "recepcao",
+		"title": "Bem-vindo ao Contal Master",
+		"body": "Olá! Seja muito bem-vindo! Sou o Jales, líder da equipe ContalMaster. É um enorme prazer acompanhar você nessa jornada de aprendizado e auditoria!"
 	},
 	{
-		"title": "Uma aventura de conhecimento",
-		"body": "Conhecimento não se resume a memorizar conceitos e normas. É preciso compreender informações, interpretar situações e saber aplicar aquilo que aprendemos."
+		"background": "recepcao",
+		"title": "Vamos aprender na prática",
+		"body": "Aprender vai além de memorizar. O verdadeiro desafio é interpretar cenários e aplicar a revisão de qualidade na prática diária da firma."
 	},
 	{
-		"title": "Uma nova Jornada",
-		"body": "Pensando nisso, o Contal Master reúne diferentes atividades gamificadas para transformar a revisão de conhecimentos em uma experiência mais dinâmica, interativa e desafiadora"
-	},
-	{
-		"title": "Escolhas também ensinam",
-		"body": "Cada modalidade possui uma dinâmica própria. Você encontrará desafios de perguntas e respostas, estratégia, tomada de decisões, associação de conceitos e raciocínio lógico."
-	},
-	{
-		"title": "Os eixos da aventura",
-		"body": "Sua jornada no ContalMaster foca na Revisão pelos Pares! A cada minigame, examine papéis de trabalho, garanta a independência do time e proteja dados sigilosos. Ao final, interprete o relatório e ajude a construir um plano de ação para a firma!"
-	},
-	{
+		"background": "escritorio",
 		"title": "Sua jornada começa agora",
-		"body": "Não importa se você está revisando conhecimentos ou dando seus primeiros passos na área. Cada desafio é uma oportunidade de aprender, exercitar suas habilidades e descobrir novas maneiras de pensar. Vamos começar!"
+		"body": "Você passará por 8 especialistas da nossa equipe, em dois dias, para examinar papéis de trabalho, garantir a independência e proteger o sigilo. Vamos começar!"
 	}
 ]
 
 var particles: Array[Dictionary] = []
+var script_pages: Array = []
 var page_index: int = 0
 var char_index: int = 0
 var char_timer: float = 0.0
 var elapsed: float = 0.0
 var finishing: bool = false
 
+var background_rect: TextureRect
+var background_next_rect: TextureRect
+var background_id: String = ""
+var background_tween: Tween
 var effects_canvas: Control
 var fade_rect: ColorRect
 var jales_sprite: TextureRect
@@ -53,8 +52,28 @@ var dialog_panel: PanelContainer
 var dialog_margin: MarginContainer
 var dialog_box: VBoxContainer
 
+func _load_script_pages() -> void:
+	# V0.10.1: o briefing vem de intro.json (historia da revisao pelos pares); se faltar, usa o texto padrao.
+	script_pages = DEFAULT_SCRIPT_PAGES.duplicate(true)
+	if not FileAccess.file_exists(Paths.DIALOGUE_INTRO):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(Paths.DIALOGUE_INTRO))
+	if not (parsed is Array):
+		return
+	var pages: Array = []
+	for item in parsed:
+		if item is Dictionary:
+			pages.append({
+				"title": str(item.get("title", "")),
+				"body": str(item.get("body", "")),
+				"background": str(item.get("background", ""))
+			})
+	if not pages.is_empty():
+		script_pages = pages
+
 func _ready() -> void:
 	randomize()
+	_load_script_pages()
 	_build_scene()
 	_reset_particles()
 	_update_page(true)
@@ -111,15 +130,12 @@ func _is_pointer_on_action_button(position: Vector2) -> bool:
 func _build_scene() -> void:
 	_clear_scene_children()
 
-	var background: TextureRect = TextureRect.new()
-	background.name = "Background"
-	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background.expand_mode = 1
-	background.stretch_mode = 6
-	var bg_texture: Resource = load(BACKGROUND_PATH)
-	if bg_texture is Texture2D:
-		background.texture = bg_texture as Texture2D
-	add_child(background)
+	background_rect = _make_background_rect("Background")
+	add_child(background_rect)
+	background_next_rect = _make_background_rect("BackgroundNext")
+	background_next_rect.modulate.a = 0.0
+	add_child(background_next_rect)
+	background_id = ""
 
 	var blur_dimmer: ColorRect = ColorRect.new()
 	blur_dimmer.name = "Dimmer"
@@ -142,6 +158,7 @@ func _build_scene() -> void:
 	jales_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var jales_texture: Resource = load(JALES_PATH)
 	if jales_texture is Texture2D:
+		# V0.11.1: imagem COMPLETA do sprite "_1" (corpo inteiro); posicao e escala vem de NovelStage.novel_rect().
 		jales_sprite.texture = jales_texture as Texture2D
 	add_child(jales_sprite)
 
@@ -273,6 +290,48 @@ func _apply_responsive_layout() -> void:
 		body_label.custom_minimum_size = Vector2(0, 74 if compact else 92)
 	_update_jales_static()
 
+func _make_background_rect(node_name: String) -> TextureRect:
+	var rect: TextureRect = TextureRect.new()
+	rect.name = node_name
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return rect
+
+func _background_texture(id: String) -> Texture2D:
+	var path: String = str(Paths.CUTSCENE_BG_INTRO.get(id, Paths.CUTSCENE_BG_INTRO[DEFAULT_BACKGROUND_ID]))
+	var resource: Resource = load(path)
+	if resource is Texture2D:
+		return resource as Texture2D
+	return null
+
+## Troca o cenario da intro. A primeira chamada nao anima; as seguintes fazem crossfade.
+func _set_page_background(id: String) -> void:
+	if id == "" or not Paths.CUTSCENE_BG_INTRO.has(id):
+		id = background_id if background_id != "" else DEFAULT_BACKGROUND_ID
+	if id == background_id or background_rect == null:
+		return
+	var texture: Texture2D = _background_texture(id)
+	var first_time: bool = background_id == ""
+	background_id = id
+	if first_time or not _animations_enabled():
+		background_rect.texture = texture
+		background_next_rect.modulate.a = 0.0
+		return
+	if background_tween != null and background_tween.is_valid():
+		background_tween.kill()
+		background_rect.texture = background_next_rect.texture
+	background_next_rect.texture = texture
+	background_next_rect.modulate.a = 0.0
+	background_tween = create_tween()
+	background_tween.tween_property(background_next_rect, "modulate:a", 1.0, BACKGROUND_FADE_SECONDS)
+	background_tween.tween_callback(_finish_background_fade.bind(texture))
+
+func _finish_background_fade(texture: Texture2D) -> void:
+	background_rect.texture = texture
+	background_next_rect.modulate.a = 0.0
+
 func _clear_scene_children() -> void:
 	for child in get_children():
 		child.queue_free()
@@ -289,17 +348,9 @@ func _animations_enabled() -> bool:
 	return not has_node("/root/SettingsManager") or SettingsManager.animations_enabled()
 
 func _jales_rect(viewport_size: Vector2) -> Rect2:
-	# Jales na area DIREITA e com zoom: cabeca e torso em destaque; o resto fica atras do painel de
-	# dialogo e do limite da tela (enquadramento de busto).
-	var aspect: float = 0.62
-	if jales_sprite != null and jales_sprite.texture != null:
-		var tex_size: Vector2 = jales_sprite.texture.get_size()
-		if tex_size.y > 0.0:
-			aspect = tex_size.x / tex_size.y
-	var height: float = viewport_size.y * (0.98 if ScreenTools.is_compact(self) else 1.10)
-	var width: float = height * aspect
-	var position_x: float = viewport_size.x - width - viewport_size.x * 0.035
-	return Rect2(Vector2(position_x, viewport_size.y * 0.015), Vector2(width, height))
+	# V0.11.1: Jales CENTRALIZADO no meio da tela, corpo inteiro em pe logo acima do quadro de dialogo
+	# (mesma escala e mesma regra das novels: NovelStage.novel_rect / Paths.NOVEL_LAYOUT).
+	return NovelStage.novel_rect("jales", viewport_size, ScreenTools.is_compact(self), viewport_size.x * 0.5)
 
 func _update_jales_static() -> void:
 	if jales_sprite == null:
@@ -354,9 +405,9 @@ func _on_effects_canvas_draw() -> void:
 		effects_canvas.draw_circle(position, radius, Color(1.0, 0.86, 0.45, alpha))
 
 func _update_typewriter(delta: float) -> void:
-	if finishing or page_index < 0 or page_index >= SCRIPT_PAGES.size():
+	if finishing or page_index < 0 or page_index >= script_pages.size():
 		return
-	var current_body: String = str(SCRIPT_PAGES[page_index].get("body", ""))
+	var current_body: String = str(script_pages[page_index].get("body", ""))
 	if char_index >= current_body.length():
 		return
 	char_timer += delta
@@ -381,11 +432,12 @@ func _update_hint_animation() -> void:
 	hint_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.95, alpha))
 
 func _update_page(reset_text: bool) -> void:
-	if page_index < 0 or page_index >= SCRIPT_PAGES.size():
+	if page_index < 0 or page_index >= script_pages.size():
 		return
-	var page: Dictionary = SCRIPT_PAGES[page_index]
+	var page: Dictionary = script_pages[page_index]
+	_set_page_background(str(page.get("background", "")))
 	title_label.text = str(page.get("title", ""))
-	page_label.text = "%s/%s" % [page_index + 1, SCRIPT_PAGES.size()]
+	page_label.text = "%s/%s" % [page_index + 1, script_pages.size()]
 	if reset_text:
 		char_index = 0
 		char_timer = 0.0
@@ -394,7 +446,7 @@ func _update_page(reset_text: bool) -> void:
 		var current_body: String = str(page.get("body", ""))
 		char_index = current_body.length()
 		body_label.text = current_body
-	if page_index == SCRIPT_PAGES.size() - 1:
+	if page_index == script_pages.size() - 1:
 		hint_label.text = "Clique na tela, Espaço ou Enter para começar"
 	else:
 		hint_label.text = "Clique na tela, Espaço ou Enter para avançar"
@@ -402,13 +454,13 @@ func _update_page(reset_text: bool) -> void:
 func _advance_or_complete_text() -> void:
 	if finishing:
 		return
-	var current_body: String = str(SCRIPT_PAGES[page_index].get("body", ""))
+	var current_body: String = str(script_pages[page_index].get("body", ""))
 	if char_index < current_body.length():
 		char_index = current_body.length()
 		body_label.text = current_body
 		return
 	page_index += 1
-	if page_index >= SCRIPT_PAGES.size():
+	if page_index >= script_pages.size():
 		_finish_intro(false)
 	else:
 		_update_page(true)

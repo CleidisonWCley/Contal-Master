@@ -1,0 +1,39 @@
+{
+  "minigame_id": "perseguicao",
+  "character": {
+    "name": "Ariel",
+    "role": "Analista de Campo & Inspeção de Inconsistências",
+    "personality_traits": [
+      "Observador",
+      "Calmo sob pressão",
+      "Direto",
+      "Agil"
+    ]
+  },
+  "presentation_dialogues": [
+    {
+      "frame": 1,
+      "title": "Quinta Estação: O Prazo",
+      "speaker": "Jales",
+      "expression": "amigavel_gesticulando",
+      "text": "O relógio da revisão não para, e agora ele aperta! Esta é a estação do Ariel, nosso analista de campo: calmo sob pressão e implacável na inspeção rápida.",
+      "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+    },
+    {
+      "frame": 2,
+      "title": "Ariel em Campo",
+      "speaker": "Ariel",
+      "expression": "olhar_de_lado_tranquilo",
+      "text": "E aí. Ariel. Na auditoria real, inconsistência não pede licença para surgir e o relógio do relatório não espera ninguém. Vacilou, perdeu o prazo.",
+      "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+    },
+    {
+      "frame": 3,
+      "title": "O Desafio: Perseguição",
+      "speaker": "Ariel",
+      "expression": "sobrancelha_erguida_desafio",
+      "text": "Na Perseguição, raciocínio lento custa caro. Identifique e resolva as não conformidades antes que o tempo te alcance. Quem for ágil leva o Selo do Prazo. Vou te mostrar o ritmo.",
+      "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+    }
+  ]
+}

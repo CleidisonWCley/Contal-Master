@@ -64,6 +64,8 @@ func _ready() -> void:
 	_set_status("Gire a roleta para revelar um imprevisto de auditoria.")
 	_update_sector_label_positions()
 	_request_wheel_redraw()
+	# V0.10: tutorial do Julios ANTES do giro (o botao fica bloqueado pelo overlay modal).
+	await TutorialManager.play(self, "roleta_risco")
 
 func _process(delta: float) -> void:
 	if _animations_enabled():

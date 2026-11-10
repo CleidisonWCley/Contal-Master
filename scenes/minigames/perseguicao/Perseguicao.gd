@@ -98,6 +98,13 @@ func _ready() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("musica_perseguicao")
 	_load_incident(0)
+	# V0.10: tutorial do Ariel ANTES da rodada; a barra de tempo so comeca a correr depois dele.
+	input_locked = true
+	await TutorialManager.play(self, "perseguicao")
+	if not is_inside_tree():
+		return
+	question_elapsed = 0.0
+	input_locked = false
 
 func _process(delta: float) -> void:
 	if _animations_enabled():

@@ -1,0 +1,69 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "forca_tecnica",
+  "host": "aline",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "4 quadros (integridade e a regra mais complexa).",
+  "steps": [
+    {
+      "id": "como_jogar",
+      "kind": "mecanica",
+      "speaker": "aline",
+      "title": "Letra por letra",
+      "text": "Descubra o termo clicando nas letras da tela ou usando o teclado. Letra certa aparece na palavra. São {rounds} termos.",
+      "modes": [
+        "campaign"
+      ],
+      "targets": [
+        "keyboard_grid"
+      ]
+    },
+    {
+      "id": "como_jogar_livre",
+      "kind": "mecanica",
+      "speaker": "aline",
+      "title": "Letra por letra",
+      "text": "Sou a Aline. Descubra o termo no teclado da tela ou no seu. Letra certa aparece na palavra. São {rounds} termos valendo recorde.",
+      "modes": [
+        "free"
+      ],
+      "targets": [
+        "keyboard_grid"
+      ]
+    },
+    {
+      "id": "integridade",
+      "kind": "aviso",
+      "speaker": "aline",
+      "title": "Integridade",
+      "text": "Cada letra errada derruba a integridade. Você aguenta {errors} erros por termo; no limite, o termo se revela e a rodada se perde.",
+      "targets": [
+        "integrity_bar",
+        "integrity_label"
+      ]
+    },
+    {
+      "id": "pontuacao",
+      "kind": "pontuacao",
+      "speaker": "aline",
+      "title": "Quanto sobrou?",
+      "text": "Termo resolvido vale {base} pontos mais até {bonus} pela integridade que sobrou. Quem erra pouco ganha mais.",
+      "targets": [
+        "score_label"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "kind": "estrategia",
+      "speaker": "aline",
+      "title": "Comece pelas vogais",
+      "text": "Comece pelas vogais, depois deduza pela categoria e pela dica. Erre as letras e verá seu prestígio enforcado.",
+      "targets": [
+        "word_label",
+        "hint_label"
+      ]
+    }
+  ]
+}

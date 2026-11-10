@@ -7,6 +7,8 @@ const BACKGROUND_PATH: String = Paths.BG_BATALHA_NAVAL
 const NAVAL_ICON_PATH: String = Paths.ICON_NAVAL
 const GRID_SIZE: int = 5
 const CELL_COUNT: int = GRID_SIZE * GRID_SIZE
+const BOARD_GAP: int = 8
+const BOARD_PADDING: int = 12
 const WATER_PARTICLE_COUNT: int = 42
 const FEEDBACK_SECONDS: float = 1.15
 
@@ -56,6 +58,7 @@ var threat_counter_label: Label
 var score_label: Label
 var difficulty_label: Label
 var grid_container: GridContainer
+var board_panel: PanelContainer
 var info_label: Label
 var feedback_layer: Control
 var feedback_title_label: Label
@@ -73,6 +76,12 @@ func _ready() -> void:
 	_on_score_changed(ScoreManager.get_score())
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("musica_batalha_naval")
+	# V0.10: tutorial do Anderson ANTES do primeiro disparo.
+	input_locked = true
+	await TutorialManager.play(self, "batalha_naval", {"placeholders": {"threats": threat_total}})
+	if not is_inside_tree():
+		return
+	input_locked = false
 
 func _process(delta: float) -> void:
 	if not _animations_enabled():
@@ -179,10 +188,9 @@ func _build_scene() -> void:
 	difficulty_label = _create_chip_label("Dificuldade: Normal", 18, Color(0.03, 0.06, 0.12, 0.94), Color(1, 1, 1))
 	status_row.add_child(difficulty_label)
 
-	var board_panel: PanelContainer = PanelContainer.new()
+	board_panel = PanelContainer.new()
 	board_panel.name = "BoardPanel"
 	board_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	board_panel.custom_minimum_size = Vector2(450, 450)
 	board_panel.add_theme_stylebox_override("panel", _make_panel_style(Color(0.01, 0.05, 0.12, 0.86), Color(0.45, 0.80, 1.0), 18, 3))
 	main_box.add_child(board_panel)
 
@@ -196,8 +204,8 @@ func _build_scene() -> void:
 	grid_container = GridContainer.new()
 	grid_container.name = "Grid"
 	grid_container.columns = GRID_SIZE
-	grid_container.add_theme_constant_override("h_separation", 7)
-	grid_container.add_theme_constant_override("v_separation", 7)
+	grid_container.add_theme_constant_override("h_separation", BOARD_GAP)
+	grid_container.add_theme_constant_override("v_separation", BOARD_GAP)
 	board_margin.add_child(grid_container)
 
 	info_label = Label.new()
@@ -282,10 +290,11 @@ func _build_grid_buttons() -> void:
 		var cell_button: Button = Button.new()
 		cell_button.name = "Cell_%s_%s" % [row + 1, col + 1]
 		cell_button.text = "%s%s" % ["ABCDE".substr(col, 1), row + 1]
-		cell_button.custom_minimum_size = Vector2(78, 78)
-		cell_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		cell_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		cell_button.custom_minimum_size = _board_cell_size()
+		cell_button.size_flags_horizontal = Control.SIZE_FILL
+		cell_button.size_flags_vertical = Control.SIZE_FILL
 		cell_button.clip_text = true
+		cell_button.text_overrun_behavior = TextServer.OVERRUN_TRIM_CHAR
 		cell_button.add_theme_font_size_override("font_size", 20)
 		cell_button.add_theme_stylebox_override("normal", _make_cell_style(Color(0.06, 0.26, 0.60, 0.94), Color(0.68, 0.90, 1.0), 2))
 		cell_button.add_theme_stylebox_override("hover", _make_cell_style(Color(0.18, 0.46, 0.86, 1.0), Color(1.0, 1.0, 1.0), 3))
@@ -298,6 +307,30 @@ func _build_grid_buttons() -> void:
 		cell_button.pressed.connect(_on_cell_pressed.bind(index, cell_button))
 		grid_container.add_child(cell_button)
 		cell_buttons.append(cell_button)
+	_apply_board_metrics()
+
+## Tamanho UNICO das celulas: grandes e mais LARGAS que altas (tabuleiro largo), proporcional a tela.
+func _board_cell_size() -> Vector2:
+	var view: Vector2 = get_viewport_rect().size
+	var cell_w: float = clampf(view.x * 0.092, 84.0, 128.0)
+	var cell_h: float = clampf(view.y * 0.118, 60.0, 88.0)
+	return Vector2(floorf(cell_w), floorf(cell_h))
+
+func _apply_board_metrics() -> void:
+	if grid_container == null or board_panel == null:
+		return
+	var cell: Vector2 = _board_cell_size()
+	for cell_button in cell_buttons:
+		cell_button.custom_minimum_size = cell
+	var grid_w: float = cell.x * GRID_SIZE + BOARD_GAP * (GRID_SIZE - 1)
+	var grid_h: float = cell.y * GRID_SIZE + BOARD_GAP * (GRID_SIZE - 1)
+	board_panel.custom_minimum_size = Vector2(grid_w + BOARD_PADDING * 2 + 6, grid_h + BOARD_PADDING * 2 + 6)
+	for cell_button in cell_buttons:
+		cell_button.add_theme_font_size_override("font_size", 22 if cell.y >= 72.0 else 18)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_apply_board_metrics()
 
 func _create_feedback_continue_button(parent: VBoxContainer) -> void:
 	feedback_continue_button = Button.new()
@@ -358,17 +391,20 @@ func _set_cell_as_threat(cell_button: Button) -> void:
 	cell_button.disabled = true
 	cell_button.text = "RISCO"
 	cell_button.icon = UiIcons.texture("burst")
-	cell_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	cell_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Icone ao LADO do texto (nunca empilhado): a celula revelada continua com o mesmo tamanho das outras.
+	cell_button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	cell_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	cell_button.expand_icon = false
-	cell_button.add_theme_constant_override("icon_max_width", 24)
+	cell_button.add_theme_constant_override("icon_max_width", 20)
+	cell_button.add_theme_constant_override("h_separation", 4)
+	cell_button.add_theme_font_size_override("font_size", 18)
 	cell_button.add_theme_color_override("icon_disabled_color", Color(1.0, 0.96, 0.86))
 	cell_button.add_theme_stylebox_override("disabled", _make_cell_style(Color(0.58, 0.05, 0.05, 0.98), Color(1.0, 0.68, 0.32), 3))
 	cell_button.add_theme_color_override("font_disabled_color", Color(1.0, 0.96, 0.86))
 
 func _set_cell_as_miss(cell_button: Button) -> void:
 	cell_button.disabled = true
-	cell_button.text = "~\nÁGUA"
+	cell_button.text = "ÁGUA"
 	cell_button.add_theme_stylebox_override("disabled", _make_cell_style(Color(0.25, 0.28, 0.36, 0.90), Color(0.56, 0.66, 0.82), 2))
 	cell_button.add_theme_color_override("font_disabled_color", Color(0.86, 0.92, 1.0))
 

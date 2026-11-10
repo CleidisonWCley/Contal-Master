@@ -5,7 +5,7 @@ enum GameMode { NONE, CAMPAIGN, FREE }
 const BrandText := preload("res://scripts/ui/BrandText.gd")
 
 const APP_NAME := "Contal Master"
-const APP_VERSION := "0.9.2.1"
+const APP_VERSION := "0.12.0"
 
 const MAIN_MENU_SCENE := Paths.SCENE_MAIN_MENU
 const MODE_SELECT_SCENE := Paths.SCENE_MODE_SELECT
@@ -78,10 +78,17 @@ const FREE_PHASE_KEYS := [
 	"desvio_logico"
 ]
 
+## V0.11: a campanha acontece em 2 dias. O dia 1 vai do Show do Bilhao ate o STOP; o dia 2 comeca
+## de manha, com o Desvio Logico (carro saindo da garagem). Mude APENAS esta chave para mover a virada.
+const DAY_TWO_FIRST_PHASE_KEY := "desvio_logico"
+const DAY_LABELS := {1: "DIA 1 · MANHÃ", 2: "DIA 2 · MANHÃ"}
+
 var current_mode: int = GameMode.NONE
 var campaign_index: int = 0
 var current_phase_key: String = ""
 var phase_start_score: int = 0
+## Resultado da ultima campanha concluida ({"saved", "previous_score", "total_score"...}); a cutscene final usa para o recorde.
+var last_campaign_result: Dictionary = {}
 
 func get_app_version_label() -> String:
 	return BrandText.version_plain(APP_VERSION)
@@ -175,6 +182,7 @@ func complete_current_stage(points: int) -> void:
 			_open_stage_transition()
 		else:
 			var campaign_result: Dictionary = ScoreManager.finish_campaign_run(difficulty, score_after_stage)
+			last_campaign_result = campaign_result
 			if has_node("/root/AchievementManager"):
 				AchievementManager.record_campaign_completed(difficulty, score_after_stage)
 				AchievementManager.record_campaign_score_result(campaign_result)
@@ -209,6 +217,33 @@ func get_current_phase_info() -> Dictionary:
 
 func get_current_stage_number() -> int:
 	return campaign_index + 1
+
+## Dia da campanha (1 ou 2) de um minigame, pela posicao dele em PHASES.
+func get_day_for_phase(phase_key: String) -> int:
+	if phase_key == "final":
+		return 2
+	var day_two_index: int = _phase_index(DAY_TWO_FIRST_PHASE_KEY)
+	var index: int = _phase_index(phase_key)
+	if day_two_index >= 0 and index >= day_two_index:
+		return 2
+	return 1
+
+## Dia da fase atual da campanha.
+func get_current_day() -> int:
+	return get_day_for_phase(current_phase_key)
+
+## true se este minigame abre um dia novo (Show do Bilhao abre o dia 1; Desvio Logico abre o dia 2).
+func is_first_phase_of_day(phase_key: String) -> bool:
+	var index: int = _phase_index(phase_key)
+	if index < 0:
+		return false
+	return index == 0 or get_day_for_phase(phase_key) != get_day_for_phase(str(PHASES[index - 1].get("key", "")))
+
+func _phase_index(phase_key: String) -> int:
+	for i in range(PHASES.size()):
+		if str(PHASES[i].get("key", "")) == phase_key:
+			return i
+	return -1
 
 func get_total_stages() -> int:
 	return PHASES.size()

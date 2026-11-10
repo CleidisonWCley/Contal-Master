@@ -8,7 +8,8 @@ const DEFAULT_SETTINGS := {
 	"sfx_volume": 1.0,
 	"fullscreen": false,
 	"difficulty": "normal",
-	"animations_enabled": true
+	"animations_enabled": true,
+	"tutorials_enabled": true
 }
 
 var settings: Dictionary = DEFAULT_SETTINGS.duplicate(true)
@@ -82,6 +83,15 @@ func animations_enabled() -> bool:
 
 func toggle_animations_enabled() -> void:
 	set_animations_enabled(not animations_enabled())
+
+func set_tutorials_enabled(value: bool) -> void:
+	set_setting("tutorials_enabled", value)
+
+func tutorials_enabled() -> bool:
+	return bool(settings.get("tutorials_enabled", DEFAULT_SETTINGS["tutorials_enabled"]))
+
+func toggle_tutorials_enabled() -> void:
+	set_tutorials_enabled(not tutorials_enabled())
 
 func set_difficulty(value: String) -> void:
 	if not ["facil", "normal", "dificil"].has(value):

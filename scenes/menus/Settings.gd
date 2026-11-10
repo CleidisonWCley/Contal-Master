@@ -10,6 +10,7 @@ var music_slider: HSlider
 var sfx_slider: HSlider
 var fullscreen_button: Button
 var animations_button: Button
+var tutorials_button: Button
 var back_button: Button
 
 var _safe_area: MarginContainer
@@ -98,6 +99,13 @@ func _build_ui() -> void:
 	animations_button.name = "AnimationsToggle"
 	animations_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	toggles.add_child(animations_button)
+	var toggles_row_2 := HBoxContainer.new()
+	toggles_row_2.add_theme_constant_override("separation", 12)
+	_content.add_child(toggles_row_2)
+	tutorials_button = Button.new()
+	tutorials_button.name = "TutorialsToggle"
+	tutorials_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	toggles_row_2.add_child(tutorials_button)
 
 	var back_holder := CenterContainer.new()
 	back_holder.add_theme_constant_override("separation", 0)
@@ -257,6 +265,7 @@ func _option_style(fill: Color, border: Color) -> StyleBoxFlat:
 func _refresh_toggles() -> void:
 	_set_toggle(fullscreen_button, "monitor", "Tela cheia", SettingsManager.is_fullscreen())
 	_set_toggle(animations_button, "sparkles", "Animações visuais", SettingsManager.animations_enabled())
+	_set_toggle(tutorials_button, "compass", "Tutoriais", SettingsManager.tutorials_enabled())
 
 func _set_toggle(button: Button, icon_name: String, label: String, enabled: bool) -> void:
 	button.text = "%s: %s" % [label, "LIGADO" if enabled else "DESLIGADO"]
@@ -292,6 +301,7 @@ func _connect_signals() -> void:
 	sfx_slider.value_changed.connect(_on_sfx_volume_changed)
 	fullscreen_button.pressed.connect(_on_fullscreen_pressed)
 	animations_button.pressed.connect(_on_animations_pressed)
+	tutorials_button.pressed.connect(_on_tutorials_pressed)
 	back_button.pressed.connect(_on_back_pressed)
 
 func _on_music_volume_changed(value: float) -> void:
@@ -313,6 +323,11 @@ func _on_fullscreen_pressed() -> void:
 	if ScreenTools.is_mobile_platform():
 		return
 	SettingsManager.toggle_fullscreen()
+	_refresh_toggles()
+	_click()
+
+func _on_tutorials_pressed() -> void:
+	SettingsManager.toggle_tutorials_enabled()
 	_refresh_toggles()
 	_click()
 

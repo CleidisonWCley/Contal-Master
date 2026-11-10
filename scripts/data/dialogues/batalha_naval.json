@@ -1,0 +1,39 @@
+{
+  "minigame_id": "batalha_naval",
+  "character": {
+    "name": "Anderson",
+    "role": "Especialista em Estratégia & Mapeamento de Evidências",
+    "personality_traits": [
+      "Entusiasta",
+      "Agitado",
+      "Estrategista",
+      "Bem-humorado"
+    ]
+  },
+  "presentation_dialogues": [
+    {
+      "frame": 1,
+      "title": "Segunda Estação: As Evidências",
+      "speaker": "Jales",
+      "expression": "amigavel_sorridente",
+      "text": "Com a norma na mão, vamos às evidências! O Anderson é apaixonado por estratégia e transformou a checagem de papéis de trabalho em um verdadeiro mapa tático.",
+      "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+    },
+    {
+      "frame": 2,
+      "title": "Anderson na Área",
+      "speaker": "Anderson",
+      "expression": "animado_energico",
+      "text": "Eae! Anderson na área! Pra mim auditoria é navegação: se você não varre cada coordenada da documentação, a falha afunda o projeto inteiro. Preparado?",
+      "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+    },
+    {
+      "frame": 3,
+      "title": "O Desafio: Batalha Naval",
+      "speaker": "Anderson",
+      "expression": "inclinado_foco_dinamico",
+      "text": "Por isso a Batalha Naval: um mapa tático em que cada coordenada pode esconder uma falha nos papéis de trabalho. Mira afiada garante o Selo da Evidência. Deixa que eu mostro como funciona!",
+      "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "minigame_id": "forca_tecnica",
+  "character": {
+	"name": "Aline",
+	"nickname": "Malfoid",
+	"role": "Professora & Mentora de Rigor Normativo",
+	"personality_traits": [
+	  "Perfeccionista",
+	  "Aristocrática",
+	  "Sarcástica",
+      "Exigente"
+	]
+  },
+  "presentation_dialogues": [
+	{
+	  "frame": 1,
+	  "title": "Sexta Estação: A Terminologia",
+	  "speaker": "Jales",
+	  "expression": "amigavel_respeitoso_apreensivo",
+	  "text": "Agora a instrutora Aline vai testar a assimilação dos conceitos centrais. Ela é exigente e perfeccionista... e a maior defensora de cada um de nós. Boa sorte. Você vai precisar!",
+	  "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+	},
+	{
+	  "frame": 2,
+	  "title": "Aline, a Mentora",
+	  "speaker": "Aline",
+	  "expression": "postura_ereta_bracos_cruzados_olhar_superior",
+	  "text": "Bem-vindo. Sou a Aline, Espero que não me façam perder tempo: o domínio exato dos termos é garantia de clareza nos nossos relatórios.",
+	  "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+	},
+	{
+	  "frame": 3,
+	  "title": "O Desafio: Forca Técnica",
+	  "speaker": "Aline",
+	  "expression": "sobrancelha_erguida_sorriso_sarcastico",
+	  "text": "Por isso a Forca Técnica: os termos do nosso glossário precisam estar na ponta da língua. Erre e verá seu prestígio enforcado. Acerte, e quem sabe eu admita que você merece o Selo da Terminologia.",
+	  "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+	}
+  ]
+}

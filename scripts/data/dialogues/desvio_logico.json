@@ -1,0 +1,40 @@
+{
+  "minigame_id": "desvio_logico",
+  "character": {
+    "name": "Natalia",
+    "role": "Especialista Sênior em Raciocínio Crítico & Análise de Desvios Éticos",
+    "personality_traits": [
+      "Extremamente Carismática",
+      "Acolhedora",
+      "Sorridente",
+      "Gentil",
+      "Encantadora"
+    ]
+  },
+  "presentation_dialogues": [
+    {
+      "frame": 1,
+      "title": "Segundo Dia: A Ética",
+      "speaker": "Jales",
+      "expression": "sorriso_caloroso_gesticulando",
+      "text": "Bom dia! Descansou? Chegamos ao segundo dia e à última estação, e confesso, estou orgulhoso de você. Quem fecha a jornada é a Natalia, nossa especialista em raciocínio crítico, com uma energia incrível para guiar o momento mais desafiador.",
+      "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+    },
+    {
+      "frame": 2,
+      "title": "Natalia, de Coração",
+      "speaker": "Natalia",
+      "expression": "sorriso_radiante_olhar_acolhedor",
+      "text": "Que alegria ter você aqui! Na pista ou na auditoria, um desvio ético mal calculado pode comprometer a confidencialidade e o trabalho de toda a equipe. Mas eu sei que você tem clareza para escolher bem!",
+      "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+    },
+    {
+      "frame": 3,
+      "title": "O Desafio: Desvio Lógico",
+      "speaker": "Natalia",
+      "expression": "risada_leve_gesto_encorajador",
+      "text": "No Desvio Lógico, as bifurcações testam seus reflexos e a sua ética ao limite. Respire fundo, confie no seu potencial e venha ver a pista comigo: vamos dirigir o dia inteiro, da manhã até a noite. Depois dela, a sala de reunião nos espera. Estou torcendo por você!",
+      "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+    }
+  ]
+}

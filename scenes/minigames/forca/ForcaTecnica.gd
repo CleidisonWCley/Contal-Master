@@ -196,7 +196,13 @@ func _ready() -> void:
 	_on_score_changed(ScoreManager.get_score())
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("musica_forca_tecnica")
-	_start_round(0)
+	await _start_round(0)
+	# V0.10: tutorial da Aline ANTES da primeira palavra (letras bloqueadas durante o tutorial).
+	input_locked = true
+	await TutorialManager.play(self, "forca_tecnica", {"placeholders": {"errors": max_errors, "base": SOLVE_BASE_POINTS, "bonus": INTEGRITY_BONUS_CAP}})
+	if not is_inside_tree():
+		return
+	input_locked = false
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:

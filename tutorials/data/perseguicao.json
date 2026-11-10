@@ -1,0 +1,58 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "perseguicao",
+  "host": "ariel",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "3 quadros.",
+  "steps": [
+    {
+      "id": "como_jogar",
+      "kind": "mecanica",
+      "speaker": "ariel",
+      "title": "Duas ações, uma certa",
+      "text": "Cada incidente traz duas ações, A e B. Clique na que resolve a não conformidade. São {rounds} incidentes.",
+      "modes": [
+        "campaign"
+      ],
+      "targets": [
+        "options_box"
+      ]
+    },
+    {
+      "id": "como_jogar_livre",
+      "kind": "mecanica",
+      "speaker": "ariel",
+      "title": "Duas ações, uma certa",
+      "text": "Ariel. Cada incidente traz duas ações, A e B. Clique na que resolve. São {rounds} incidentes valendo recorde.",
+      "modes": [
+        "free"
+      ],
+      "targets": [
+        "options_box"
+      ]
+    },
+    {
+      "id": "relogio",
+      "kind": "aviso",
+      "speaker": "ariel",
+      "title": "Olho na barra",
+      "text": "A barra de tempo corre. Responda o mais rápido que puder: quem demora perde pontos, e estourar o tempo conta como erro.",
+      "targets": [
+        "timer_progress",
+        "timer_label"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "kind": "estrategia",
+      "speaker": "ariel",
+      "title": "Calma sob pressão",
+      "text": "Primeiro identifique o problema, depois escolha a ação. Acerto vale até {correct}; erro tira {wrong}.",
+      "targets": [
+        "incident_label"
+      ]
+    }
+  ]
+}

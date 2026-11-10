@@ -1,38 +1,63 @@
 extends Control
+## Cutscene final Roteiro em res://scripts/data/dialogues/final.json
+##
+## Sequencia (todos os blocos usam o NovelStage com os sprites "_2", corpo inteiro, com os PES no chao do cenario):
+##   ESCRITORIO (09, noite)                 CORREDOR (012)                      SALA DE REUNIAO (10)
+##   1. Despedida do Jales                  3. Natalia (natalia_2) conversa     4. Elenco aparece UM A UM agradecendo
+##   2. Natalia chama para a reuniao           com o jogador: 2 quadros         5. Corte para o Ariel -> o score SOBE
+##                                                                              6. Fala final do Jales (4 variacoes)
+##   7. Creditos (rolagem)
+##   8. CENA FINAL (11): elenco reunido, cortina de brilho dourado, titulo "CONTAL MASTER" + "Obrigado por jogar!"
+##   9. A tela escurece -> GAME OVER -> voltar ao menu
+## Cada bloco escolhe o cenario pela chave "backgrounds" do final.json (ids em Paths.CUTSCENE_BG_FINAL).
+## "Pular" pula apenas o bloco atual; Esc volta ao menu.
 
 const BrandText := preload("res://scripts/ui/BrandText.gd")
 
-const BACKGROUND_PATH := Paths.BG_CUTSCENE_FINAL
-const JALES_PATH := Paths.SPRITE_JALES_RECEPTIVO
 const CREDIT_SCROLL_SPEED := 48.0
+## Cena final (V0.11): tempos em segundos.
+const FINALE_REVEAL_SECONDS := 3.4      # cortina dourada revelando a imagem
+const FINALE_HOLD_SECONDS := 1.5        # imagem limpa, so o brilho
+const FINALE_TITLE_SWEEP_SECONDS := 2.3 # segunda cortina, mais suave, junto com o titulo
+const FINALE_TITLE_FADE_SECONDS := 1.2
+const FINALE_TITLE_HOLD_SECONDS := 4.6  # titulo na tela antes de escurecer (clique adianta)
+const FINALE_DARKEN_SECONDS := 1.4
+const FINALE_MIN_SKIP_SECONDS := 1.2
+const FINALE_DIM_ALPHA := 0.52
+const FINALE_VEIL_ALPHA := 0.86
+const FINALE_GOLD := Color(1.0, 0.84, 0.34)
+const FINALE_GOLD_DEEP := Color(1.0, 0.70, 0.16)
+const FINALE_MAX_SPARKLES := 140
+const SCORE_COUNT_SECONDS := 2.8
+const CAST_ROW := ["priscila", "anderson", "tiago", "julios", "jales", "ariel", "aline", "cleiton", "natalia"]
+## Jogos que definem a referencia de pontuacao por dificuldade (mesma escala da conquista Platina).
+const REFERENCE_GAMES := ["show_do_bilhao", "maleta_certa", "perseguicao", "stop", "batalha_naval"]
+const GOLD := Color(1.0, 0.82, 0.16)
 
 var particles: Array[Dictionary] = []
 var elapsed: float = 0.0
-var act: String = "dialog"
-var char_index: int = 0
-var char_timer: float = 0.0
+var act: String = "novel"
 var final_score: int = 0
-var final_title: String = ""
-var final_body: String = ""
-var final_pages: Array[Dictionary] = []
-var final_page_index: int = 0
+var story: Dictionary = {}
+var tier: Dictionary = {}
 var can_click: bool = true
+var counting: bool = false
+var shown_score: float = 0.0
 
 var background_rect: TextureRect
+var background_id: String = ""
 var dimmer: ColorRect
 var effects_canvas: Control
-var jales_sprite: TextureRect
-var dialog_panel: PanelContainer
-var dialog_margin: MarginContainer
-var dialog_box: VBoxContainer
+var novel: NovelStage
 var score_panel: PanelContainer
-var title_label: Label
-var body_label: Label
-var hint_label: Label
 var score_layer: Control
+var score_title_label: Label
 var score_value_label: Label
 var difficulty_label: Label
+var tier_label: Label
+var record_label: Label
 var motivation_label: Label
+var score_hint_label: Label
 var credits_layer: Control
 var credits_box: VBoxContainer
 var gameover_layer: Control
@@ -40,16 +65,37 @@ var gameover_label: Label
 var menu_button: Button
 var fade_rect: ColorRect
 
+# ---- cena final (V0.11) ----
+var finale_layer: Control
+var finale_veil: Control        # veu escuro que a cortina dourada "puxa" para revelar a imagem
+var finale_dim: ColorRect       # escurece a imagem para o titulo ler bem
+var finale_fx: Control          # faixa/cortina dourada + brilhos (mistura aditiva)
+var finale_box: VBoxContainer
+var finale_title_label: RichTextLabel
+var finale_line: ColorRect
+var finale_thanks_label: Label
+var finale_subtitle_label: Label
+var finale_sparkles: Array[Dictionary] = []
+var finale_sweep_pos: float = -1.0   # 0..1 = cortina atravessando a tela; -1 = inativa
+var finale_veil_on: bool = false
+var finale_stage: int = 0            # 0 revelando, 1 imagem limpa, 2 titulo na tela
+var finale_leaving: bool = false
+var finale_token: int = 0            # invalida corrotinas antigas (pular / sair)
+var finale_tweens: Array[Tween] = []
+var finale_spark_timer: float = 0.0
+
+signal _score_continue
+
 func _ready() -> void:
 	randomize()
 	final_score = ScoreManager.get_score()
-	_prepare_final_message()
+	_load_story()
 	_build_scene()
 	_reset_particles(42)
-	_show_dialog_act(0)
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("musica_final")
 	_fade_from_black()
+	_run_story()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
@@ -61,30 +107,31 @@ func _process(delta: float) -> void:
 	elapsed += delta
 	if _animations_enabled():
 		_update_particles(delta)
-		_update_jales_animation()
-		_update_hint()
 		if effects_canvas != null:
-			effects_canvas.visible = true
+			effects_canvas.visible = act != "finale"  # a cena final tem o proprio brilho dourado
 			effects_canvas.queue_redraw()
 	else:
-		_update_jales_static()
 		if effects_canvas != null:
 			effects_canvas.visible = false
-	_update_typewriter(delta)
 	_update_credits(delta)
+	_update_finale(delta)
 	_update_gameover()
+	_update_score_hint()
 
 func _input(event: InputEvent) -> void:
 	if not can_click:
 		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+		_return_to_menu()
+		return
+	if act == "novel":
+		return # o NovelStage cuida de clique, Espaco e Enter
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_pointer_advance(event.position)
 	elif event is InputEventScreenTouch and event.pressed:
 		_handle_pointer_advance(event.position)
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
-			KEY_ESCAPE:
-				_return_to_menu()
 			KEY_SPACE, KEY_ENTER, KEY_KP_ENTER:
 				_advance_act()
 
@@ -99,75 +146,162 @@ func _is_pointer_on_menu_button(position: Vector2) -> bool:
 func _animations_enabled() -> bool:
 	return not has_node("/root/SettingsManager") or SettingsManager.animations_enabled()
 
-func _jales_rect(viewport_size: Vector2) -> Rect2:
-	# Jales na area DIREITA e com zoom: cabeca e torso em destaque; o resto fica atras do painel de
-	# dialogo e do limite da tela (enquadramento de busto).
-	var aspect: float = 0.62
-	if jales_sprite != null and jales_sprite.texture != null:
-		var tex_size: Vector2 = jales_sprite.texture.get_size()
-		if tex_size.y > 0.0:
-			aspect = tex_size.x / tex_size.y
-	var height: float = viewport_size.y * (0.98 if ScreenTools.is_compact(self) else 1.10)
-	var width: float = height * aspect
-	var position_x: float = viewport_size.x - width - viewport_size.x * 0.035
-	return Rect2(Vector2(position_x, viewport_size.y * 0.015), Vector2(width, height))
+# ---------------------------------------------------------------- roteiro
 
-func _update_jales_static() -> void:
-	if jales_sprite == null or not jales_sprite.visible:
+func _load_story() -> void:
+	story = {}
+	if FileAccess.file_exists(Paths.DIALOGUE_FINAL):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(Paths.DIALOGUE_FINAL))
+		if parsed is Dictionary:
+			story = parsed as Dictionary
+	tier = _pick_tier()
+
+## Referencia de pontos por dificuldade: PLATINUM_SCORE_HARD escalado pelo valor dos acertos de cada nivel.
+func _reference_score() -> float:
+	var difficulty: String = DifficultyManager.get_difficulty()
+	var current: float = 0.0
+	var hard: float = 0.0
+	for key in REFERENCE_GAMES:
+		current += float(DifficultyManager.get_correct_points(key, difficulty))
+		hard += float(DifficultyManager.get_correct_points(key, "dificil"))
+	if hard <= 0.0:
+		return float(AchievementManager.PLATINUM_SCORE_HARD)
+	return float(AchievementManager.PLATINUM_SCORE_HARD) * current / hard
+
+func _pick_tier() -> Dictionary:
+	var tiers: Array = story.get("tiers", [])
+	var ratio: float = float(final_score) / maxf(_reference_score(), 1.0)
+	for item in tiers:
+		if item is Dictionary and ratio >= float((item as Dictionary).get("min_ratio", 0.0)):
+			return item as Dictionary
+	if not tiers.is_empty() and tiers.back() is Dictionary:
+		return tiers.back() as Dictionary
+	return {"id": "recomeco", "title": "Revisor", "ariel": "Vamos ver o placar.", "jales": [{"title": "Obrigado!", "text": "Obrigado por jogar o ContalMaster!"}]}
+
+func _frames_of(key: String) -> Array:
+	var result: Array = []
+	for item in story.get(key, []):
+		if item is Dictionary:
+			result.append((item as Dictionary).duplicate(true))
+	return result
+
+func _run_story() -> void:
+	novel = NovelStage.new()
+	novel.z_index = 30
+	add_child(novel)
+	# Cena final: sprites "_2" (corpo inteiro) com os pes no chao; fundo desfocado e caixa limpa (nome + fala).
+	novel.configure({"accent": GOLD, "show_skip": true, "variant": "v2"})
+	await get_tree().create_timer(0.6).timeout
+
+	# ---- ESCRITORIO (noite) ----
+	# 1) Despedida do Jales (sozinho, em pe no chao; a mesa fica a esquerda).
+	await _play_block(_frames_of("farewell"), {"slots": {"jales": 0.60}})
+	# 2) Natalia chega (sobe) e chama para a sala de reuniao; o Jales sai de cena no 2o quadro.
+	await _cut()
+	await _play_block(_frames_of("meeting_call"), {"slots": {"jales": 0.52, "natalia": 0.76}})
+	# ---- CORREDOR ----
+	# 3) Corte para o corredor: Natalia (natalia_2) conversa com o jogador em 2 quadros de apoio.
+	await _cut(_bg_id("corridor"))
+	await _play_block(_frames_of("corridor"), {"slots": {"natalia": 0.50}})
+	# ---- SALA DE REUNIAO ----
+	# 4) Corte para a sala: o elenco aparece um por um agradecendo.
+	await _cut(_bg_id("cast_thanks"))
+	await _play_block(_cast_frames(), {"row_ids": CAST_ROW})
+	# 5) Corte para o Ariel na sala; ele puxa o score do jogador.
+	await _cut(_bg_id("ariel_intro"))
+	var ariel_frame: Dictionary = (story.get("ariel_intro", {}) as Dictionary).duplicate(true)
+	ariel_frame["speaker"] = "ariel"
+	ariel_frame["text"] = str(tier.get("ariel", "Vamos ver o placar."))
+	ariel_frame["show"] = ["ariel"]
+	await _play_block([ariel_frame], {"slots": {"ariel": 0.50}})
+	# 6) O score sobe.
+	await _show_score_act()
+	# 7) Fala final do Jales sobre o desempenho (4 variacoes), depois creditos e cena final.
+	await _cut(_bg_id("jales_closing"))
+	var jales_frames: Array = []
+	for item in tier.get("jales", []):
+		var frame: Dictionary = (item as Dictionary).duplicate(true)
+		frame["speaker"] = "jales"
+		frame["show"] = ["jales"]
+		jales_frames.append(frame)
+	await _play_block(jales_frames, {"slots": {"jales": 0.50}})
+	if is_inside_tree():
+		_show_credits_act()
+
+## Mostra um bloco de novel. O chao e a posicao da caixa de dialogo vem do cenario atual (Paths.CUTSCENE_FLOOR).
+func _play_block(frames: Array, layout: Dictionary) -> void:
+	if frames.is_empty() or not is_inside_tree():
 		return
-	var rect: Rect2 = _jales_rect(get_viewport_rect().size)
-	jales_sprite.size = rect.size
-	jales_sprite.position = rect.position
-	jales_sprite.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	act = "novel"
+	score_layer.visible = false
+	var floor_data: Dictionary = Paths.CUTSCENE_FLOOR.get(background_id, {}) as Dictionary
+	var full_layout: Dictionary = layout.duplicate()
+	full_layout["floor"] = floor_data
+	full_layout["panel_top"] = false  # V0.11.1: caixa SEMPRE embaixo (padrao das novels); ela cobre parte das pernas/pes
+	novel.apply_layout(full_layout)
+	novel.visible = true
+	await novel.play_frames(frames)
 
-func _prepare_final_message() -> void:
-	var opening_title: String = "A jornada continua."
-	if final_score >= 450:
-		opening_title = "Jornada concluída com maestria!"
-	elif final_score >= 250:
-		opening_title = "Boa jornada!"
+## Elenco reunido: cada personagem SOBE na tela na hora em que fala; quem ja falou continua em cena.
+func _cast_frames() -> Array:
+	var frames: Array = _frames_of("cast_thanks")
+	var present: Array = []
+	for frame in frames:
+		var speaker: String = str(frame.get("speaker", ""))
+		if speaker != "" and not present.has(speaker):
+			present.append(speaker)
+		frame["show"] = present.duplicate()
+		frame["dim"] = 0.22
+	return frames
 
-	final_pages = [
-		{
-			"title": opening_title,
-			"body": "Parabéns! Seu desempenho em Contal Master foi inspirador."
-		},
-		{
-			"title": "um passo por vez",
-			"body": "Passar pelos Desafios mostrou seu comprometimento, postura técnica e excelente capacidade de análise."
-		},
-		{
-			"title": "O Aprendizado não para por aqui",
-			"body": "O mundo corporativo se transforma todos os dias. Encare cada novo desafio como uma oportunidade de evoluir, aprimorar seus conhecimentos e fazer a diferença na sociedade."
-		}
-	]
-	final_page_index = 0
-	_set_current_dialog_page()
+## Cenario (ids de Paths.CUTSCENE_BG_FINAL) do bloco, lido de final.json > backgrounds.
+func _bg_id(block: String) -> String:
+	var map: Dictionary = story.get("backgrounds", {}) as Dictionary
+	return str(map.get(block, ""))
 
-func _set_current_dialog_page() -> void:
-	if final_pages.is_empty():
-		final_title = "A jornada continua."
-		final_body = "Você concluiu os desafios do Contal Master."
+## Troca o cenario de fundo (sem animar: so e chamada com a tela preta).
+func _set_background(id: String) -> void:
+	if id == "" or id == background_id or background_rect == null:
 		return
-	final_page_index = clampi(final_page_index, 0, final_pages.size() - 1)
-	var page: Dictionary = final_pages[final_page_index]
-	final_title = str(page.get("title", "A jornada continua."))
-	final_body = str(page.get("body", ""))
+	var path: String = str(Paths.CUTSCENE_BG_FINAL.get(id, ""))
+	if path == "":
+		push_warning("CutsceneFinal: cenario '%s' nao existe em Paths.CUTSCENE_BG_FINAL." % id)
+		return
+	var texture: Resource = load(path)
+	if texture is Texture2D:
+		background_rect.texture = texture as Texture2D
+		background_id = id
+
+## Corte entre blocos: fade para preto, troca o cenario (se pedido) e volta.
+func _cut(new_background_id: String = "") -> void:
+	if not is_inside_tree():
+		return
+	if not _animations_enabled():
+		_set_background(new_background_id)
+		return
+	var tween: Tween = create_tween()
+	tween.tween_property(fade_rect, "color:a", 1.0, 0.30)
+	await tween.finished
+	_set_background(new_background_id)
+	tween = create_tween()
+	tween.tween_property(fade_rect, "color:a", 0.0, 0.40)
+
+# ---------------------------------------------------------------- construcao
 
 func _build_scene() -> void:
 	background_rect = TextureRect.new()
 	background_rect.name = "Background"
 	background_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background_rect.expand_mode = 1
-	background_rect.stretch_mode = 6
-	var bg_texture: Resource = load(BACKGROUND_PATH)
-	if bg_texture is Texture2D:
-		background_rect.texture = bg_texture as Texture2D
+	background_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	background_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background_rect)
+	_set_background(_bg_id("farewell") if _bg_id("farewell") != "" else "escritorio_noite")
 
 	dimmer = ColorRect.new()
 	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dimmer.color = Color(0.0, 0.0, 0.0, 0.55)
+	dimmer.color = Color(0.0, 0.0, 0.0, 0.20)
+	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dimmer)
 
 	effects_canvas = Control.new()
@@ -176,18 +310,9 @@ func _build_scene() -> void:
 	effects_canvas.draw.connect(_on_effects_canvas_draw)
 	add_child(effects_canvas)
 
-	jales_sprite = TextureRect.new()
-	jales_sprite.custom_minimum_size = Vector2.ZERO
-	jales_sprite.expand_mode = 1
-	jales_sprite.stretch_mode = 5
-	var jales_texture: Resource = load(JALES_PATH)
-	if jales_texture is Texture2D:
-		jales_sprite.texture = jales_texture as Texture2D
-	add_child(jales_sprite)
-
-	_build_dialog_panel()
 	_build_score_layer()
 	_build_credits_layer()
+	_build_finale_layer()
 	_build_gameover_layer()
 
 	fade_rect = ColorRect.new()
@@ -198,53 +323,11 @@ func _build_scene() -> void:
 	add_child(fade_rect)
 	_apply_responsive_layout()
 
-func _build_dialog_panel() -> void:
-	dialog_panel = PanelContainer.new()
-	dialog_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	dialog_panel.offset_left = 54
-	dialog_panel.offset_right = -54
-	dialog_panel.offset_top = -315
-	dialog_panel.offset_bottom = -118
-	dialog_panel.add_theme_stylebox_override("panel", _make_panel_style(Color(0.03, 0.04, 0.09, 0.90), Color(1.0, 0.78, 0.16, 0.88), 18, 2))
-	add_child(dialog_panel)
-
-	dialog_margin = MarginContainer.new()
-	dialog_margin.add_theme_constant_override("margin_left", 34)
-	dialog_margin.add_theme_constant_override("margin_top", 22)
-	dialog_margin.add_theme_constant_override("margin_right", 34)
-	dialog_margin.add_theme_constant_override("margin_bottom", 16)
-	dialog_panel.add_child(dialog_margin)
-
-	dialog_box = VBoxContainer.new()
-	dialog_box.add_theme_constant_override("separation", 12)
-	dialog_margin.add_child(dialog_box)
-
-	title_label = Label.new()
-	title_label.add_theme_font_size_override("font_size", 34)
-	title_label.add_theme_color_override("font_color", Color(1.0, 0.86, 0.30))
-	title_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
-	title_label.add_theme_constant_override("shadow_offset_x", 2)
-	title_label.add_theme_constant_override("shadow_offset_y", 2)
-	dialog_box.add_child(title_label)
-
-	body_label = Label.new()
-	body_label.custom_minimum_size = Vector2(0, 76)
-	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	body_label.add_theme_font_size_override("font_size", 23)
-	body_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
-	dialog_box.add_child(body_label)
-
-	hint_label = Label.new()
-	hint_label.text = "Clique na tela, Espaço ou Enter para continuar"
-	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint_label.add_theme_font_size_override("font_size", 17)
-	hint_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.95, 0.82))
-	dialog_box.add_child(hint_label)
-
 func _build_score_layer() -> void:
 	score_layer = Control.new()
 	score_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	score_layer.visible = false
+	score_layer.z_index = 40
 	add_child(score_layer)
 
 	var center: CenterContainer = CenterContainer.new()
@@ -252,34 +335,34 @@ func _build_score_layer() -> void:
 	score_layer.add_child(center)
 
 	score_panel = PanelContainer.new()
-	score_panel.custom_minimum_size = Vector2(760, 390)
-	score_panel.add_theme_stylebox_override("panel", _make_panel_style(Color(0.03, 0.05, 0.11, 0.94), Color(1.0, 0.78, 0.16), 22, 3))
+	score_panel.custom_minimum_size = Vector2(760, 440)
+	score_panel.add_theme_stylebox_override("panel", _make_panel_style(Color(0.03, 0.05, 0.11, 0.94), GOLD, 22, 3))
 	center.add_child(score_panel)
 
 	var margin: MarginContainer = MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 42)
-	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_top", 28)
 	margin.add_theme_constant_override("margin_right", 42)
-	margin.add_theme_constant_override("margin_bottom", 32)
+	margin.add_theme_constant_override("margin_bottom", 24)
 	score_panel.add_child(margin)
 
 	var box: VBoxContainer = VBoxContainer.new()
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
-	box.add_theme_constant_override("separation", 16)
+	box.add_theme_constant_override("separation", 12)
 	margin.add_child(box)
 
-	var score_title: Label = Label.new()
-	score_title.text = "PONTUAÇÃO FINAL DA JORNADA"
-	score_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	score_title.add_theme_font_size_override("font_size", 29)
-	score_title.add_theme_color_override("font_color", Color(0.82, 0.84, 0.92))
-	box.add_child(score_title)
+	score_title_label = Label.new()
+	score_title_label.text = "PONTUAÇÃO FINAL DA JORNADA"
+	score_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	score_title_label.add_theme_font_size_override("font_size", 29)
+	score_title_label.add_theme_color_override("font_color", Color(0.82, 0.84, 0.92))
+	box.add_child(score_title_label)
 
 	score_value_label = Label.new()
-	score_value_label.text = str(final_score)
+	score_value_label.text = "0"
 	score_value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	score_value_label.add_theme_font_size_override("font_size", 86)
-	score_value_label.add_theme_color_override("font_color", Color(1.0, 0.82, 0.14))
+	score_value_label.add_theme_color_override("font_color", GOLD)
 	score_value_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
 	score_value_label.add_theme_constant_override("shadow_offset_x", 4)
 	score_value_label.add_theme_constant_override("shadow_offset_y", 4)
@@ -292,13 +375,49 @@ func _build_score_layer() -> void:
 	difficulty_label.add_theme_color_override("font_color", Color(0.42, 0.78, 1.0))
 	box.add_child(difficulty_label)
 
+	tier_label = Label.new()
+	tier_label.text = str(tier.get("title", ""))
+	tier_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tier_label.add_theme_font_size_override("font_size", 34)
+	tier_label.add_theme_color_override("font_color", Color(1.0, 0.92, 0.55))
+	tier_label.modulate.a = 0.0
+	box.add_child(tier_label)
+
+	record_label = Label.new()
+	record_label.text = _record_text()
+	record_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	record_label.add_theme_font_size_override("font_size", 21)
+	record_label.add_theme_color_override("font_color", Color(0.62, 1.0, 0.72))
+	record_label.modulate.a = 0.0
+	box.add_child(record_label)
+
 	motivation_label = Label.new()
 	motivation_label.text = "\"%s\"" % _get_motivation()
 	motivation_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	motivation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	motivation_label.add_theme_font_size_override("font_size", 22)
+	motivation_label.add_theme_font_size_override("font_size", 20)
 	motivation_label.add_theme_color_override("font_color", Color(0.82, 0.82, 0.86))
+	motivation_label.modulate.a = 0.0
 	box.add_child(motivation_label)
+
+	score_hint_label = Label.new()
+	score_hint_label.text = "Clique, Espaço ou Enter para continuar"
+	score_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	score_hint_label.add_theme_font_size_override("font_size", 17)
+	score_hint_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.95, 0.85))
+	score_hint_label.modulate.a = 0.0
+	box.add_child(score_hint_label)
+
+## Mensagem de recorde (usa o resultado guardado pelo GameManager ao fechar a campanha).
+func _record_text() -> String:
+	var result: Dictionary = GameManager.last_campaign_result
+	var saved: bool = bool(result.get("saved", false))
+	var previous: int = int(result.get("previous_score", 0))
+	if saved and previous > 0:
+		return "NOVO RECORDE nesta dificuldade! (anterior: %s)" % previous
+	if saved:
+		return "Primeira campanha registrada nesta dificuldade!"
+	return "Seu recorde nesta dificuldade: %s" % ScoreManager.get_campaign_total_score(DifficultyManager.get_difficulty())
 
 func _build_credits_layer() -> void:
 	credits_layer = Control.new()
@@ -313,7 +432,7 @@ func _build_credits_layer() -> void:
 	credits_layer.add_child(credits_box)
 
 	_add_credit_rich(BrandText.brand_bbcode(true), 48)
-	_add_credit_rich(GameManager.get_app_version_bbcode() if has_node("/root/GameManager") else BrandText.version_bbcode("0.9.2.1"), 24)
+	_add_credit_rich(GameManager.get_app_version_bbcode() if has_node("/root/GameManager") else BrandText.version_bbcode("0.12.1"), 24)
 	_add_credit_space(22)
 	_add_credit_label("Game Design & Idealização", 22, Color(0.62, 0.62, 0.68))
 	_add_credit_label("Marcelo Felipe Beckman", 32, Color(1.0, 1.0, 1.0))
@@ -329,8 +448,90 @@ func _build_credits_layer() -> void:
 	_add_credit_space(18)
 	_add_credit_label("Suporte da Equipe", 22, Color(0.62, 0.62, 0.68))
 	_add_credit_label("Fernando Luiz Jales Da Rocha", 32, Color(1.0, 1.0, 1.0))
-	_add_credit_space(26)
-	_add_credit_rich("Obrigado por jogar " + BrandText.brand_bbcode(true) + "!", 44)
+	_add_credit_space(40)
+
+## Camada da cena final (V0.11). A imagem em si e o proprio background_rect (11_cena_creditos);
+## aqui ficam o veu da cortina, o escurecimento, o brilho dourado e o bloco de titulo.
+func _build_finale_layer() -> void:
+	finale_layer = Control.new()
+	finale_layer.name = "FinaleLayer"
+	finale_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	finale_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	finale_layer.visible = false
+	finale_layer.z_index = 35
+	add_child(finale_layer)
+
+	finale_veil = Control.new()
+	finale_veil.name = "CurtainVeil"
+	finale_veil.set_anchors_preset(Control.PRESET_FULL_RECT)
+	finale_veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	finale_veil.draw.connect(_on_finale_veil_draw)
+	finale_layer.add_child(finale_veil)
+
+	finale_dim = ColorRect.new()
+	finale_dim.name = "FinaleDim"
+	finale_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	finale_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	finale_dim.color = Color(0.02, 0.01, 0.06, 0.0)
+	finale_layer.add_child(finale_dim)
+
+	finale_fx = Control.new()
+	finale_fx.name = "GoldCurtainFX"
+	finale_fx.set_anchors_preset(Control.PRESET_FULL_RECT)
+	finale_fx.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var additive: CanvasItemMaterial = CanvasItemMaterial.new()
+	additive.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	finale_fx.material = additive
+	finale_fx.draw.connect(_on_finale_fx_draw)
+	finale_layer.add_child(finale_fx)
+
+	var texts: Dictionary = story.get("finale", {}) as Dictionary
+	finale_box = VBoxContainer.new()
+	finale_box.name = "FinaleTitleBox"
+	finale_box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	finale_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	finale_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	finale_box.add_theme_constant_override("separation", 14)
+	finale_box.modulate.a = 0.0
+	finale_layer.add_child(finale_box)
+
+	var title_text: String = str(texts.get("title", "CONTALMASTER"))
+	finale_title_label = BrandText.make_label(BrandText.brand_bbcode(true) if title_text.to_upper() == "CONTAL MASTER" else title_text, 110, "center", true)
+	finale_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	finale_box.add_child(finale_title_label)
+
+	var line_holder: CenterContainer = CenterContainer.new()
+	line_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	finale_box.add_child(line_holder)
+	finale_line = ColorRect.new()
+	finale_line.color = Color(FINALE_GOLD.r, FINALE_GOLD.g, FINALE_GOLD.b, 0.92)
+	finale_line.custom_minimum_size = Vector2(560, 4)
+	finale_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line_holder.add_child(finale_line)
+
+	finale_thanks_label = Label.new()
+	finale_thanks_label.text = str(texts.get("thanks", "Obrigado por jogar!"))
+	finale_thanks_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	finale_thanks_label.add_theme_font_size_override("font_size", 54)
+	finale_thanks_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.78))
+	finale_thanks_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
+	finale_thanks_label.add_theme_constant_override("shadow_offset_x", 3)
+	finale_thanks_label.add_theme_constant_override("shadow_offset_y", 3)
+	finale_thanks_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	finale_box.add_child(finale_thanks_label)
+
+	finale_subtitle_label = Label.new()
+	finale_subtitle_label.text = str(texts.get("subtitle", ""))
+	finale_subtitle_label.visible = finale_subtitle_label.text != ""
+	finale_subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	finale_subtitle_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	finale_subtitle_label.add_theme_font_size_override("font_size", 24)
+	finale_subtitle_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.96, 0.92))
+	finale_subtitle_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
+	finale_subtitle_label.add_theme_constant_override("shadow_offset_x", 2)
+	finale_subtitle_label.add_theme_constant_override("shadow_offset_y", 2)
+	finale_subtitle_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	finale_box.add_child(finale_subtitle_label)
 
 func _build_gameover_layer() -> void:
 	gameover_layer = Control.new()
@@ -371,34 +572,23 @@ func _build_gameover_layer() -> void:
 	box.add_child(menu_button)
 
 func _apply_responsive_layout() -> void:
-	var compact: bool = ScreenTools.is_compact(self)
-	if dialog_panel != null:
-		dialog_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-		dialog_panel.offset_left = 34.0 if compact else 54.0
-		dialog_panel.offset_right = -dialog_panel.offset_left
-		dialog_panel.offset_top = -245.0 if compact else -315.0
-		dialog_panel.offset_bottom = -58.0 if compact else -118.0
-	if dialog_margin != null:
-		var side: int = 22 if compact else 34
-		dialog_margin.add_theme_constant_override("margin_left", side)
-		dialog_margin.add_theme_constant_override("margin_top", 16 if compact else 22)
-		dialog_margin.add_theme_constant_override("margin_right", side)
-		dialog_margin.add_theme_constant_override("margin_bottom", 12 if compact else 16)
-	if dialog_box != null:
-		dialog_box.add_theme_constant_override("separation", 8 if compact else 12)
-	ScreenTools.apply_label_font(title_label, self, 34, 26)
-	ScreenTools.apply_label_font(body_label, self, 23, 19)
-	ScreenTools.apply_label_font(hint_label, self, 17, 14)
-	if body_label != null:
-		body_label.custom_minimum_size = Vector2(0, 64 if compact else 76)
 	if score_panel != null:
-		score_panel.custom_minimum_size = ScreenTools.panel_size(self, Vector2(760, 390), Vector2(340, 330), 70.0, 70.0)
+		score_panel.custom_minimum_size = ScreenTools.panel_size(self, Vector2(760, 440), Vector2(340, 380), 70.0, 70.0)
 	ScreenTools.apply_label_font(score_value_label, self, 86, 62)
 	ScreenTools.apply_label_font(difficulty_label, self, 25, 20)
-	ScreenTools.apply_label_font(motivation_label, self, 22, 18)
+	ScreenTools.apply_label_font(tier_label, self, 34, 26)
+	ScreenTools.apply_label_font(record_label, self, 21, 17)
+	ScreenTools.apply_label_font(motivation_label, self, 20, 16)
 	if menu_button != null:
 		ButtonStyles.apply(menu_button, "cutscene_return", ScreenTools.button_size(self, Vector2(320, 58), Vector2(260, 50)), ScreenTools.responsive_font(self, 22, 18))
-	_update_jales_static()
+	if finale_title_label != null:
+		BrandText.set_font_size(finale_title_label, ScreenTools.responsive_font(self, 110, 56))
+	if finale_thanks_label != null:
+		ScreenTools.apply_label_font(finale_thanks_label, self, 54, 32)
+	if finale_subtitle_label != null:
+		ScreenTools.apply_label_font(finale_subtitle_label, self, 24, 17)
+	if finale_line != null:
+		finale_line.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(560, 4), Vector2(300, 3))
 
 func _add_credit_label(text_value: String, font_size: int, color: Color) -> void:
 	var label: Label = Label.new()
@@ -419,108 +609,376 @@ func _add_credit_space(height: int) -> void:
 	spacer.custom_minimum_size = Vector2(0, height)
 	credits_box.add_child(spacer)
 
-func _show_dialog_act(page_index: int = -1) -> void:
-	act = "dialog"
-	elapsed = 0.0
-	char_index = 0
-	char_timer = 0.0
-	if page_index >= 0:
-		final_page_index = page_index
-	_set_current_dialog_page()
-	background_rect.visible = true
-	dimmer.color = Color(0.0, 0.0, 0.0, 0.55)
-	jales_sprite.visible = true
-	dialog_panel.visible = true
-	score_layer.visible = false
-	credits_layer.visible = false
-	gameover_layer.visible = false
-	title_label.text = final_title
-	body_label.text = ""
+# ---------------------------------------------------------------- atos finais
 
+## O score SOBE: contagem animada, depois titulo do desempenho, recorde e frase.
 func _show_score_act() -> void:
 	act = "score"
 	elapsed = 0.0
-	jales_sprite.visible = false
-	dialog_panel.visible = false
+	novel.visible = false
 	score_layer.visible = true
-	credits_layer.visible = false
-	gameover_layer.visible = false
 	dimmer.color = Color(0.0, 0.0, 0.0, 0.72)
+	score_value_label.text = "0"
+	score_hint_label.modulate.a = 0.0
+	counting = true
+	if _animations_enabled():
+		var tween: Tween = create_tween()
+		tween.tween_method(_set_shown_score, 0.0, float(final_score), SCORE_COUNT_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		await tween.finished
+	_set_shown_score(float(final_score))
+	await _reveal_score_details()
+	counting = false
+	await _score_continue
+	dimmer.color = Color(0.0, 0.0, 0.0, 0.20)
+	score_layer.visible = false
+
+func _set_shown_score(value: float) -> void:
+	shown_score = value
+	score_value_label.text = str(int(round(value)))
+
+func _reveal_score_details() -> void:
+	for label in [tier_label, record_label, motivation_label, score_hint_label]:
+		if _animations_enabled():
+			var tween: Tween = create_tween()
+			tween.tween_property(label, "modulate:a", 1.0, 0.45)
+			await get_tree().create_timer(0.35).timeout
+		else:
+			label.modulate.a = 1.0
 
 func _show_credits_act() -> void:
 	act = "credits"
 	elapsed = 0.0
 	_reset_particles(28)
-	jales_sprite.visible = false
-	dialog_panel.visible = false
+	novel.visible = false
 	score_layer.visible = false
 	credits_layer.visible = true
 	gameover_layer.visible = false
+	finale_layer.visible = false
 	dimmer.color = Color(0.0, 0.0, 0.0, 0.92)
 	var viewport_size: Vector2 = get_viewport_rect().size
 	credits_box.size = Vector2(viewport_size.x, 900)
 	credits_box.position = Vector2(0.0, viewport_size.y + 60.0)
 
+# ---------------------------------------------------------------- cena final (V0.11)
+## Creditos terminaram: escurece, entra a imagem final (11_cena_creditos) e a cortina dourada a revela.
+## Decisao criativa: (1) a imagem entra escura; (2) uma cortina de luz dourada atravessa a tela da esquerda
+## para a direita "puxando" o veu e revelando o elenco, deixando brilhos no caminho; (3) o elenco respira
+## limpo por um instante; (4) uma segunda cortina, mais suave, passa enquanto a imagem escurece de leve e o
+## titulo CONTAL MASTER + "Obrigado por jogar!" surgem; (5) a tela escurece e vem o GAME OVER.
+func _show_finale_act() -> void:
+	if act == "finale" or act == "gameover":
+		return
+	act = "finale"
+	finale_token += 1
+	var token: int = finale_token
+	elapsed = 0.0
+	finale_stage = 0
+	finale_leaving = false
+	_kill_finale_tweens()
+	finale_sparkles.clear()
+	finale_spark_timer = 0.0
+	novel.visible = false
+	score_layer.visible = false
+	gameover_layer.visible = false
+	credits_layer.visible = false
+
+	# Escurece (fim dos creditos), troca para a imagem final e volta com a cortina ainda fechada.
+	if _animations_enabled():
+		var close: Tween = _finale_tween()
+		close.tween_property(fade_rect, "color:a", 1.0, 0.55)
+		await close.finished
+		if token != finale_token or not is_inside_tree():
+			return
+	_set_background(_bg_id("finale") if _bg_id("finale") != "" else "cena_creditos")
+	dimmer.color = Color(0.0, 0.0, 0.0, 0.0)
+	finale_layer.visible = true
+	finale_dim.color.a = 0.0
+	finale_box.modulate.a = 0.0
+	finale_sweep_pos = -1.0
+	finale_veil_on = _animations_enabled()
+	finale_veil.queue_redraw()
+	_apply_responsive_layout()
+
+	if not _animations_enabled():
+		# Sem animacoes: mostra direto a composicao final e segue o fluxo normal.
+		fade_rect.color.a = 0.0
+		_finale_apply_final_state()
+		await get_tree().create_timer(FINALE_TITLE_HOLD_SECONDS * 0.6).timeout
+		if token == finale_token and is_inside_tree():
+			_finale_end()
+		return
+
+	var reveal_in: Tween = _finale_tween()
+	reveal_in.tween_property(fade_rect, "color:a", 0.0, 0.7)
+	await get_tree().create_timer(0.55).timeout
+	if token != finale_token or not is_inside_tree():
+		return
+
+	# 1) Cortina dourada revela o elenco.
+	finale_sweep_pos = 0.0
+	var sweep: Tween = _finale_tween()
+	sweep.tween_property(self, "finale_sweep_pos", 1.0, FINALE_REVEAL_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	await sweep.finished
+	if token != finale_token or not is_inside_tree():
+		return
+	finale_veil_on = false
+	finale_sweep_pos = -1.0
+	finale_veil.queue_redraw()
+	finale_stage = 1
+
+	# 2) Elenco limpo, so o brilho flutuando.
+	await get_tree().create_timer(FINALE_HOLD_SECONDS).timeout
+	if token != finale_token or not is_inside_tree():
+		return
+
+	# 3) Segunda cortina (suave) + imagem escurece de leve + titulo.
+	var dim: Tween = _finale_tween()
+	dim.tween_property(finale_dim, "color:a", FINALE_DIM_ALPHA, FINALE_TITLE_FADE_SECONDS + 0.6)
+	var second: Tween = _finale_tween()
+	finale_sweep_pos = 0.0
+	second.tween_property(self, "finale_sweep_pos", 1.0, FINALE_TITLE_SWEEP_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	second.tween_callback(func() -> void: finale_sweep_pos = -1.0)
+	await get_tree().create_timer(FINALE_TITLE_SWEEP_SECONDS * 0.42).timeout
+	if token != finale_token or not is_inside_tree():
+		return
+	_finale_show_title(true)
+	finale_stage = 2
+	await get_tree().create_timer(FINALE_TITLE_FADE_SECONDS + FINALE_TITLE_HOLD_SECONDS).timeout
+	if token != finale_token or not is_inside_tree():
+		return
+	_finale_end()
+
+func _finale_tween() -> Tween:
+	var tween: Tween = create_tween()
+	finale_tweens.append(tween)
+	return tween
+
+func _kill_finale_tweens() -> void:
+	for tween in finale_tweens:
+		if tween != null and tween.is_valid():
+			tween.kill()
+	finale_tweens.clear()
+
+## Titulo + agradecimento entram (fade e leve zoom-out, com brilho dourado atras).
+func _finale_show_title(animate: bool) -> void:
+	if not animate or not _animations_enabled():
+		finale_box.modulate.a = 1.0
+		finale_box.scale = Vector2.ONE
+		return
+	finale_box.pivot_offset = finale_box.size * 0.5
+	finale_box.scale = Vector2(1.12, 1.12)
+	var tween: Tween = _finale_tween().set_parallel(true)
+	tween.tween_property(finale_box, "modulate:a", 1.0, FINALE_TITLE_FADE_SECONDS)
+	tween.tween_property(finale_box, "scale", Vector2.ONE, FINALE_TITLE_FADE_SECONDS + 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+## Estado final da cena (usado ao pular ou com animacoes desligadas): sem veu, imagem escurecida, titulo visivel.
+func _finale_apply_final_state() -> void:
+	finale_veil_on = false
+	finale_sweep_pos = -1.0
+	finale_veil.queue_redraw()
+	finale_dim.color.a = FINALE_DIM_ALPHA
+	finale_box.modulate.a = 1.0
+	finale_box.scale = Vector2.ONE
+	finale_stage = 2
+
+## Clique/Espaco/Enter na cena final: antes do titulo, pula para o titulo; com o titulo na tela, segue para o Game Over.
+func _finale_advance() -> void:
+	if finale_leaving or elapsed < FINALE_MIN_SKIP_SECONDS:
+		return
+	if finale_stage < 2:
+		finale_token += 1
+		var token: int = finale_token
+		_kill_finale_tweens()
+		fade_rect.color.a = 0.0
+		_finale_apply_final_state()
+		await get_tree().create_timer(FINALE_TITLE_HOLD_SECONDS * 0.6).timeout
+		if token == finale_token and is_inside_tree():
+			_finale_end()
+		return
+	finale_token += 1
+	_finale_end()
+
+## A tela escurece e entra o GAME OVER (com o botao VOLTAR AO MENU).
+func _finale_end() -> void:
+	if finale_leaving or act != "finale":
+		return
+	finale_leaving = true
+	finale_token += 1
+	var token: int = finale_token
+	_kill_finale_tweens()
+	if _animations_enabled():
+		var darken: Tween = _finale_tween()
+		darken.tween_property(fade_rect, "color:a", 1.0, FINALE_DARKEN_SECONDS)
+		await darken.finished
+		if token != finale_token or not is_inside_tree():
+			return
+	_show_gameover_act()
+	if _animations_enabled():
+		var back: Tween = _finale_tween()
+		back.tween_property(fade_rect, "color:a", 0.0, 0.8)
+	else:
+		fade_rect.color.a = 0.0
+
+func _update_finale(delta: float) -> void:
+	if act != "finale" or not finale_layer.visible:
+		return
+	if not _animations_enabled():
+		return
+	var viewport_size: Vector2 = get_viewport_rect().size
+	# Zoom lento na imagem durante toda a cena.
+	background_rect.pivot_offset = viewport_size * 0.5
+	var zoom: float = 1.0 + minf(elapsed * 0.0042, 0.055)
+	background_rect.scale = Vector2(zoom, zoom)
+
+	var sweeping: bool = finale_sweep_pos >= 0.0 and finale_sweep_pos <= 1.0
+	# Brilhos: nascem ao longo da cortina; depois, poeira dourada ambiente.
+	finale_spark_timer -= delta
+	if sweeping and finale_spark_timer <= 0.0:
+		finale_spark_timer = 0.012
+		var front: float = _finale_front_x(viewport_size)
+		for _i in range(3):
+			_spawn_sparkle(Vector2(front + randf_range(-viewport_size.x * 0.20, viewport_size.x * 0.04), randf_range(0.0, viewport_size.y)), 1.0)
+	elif not sweeping and finale_stage >= 1 and finale_spark_timer <= 0.0:
+		finale_spark_timer = 0.07
+		_spawn_sparkle(Vector2(randf_range(0.0, viewport_size.x), randf_range(viewport_size.y * 0.25, viewport_size.y)), 0.7)
+	var i: int = finale_sparkles.size() - 1
+	while i >= 0:
+		var sparkle: Dictionary = finale_sparkles[i]
+		sparkle["age"] = float(sparkle.get("age", 0.0)) + delta
+		sparkle["pos"] = _dict_vec2(sparkle, "pos", Vector2.ZERO) + _dict_vec2(sparkle, "vel", Vector2.ZERO) * delta
+		if float(sparkle["age"]) >= float(sparkle.get("life", 1.0)):
+			finale_sparkles.remove_at(i)
+		else:
+			finale_sparkles[i] = sparkle
+		i -= 1
+	finale_fx.queue_redraw()
+	if finale_veil_on:
+		finale_veil.queue_redraw()
+
+func _spawn_sparkle(position: Vector2, strength: float) -> void:
+	if finale_sparkles.size() >= FINALE_MAX_SPARKLES:
+		return
+	finale_sparkles.append({
+		"pos": position,
+		"vel": Vector2(randf_range(-14.0, 14.0), randf_range(-46.0, -12.0)),
+		"age": 0.0,
+		"life": randf_range(0.9, 2.1),
+		"size": randf_range(6.0, 20.0) * strength,
+		"spin": randf_range(0.0, TAU)
+	})
+
+## x (em pixels) do centro da cortina na altura do meio da tela.
+func _finale_front_x(viewport_size: Vector2) -> float:
+	var band: float = viewport_size.x * 0.20
+	return lerpf(-band * 0.6, viewport_size.x + band * 0.6, clampf(finale_sweep_pos, 0.0, 1.0))
+
+## Veu escuro: cobre o que a cortina ainda nao revelou (a borda segue a inclinacao da faixa dourada).
+func _on_finale_veil_draw() -> void:
+	if not finale_veil_on:
+		return
+	var viewport_size: Vector2 = get_viewport_rect().size
+	var color: Color = Color(0.02, 0.01, 0.07, FINALE_VEIL_ALPHA)
+	if finale_sweep_pos < 0.0:
+		finale_veil.draw_rect(Rect2(Vector2.ZERO, viewport_size), color, true)
+		return
+	var skew: float = viewport_size.y * 0.16
+	var front: float = _finale_front_x(viewport_size)
+	var points: PackedVector2Array = PackedVector2Array([
+		Vector2(front + skew * 0.5, 0.0),
+		Vector2(viewport_size.x + skew, 0.0),
+		Vector2(viewport_size.x + skew, viewport_size.y),
+		Vector2(front - skew * 0.5, viewport_size.y)
+	])
+	finale_veil.draw_colored_polygon(points, color)
+
+func _on_finale_fx_draw() -> void:
+	if act != "finale":
+		return
+	var viewport_size: Vector2 = get_viewport_rect().size
+	if finale_sweep_pos >= 0.0 and finale_sweep_pos <= 1.0:
+		var band: float = viewport_size.x * 0.20
+		var skew: float = viewport_size.y * 0.16
+		var front: float = _finale_front_x(viewport_size)
+		# "Dobras" da cortina atras da faixa principal (mais fracas e mais finas).
+		for fold in range(3):
+			var offset: float = band * (0.62 + 0.46 * float(fold))
+			_draw_gold_band(front - offset, band * (0.34 - 0.07 * float(fold)), skew, viewport_size.y, 0.40 - 0.11 * float(fold))
+		_draw_gold_band(front, band, skew, viewport_size.y, 1.0)
+	for sparkle in finale_sparkles:
+		var life: float = maxf(float(sparkle.get("life", 1.0)), 0.01)
+		var t: float = clampf(float(sparkle.get("age", 0.0)) / life, 0.0, 1.0)
+		var alpha: float = sin(t * PI)
+		_draw_sparkle(_dict_vec2(sparkle, "pos", Vector2.ZERO), float(sparkle.get("size", 10.0)) * (0.6 + 0.4 * alpha), float(sparkle.get("spin", 0.0)) + t * 1.4, alpha)
+
+## Faixa inclinada de luz dourada: gradiente longo atras, gradiente curto na frente e nucleo branco-quente.
+func _draw_gold_band(x: float, width: float, skew: float, height: float, strength: float) -> void:
+	var edge: Color = Color(FINALE_GOLD_DEEP.r, FINALE_GOLD_DEEP.g, FINALE_GOLD_DEEP.b, 0.0)
+	var core: Color = Color(FINALE_GOLD.r, FINALE_GOLD.g, FINALE_GOLD.b, 0.72 * strength)
+	var hot: Color = Color(1.0, 0.97, 0.84, 0.95 * strength)
+	_draw_band_quad(x - width, x, skew, height, edge, core)
+	_draw_band_quad(x, x + width * 0.30, skew, height, core, edge)
+	_draw_band_quad(x - width * 0.035, x + width * 0.035, skew, height, hot, hot)
+
+func _draw_band_quad(x_a: float, x_b: float, skew: float, height: float, color_a: Color, color_b: Color) -> void:
+	var points: PackedVector2Array = PackedVector2Array([
+		Vector2(x_a + skew * 0.5, 0.0),
+		Vector2(x_b + skew * 0.5, 0.0),
+		Vector2(x_b - skew * 0.5, height),
+		Vector2(x_a - skew * 0.5, height)
+	])
+	var colors: PackedColorArray = PackedColorArray([color_a, color_b, color_b, color_a])
+	finale_fx.draw_polygon(points, colors)
+
+## Brilho em estrela de 4 pontas.
+func _draw_sparkle(center: Vector2, radius: float, rotation_angle: float, alpha: float) -> void:
+	if alpha <= 0.01 or radius <= 0.5:
+		return
+	var points: PackedVector2Array = PackedVector2Array()
+	for k in range(8):
+		var angle: float = rotation_angle + float(k) * PI * 0.25
+		var r: float = radius if k % 2 == 0 else radius * 0.24
+		points.append(center + Vector2(cos(angle), sin(angle)) * r)
+	finale_fx.draw_colored_polygon(points, Color(1.0, 0.92, 0.55, 0.85 * alpha))
+	finale_fx.draw_circle(center, radius * 0.22, Color(1.0, 1.0, 0.9, 0.9 * alpha))
+
 func _show_gameover_act() -> void:
 	act = "gameover"
 	elapsed = 0.0
 	_reset_particles(40)
-	jales_sprite.visible = false
-	dialog_panel.visible = false
+	novel.visible = false
 	score_layer.visible = false
 	credits_layer.visible = false
+	finale_layer.visible = false
 	gameover_layer.visible = true
+	background_rect.scale = Vector2.ONE
 	dimmer.color = Color(0.0, 0.0, 0.0, 0.96)
 
 func _advance_act() -> void:
-	if act == "dialog":
-		var done: bool = char_index >= final_body.length()
-		if not done:
-			char_index = final_body.length()
-			body_label.text = final_body
-		elif final_page_index < final_pages.size() - 1:
-			final_page_index += 1
-			_show_dialog_act()
-		else:
-			_show_score_act()
-	elif act == "score":
-		_show_credits_act()
+	if act == "score":
+		if counting:
+			# Clique durante a contagem: mostra o valor final na hora.
+			_set_shown_score(float(final_score))
+			return
+		_score_continue.emit()
 	elif act == "credits":
-		_show_gameover_act()
+		_show_finale_act()
+	elif act == "finale":
+		_finale_advance()
 	elif act == "gameover":
 		_return_to_menu()
 
-func _update_typewriter(delta: float) -> void:
-	if act != "dialog":
-		return
-	if char_index >= final_body.length():
-		return
-	char_timer += delta
-	while char_timer >= 0.018 and char_index < final_body.length():
-		char_index += 1
-		char_timer -= 0.018
-	body_label.text = final_body.substr(0, char_index)
-
-func _update_jales_animation() -> void:
-	if jales_sprite == null or not jales_sprite.visible:
-		return
-	var rect: Rect2 = _jales_rect(get_viewport_rect().size)
-	var breathing: float = sin(elapsed * 2.1) * 6.0
-	jales_sprite.size = rect.size
-	jales_sprite.position = rect.position + Vector2(0.0, breathing)
-
-func _update_hint() -> void:
-	if hint_label == null:
+func _update_score_hint() -> void:
+	if act != "score" or score_hint_label == null or counting:
 		return
 	var alpha: float = 0.42 + absf(sin(elapsed * 2.8)) * 0.48
-	hint_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.95, alpha))
+	score_hint_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.95, alpha))
 
 func _update_credits(delta: float) -> void:
 	if act != "credits" or credits_box == null:
 		return
 	credits_box.position.y -= CREDIT_SCROLL_SPEED * delta
 	if credits_box.position.y + credits_box.size.y < -40.0:
-		_show_gameover_act()
+		_show_finale_act()
 
 func _update_gameover() -> void:
 	if act != "gameover" or gameover_label == null:

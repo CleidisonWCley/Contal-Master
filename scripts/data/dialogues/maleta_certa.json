@@ -1,0 +1,39 @@
+{
+  "minigame_id": "maleta_certa",
+  "character": {
+    "name": "Tiago",
+    "role": "Auditor Assistente / Especialista em Emissão de Pareceres",
+    "personality_traits": [
+      "Entusiasta",
+      "Didático",
+      "Prestativo",
+      "Motivado"
+    ]
+  },
+  "presentation_dialogues": [
+    {
+      "frame": 1,
+      "title": "Terceira Estação: O Parecer",
+      "speaker": "Jales",
+      "expression": "amigavel_orgulhoso",
+      "text": "Agora é hora de concluir! Quem vai te guiar é o Tiago, o mais novo da equipe. Chegou há pouco, mas já preparou uma dinâmica super prática sobre pareceres de auditoria.",
+      "notes": "Jales apresenta o especialista da estacao. O anfitriao SOBE na tela (fade + subida) quando a fala termina. Historia (V0.11, 2 dias): revisao pelos pares da NBC PA 11 daqui a dois dias, as 9h; dia 1 = Show do Bilhao ate STOP, dia 2 = Desvio Logico (manha) e reuniao; cada estacao entrega um Selo. O cenario de fundo vem de Paths.CUTSCENE_BG_BY_PHASE."
+    },
+    {
+      "frame": 2,
+      "title": "Muito Prazer, Tiago",
+      "speaker": "Tiago",
+      "expression": "sorriso_entusiasmado_postura_pratica",
+      "text": "Muito prazer, eu sou o Tiago! Ainda sou novo por aqui, mas aprendi rápido: saber qual conclusão emitir depois de analisar as evidências é o coração do nosso trabalho.",
+      "notes": "O anfitriao se apresenta com a personalidade dele (traits do JSON)."
+    },
+    {
+      "frame": 3,
+      "title": "O Desafio: Maleta Certa",
+      "speaker": "Tiago",
+      "expression": "gesto_explicativo_confiante",
+      "text": "Por isso a Maleta Certa: cada cenário pede a conclusão certa, e acertar rende o Selo do Parecer. Pode contar comigo, eu te explico como funciona!",
+      "notes": "O anfitriao justifica o minigame dentro da historia, cita o Selo da estacao e avisa que vai explicar a mecanica (tutorial)."
+    }
+  ]
+}

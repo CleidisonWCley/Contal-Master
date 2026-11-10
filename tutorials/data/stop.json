@@ -1,0 +1,62 @@
+{
+  "schema": "tutorial",
+  "version": 2,
+  "minigame_id": "stop",
+  "host": "cleiton",
+  "partner": "",
+  "cta": "Começar!",
+  "notes": "3 quadros.",
+  "steps": [
+    {
+      "id": "como_jogar",
+      "kind": "mecanica",
+      "speaker": "cleiton",
+      "title": "A letra da rodada",
+      "text": "Uma letra é sorteada e aparecem a categoria e uma dica. Todas as opções começam com a letra: clique na que responde às duas.",
+      "modes": [
+        "campaign"
+      ],
+      "targets": [
+        "category_label",
+        "tip_label",
+        "options_grid"
+      ]
+    },
+    {
+      "id": "como_jogar_livre",
+      "kind": "mecanica",
+      "speaker": "cleiton",
+      "title": "A letra da rodada",
+      "text": "Olá, sou o Cleiton. Uma letra é sorteada, com categoria e dica. Todas as opções começam com ela: clique na que responde às duas.",
+      "modes": [
+        "free"
+      ],
+      "targets": [
+        "category_label",
+        "tip_label",
+        "options_grid"
+      ]
+    },
+    {
+      "id": "tempo",
+      "kind": "pontuacao",
+      "speaker": "cleiton",
+      "title": "Agilidade e foco",
+      "text": "Enquanto o relógio corre, quanto mais rápido você acertar, mais pontos ganha. Acerto vale até {correct}; erro tira {wrong}.",
+      "targets": [
+        "score_label",
+        "difficulty_label"
+      ]
+    },
+    {
+      "id": "estrategia",
+      "kind": "estrategia",
+      "speaker": "cleiton",
+      "title": "Categoria filtra, dica decide",
+      "text": "Use a categoria para eliminar o que é de outro assunto e a dica para escolher entre os que sobraram.",
+      "targets": [
+        "tip_label"
+      ]
+    }
+  ]
+}

@@ -15,6 +15,20 @@ const MUSIC := {
 	"musica_final": Paths.MUSIC_FINAL
 }
 
+## V0.12: musica de cada minigame da campanha (chave = key de GameManager.PHASES). A transicao toca a musica
+## do PROPRIO minigame (em vez do "loop_start" generico) e ela segue sem corte quando o minigame comeca,
+## porque play_music() ignora a chamada se a mesma musica ja esta tocando.
+const PHASE_MUSIC := {
+	"show_do_bilhao": "musica_show_do_bilhao",
+	"batalha_naval": "musica_batalha_naval",
+	"maleta_certa": "musica_maleta_certa",
+	"roleta_risco": "musica_rodada_bonus",
+	"perseguicao": "musica_perseguicao",
+	"forca_tecnica": "musica_forca_tecnica",
+	"stop": "musica_stop",
+	"desvio_logico": "desvio_logico"
+}
+
 const SFX := {
 	"click": Paths.SFX_CLICK,
 	"correto": Paths.SFX_CORRECT,
@@ -59,6 +73,11 @@ func _volume_to_db(value: float) -> float:
 	if value <= 0.001:
 		return -80.0
 	return linear_to_db(value)
+
+## Chave de musica (MUSIC) do minigame; "loop_start" se a fase nao tiver musica propria.
+func music_key_for_phase(phase_key: String) -> String:
+	return str(PHASE_MUSIC.get(phase_key, "loop_start"))
+
 
 func play_music(key: String, force_restart: bool = false) -> void:
 	if not MUSIC.has(key):
