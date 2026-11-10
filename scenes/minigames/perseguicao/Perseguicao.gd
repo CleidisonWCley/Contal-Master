@@ -142,8 +142,8 @@ func _build_scene() -> void:
 	var background_rect := TextureRect.new()
 	background_rect.name = "Background"
 	background_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background_rect.expand_mode = 1
-	background_rect.stretch_mode = 6
+	background_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	var bg_texture = load(BACKGROUND_PATH)
 	if bg_texture is Texture2D:
 		background_rect.texture = bg_texture
@@ -166,7 +166,11 @@ func _build_scene() -> void:
 	top_siren.name = "TopSiren"
 	top_siren.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	top_siren.custom_minimum_size = Vector2(0, 34)
-	top_siren.size = Vector2(get_viewport_rect().size.x, 34)
+	# V0.13.4: a altura vem dos OFFSETS (faixa de 34 px colada no topo). Antes se atribuia .size a um Control de
+	# ancoras opostas diferentes, o que o Godot avisa e sobrescreve (control.cpp _set_size); a faixa de baixo
+	# provavelmente ficava fora da tela. Agora as duas ficam coladas nas bordas.
+	top_siren.offset_top = 0.0
+	top_siren.offset_bottom = 34.0
 	top_siren.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(top_siren)
 
@@ -174,7 +178,8 @@ func _build_scene() -> void:
 	bottom_siren.name = "BottomSiren"
 	bottom_siren.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	bottom_siren.custom_minimum_size = Vector2(0, 34)
-	bottom_siren.size = Vector2(get_viewport_rect().size.x, 34)
+	bottom_siren.offset_top = -34.0
+	bottom_siren.offset_bottom = 0.0
 	bottom_siren.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bottom_siren)
 
@@ -322,8 +327,8 @@ func _clear_scene_children() -> void:
 func _create_icon(path: String, min_size: Vector2) -> TextureRect:
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = min_size
-	icon.expand_mode = 1
-	icon.stretch_mode = 5
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var texture = load(path)
 	if texture is Texture2D:
 		icon.texture = texture
@@ -605,7 +610,7 @@ func _highlight_answer(selected_button, correct_text: String, is_correct: bool, 
 		elif button == selected_button and not is_correct and not timed_out:
 			button.add_theme_stylebox_override("disabled", _make_option_button_style(Color(0.54, 0.02, 0.02, 0.98), Color(1.0, 0.52, 0.52), 3))
 
-func _show_feedback(is_correct: bool, selected_text: String, correct_text: String, timed_out: bool, remaining_ratio: float, awarded_points: int) -> void:
+func _show_feedback(is_correct: bool, selected_text: String, correct_text: String, timed_out: bool, _remaining_ratio: float, awarded_points: int) -> void:
 	var current_incident: Dictionary = incidents[current_incident_index]
 	var explanation: String = _clean_feedback_explanation(correct_text, str(current_incident.get("explanation", _get_action_explanation(correct_text))))
 	if is_correct:

@@ -270,9 +270,12 @@ func _animate_card(button: Button, art: UiFrameArt, hot: bool, down: bool) -> vo
 	var target_scale: float = PRESS_SCALE if down else (HOVER_SCALE if hot else 1.0)
 	var target_glow: float = 1.0 if (hot or down) else 0.0
 	# Um unico Tween por cartao: o novo cancela o anterior (sem animacoes brigando entre si).
-	var old_tween: Variant = button.get_meta("tween", null)
-	if old_tween is Tween and (old_tween as Tween).is_valid():
-		(old_tween as Tween).kill()
+	# V0.13.4: get_meta(chave, null) NAO conta como "tem padrao": no Godot 4.5 o null e tratado como "sem padrao" e,
+	# na primeira animacao do cartao (ainda sem "tween"), gera "The object does not have any 'meta' values...".
+	if button.has_meta("tween"):
+		var old_tween: Variant = button.get_meta("tween")
+		if old_tween is Tween and (old_tween as Tween).is_valid():
+			(old_tween as Tween).kill()
 	if not _animations_enabled():
 		button.scale = Vector2.ONE * target_scale
 		art.glow_amount = target_glow

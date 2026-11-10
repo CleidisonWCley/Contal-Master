@@ -11,7 +11,7 @@ const TYPE_SPEED := 0.018
 const DEFAULT_SCRIPT_PAGES := [
 	{
 		"background": "recepcao",
-		"title": "Bem-vindo ao Contal Master",
+		"title": "Bem-vindo ao ContalMaster",
 		"body": "Olá! Seja muito bem-vindo! Sou o Jales, líder da equipe ContalMaster. É um enorme prazer acompanhar você nessa jornada de aprendizado e auditoria!"
 	},
 	{
@@ -116,14 +116,14 @@ func _input(event: InputEvent) -> void:
 			KEY_SPACE, KEY_ENTER, KEY_KP_ENTER:
 				_advance_or_complete_text()
 
-func _handle_pointer_advance(position: Vector2) -> void:
-	if _is_pointer_on_action_button(position):
+func _handle_pointer_advance(point: Vector2) -> void:
+	if _is_pointer_on_action_button(point):
 		return
 	_advance_or_complete_text()
 
-func _is_pointer_on_action_button(position: Vector2) -> bool:
+func _is_pointer_on_action_button(point: Vector2) -> bool:
 	for button in [back_button, skip_button]:
-		if button != null and button.is_visible_in_tree() and button.get_global_rect().has_point(position):
+		if button != null and button.is_visible_in_tree() and button.get_global_rect().has_point(point):
 			return true
 	return false
 
@@ -153,8 +153,8 @@ func _build_scene() -> void:
 	jales_sprite = TextureRect.new()
 	jales_sprite.name = "Jales"
 	jales_sprite.custom_minimum_size = Vector2.ZERO
-	jales_sprite.expand_mode = 1
-	jales_sprite.stretch_mode = 5
+	jales_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	jales_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	jales_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var jales_texture: Resource = load(JALES_PATH)
 	if jales_texture is Texture2D:
@@ -177,11 +177,11 @@ func _build_scene() -> void:
 	top_buttons.z_index = 80
 	add_child(top_buttons)
 
-	back_button = _create_cutscene_button("Menu", Color(0.05, 0.05, 0.08, 0.74), Color(1.0, 0.82, 0.18, 0.74))
+	back_button = _create_cutscene_button("Menu")
 	back_button.pressed.connect(_on_back_pressed)
 	top_buttons.add_child(back_button)
 
-	skip_button = _create_cutscene_button("Pular", Color(0.56, 0.02, 0.05, 0.86), Color(1.0, 0.82, 0.18, 0.92))
+	skip_button = _create_cutscene_button("Pular")
 	skip_button.pressed.connect(_on_skip_pressed)
 	top_buttons.add_child(skip_button)
 
@@ -336,7 +336,7 @@ func _clear_scene_children() -> void:
 	for child in get_children():
 		child.queue_free()
 
-func _create_cutscene_button(text_value: String, bg_color: Color, border_color: Color) -> Button:
+func _create_cutscene_button(text_value: String) -> Button:
 	var button: Button = Button.new()
 	button.text = text_value
 	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -378,15 +378,15 @@ func _update_particles(delta: float) -> void:
 	for i in range(particles.size()):
 		var particle: Dictionary = particles[i]
 		var position_value: Variant = particle.get("position", Vector2.ZERO)
-		var position: Vector2 = Vector2.ZERO
+		var pos: Vector2 = Vector2.ZERO
 		if position_value is Vector2:
-			position = position_value
-		position.y -= float(particle.get("speed", 24.0)) * delta
-		position.x += sin(elapsed * 0.8 + float(i)) * 8.0 * delta
-		if position.y < -18.0:
-			position.y = viewport_size.y + randf_range(20.0, 120.0)
-			position.x = randf_range(0.0, viewport_size.x)
-		particle["position"] = position
+			pos = position_value
+		pos.y -= float(particle.get("speed", 24.0)) * delta
+		pos.x += sin(elapsed * 0.8 + float(i)) * 8.0 * delta
+		if pos.y < -18.0:
+			pos.y = viewport_size.y + randf_range(20.0, 120.0)
+			pos.x = randf_range(0.0, viewport_size.x)
+		particle["position"] = pos
 		particles[i] = particle
 
 func _on_effects_canvas_draw() -> void:
@@ -397,12 +397,12 @@ func _on_effects_canvas_draw() -> void:
 	effects_canvas.draw_rect(Rect2(Vector2.ZERO, viewport_size), Color(0.12, 0.18, 0.38, 0.10 + pulse * 0.05), true)
 	for particle in particles:
 		var position_value: Variant = particle.get("position", Vector2.ZERO)
-		var position: Vector2 = Vector2.ZERO
+		var pos: Vector2 = Vector2.ZERO
 		if position_value is Vector2:
-			position = position_value
+			pos = position_value
 		var radius: float = float(particle.get("radius", 2.5))
 		var alpha: float = float(particle.get("alpha", 0.6))
-		effects_canvas.draw_circle(position, radius, Color(1.0, 0.86, 0.45, alpha))
+		effects_canvas.draw_circle(pos, radius, Color(1.0, 0.86, 0.45, alpha))
 
 func _update_typewriter(delta: float) -> void:
 	if finishing or page_index < 0 or page_index >= script_pages.size():

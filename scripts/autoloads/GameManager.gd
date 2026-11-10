@@ -4,8 +4,8 @@ enum GameMode { NONE, CAMPAIGN, FREE }
 
 const BrandText := preload("res://scripts/ui/BrandText.gd")
 
-const APP_NAME := "Contal Master"
-const APP_VERSION := "0.12.0"
+const APP_NAME := BrandText.BRAND_NAME  # "ContalMaster" (sempre junto)
+const APP_VERSION := BrandText.DEFAULT_VERSION  # versao real: project.godot > BrandText.app_version()
 
 const MAIN_MENU_SCENE := Paths.SCENE_MAIN_MENU
 const MODE_SELECT_SCENE := Paths.SCENE_MODE_SELECT
@@ -91,10 +91,10 @@ var phase_start_score: int = 0
 var last_campaign_result: Dictionary = {}
 
 func get_app_version_label() -> String:
-	return BrandText.version_plain(APP_VERSION)
+	return BrandText.version_plain()
 
 func get_app_version_bbcode() -> String:
-	return BrandText.version_bbcode(APP_VERSION)
+	return BrandText.version_bbcode()
 
 func go_to_main_menu() -> void:
 	current_mode = GameMode.NONE

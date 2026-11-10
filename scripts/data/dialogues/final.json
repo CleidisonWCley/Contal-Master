@@ -1,20 +1,19 @@
 {
   "schema": "final_narrative",
-  "version": 3,
-  "notes": "Roteiro da cutscene final (V0.12). Ordem: farewell (Jales, escritorio a noite) -> meeting_call (Natalia chama) -> [corte p/ corredor, 012_corredor] corridor (Natalia, sprite natalia_2, 2 quadros de apoio) -> [corte p/ sala de reuniao] cast_thanks (elenco aparece um a um agradecendo) -> [corte] Ariel mostra o score (tier.ariel) -> score sobe -> tier.jales (fala final) -> creditos -> cena final (11_cena_creditos, cortina dourada, titulo e 'Obrigado por jogar') -> GAME OVER -> menu. O campo 'title' dos quadros NAO e mais exibido (a caixa mostra so o nome e a fala); pode ficar no JSON como anotacao. 'backgrounds' mapeia cada bloco para um id de Paths.CUTSCENE_BG_FINAL; o chao e a posicao da caixa de cada cenario ficam em Paths.CUTSCENE_FLOOR. 'tiers' vai do melhor para o pior; vale o primeiro cujo min_ratio <= pontos/referencia. A referencia e calculada por dificuldade (ver CutsceneFinal.gd).",
+  "version": 5,
+  "notes": "Roteiro da cutscene final (V0.13.2). Ordem: farewell (Jales, escritorio a noite) -> meeting_call (Natalia chama e SAI andando para o corredor) -> [corte p/ corredor, 012_corredor] corridor (Natalia, sprite natalia_2, 1 quadro de apoio - V0.13.4) -> [tela escura] arrival (V0.13.2: porta abre, luzes sobem, card pequeno da Natalia, sem botao; clique acelera) -> [tela escura] cast_thanks (agradecimentos em JANELA DE 3 personagens: entra um, o mais antigo sai andando; os 3 ultimos ficam) -> todos saem -> score_dialogue (Jales volta pela esquerda, Ariel pela direita; Jales abre e Ariel responde com tiers[].ariel) -> score sobe -> closing_intro + tiers[].jales (Jales centralizado, MESMA sala, sem corte) -> creditos -> cena final (11_cena_creditos, cortina dourada, LOGO contalmaster_logo.png e 'Obrigado por jogar') -> GAME OVER -> menu. O campo 'title' dos quadros NAO e exibido (a caixa mostra so o nome e a fala). 'backgrounds' mapeia os blocos que TROCAM de cenario (ids de Paths.CUTSCENE_BG_FINAL); na sala de reuniao nao ha mais corte solo para Ariel/Jales. O chao/tamanho de cada cenario fica em Paths.CUTSCENE_FLOOR. 'tiers' vai do melhor para o pior; vale o primeiro cujo min_ratio <= pontos/referencia (ver CutsceneFinal.gd). 'closing_intro' e colado no inicio da 1a fala de tiers[].jales (nao cria caixa nova; vazio = desliga). Nome do jogo: sempre ContalMaster (junto). V0.13.2: meeting_call agora e uma conversa Jales (esquerda) <-> Natalia (direita): Jales avisa que vai na frente e pede que a Natalia guie o revisor; 'arrival' e a frase unica da Natalia na cena 13_entrada_sala_reuniao (campos: speaker, name opcional, text). Para remover a cena de chegada: CutsceneFinal.ARRIVAL_ENABLED := false.",
   "backgrounds": {
     "farewell": "escritorio_noite",
     "meeting_call": "escritorio_noite",
     "corridor": "corredor",
     "cast_thanks": "sala_reuniao",
-    "ariel_intro": "sala_reuniao",
     "score": "sala_reuniao",
-    "jales_closing": "sala_reuniao",
     "credits": "sala_reuniao",
-    "finale": "cena_creditos"
+    "finale": "cena_creditos",
+    "arrival": "entrada_sala"
   },
   "finale": {
-    "title": "CONTAL MASTER",
+    "title": "CONTALMASTER",
     "thanks": "Obrigado por jogar!",
     "subtitle": "A equipe ContalMaster agradece a sua jornada."
   },
@@ -37,16 +36,32 @@
         "jales",
         "natalia"
       ],
+      "slide": {
+        "jales": "left",
+        "natalia": "right"
+      },
       "title": "Sala de reunião",
-      "text": "Jales, o pessoal já está todo reunido! Ei, venha comigo, a equipe inteira está esperando você na sala de reunião. Ninguém quis começar sem você, sabia?"
+      "text": "Jales, o pessoal já está todo reunido! Ninguém quis começar sem o nosso novo revisor, e a equipe inteira já está esperando na sala de reunião."
+    },
+    {
+      "speaker": "jales",
+      "show": [
+        "jales",
+        "natalia"
+      ],
+      "title": "Vou na frente",
+      "text": "Que ótima notícia, Natalia! Estou indo na frente. Guie o nosso novo revisor por mim, por favor. Espero vocês na sala de reunião!"
     },
     {
       "speaker": "natalia",
       "show": [
         "natalia"
       ],
+      "slide": {
+        "jales": "left"
+      },
       "title": "Venha comigo",
-      "text": "Vamos? Eu te acompanho até lá. E não fique nervoso: hoje o assunto é só agradecer. Estou muito orgulhosa de você!"
+      "text": "Pode deixar, Jales! Vem comigo, revisor, eu te acompanho até lá. E não fique nervoso: hoje o assunto é só agradecer. Estou muito orgulhosa de você!"
     }
   ],
   "corridor": [
@@ -56,22 +71,19 @@
         "natalia"
       ],
       "title": "Respire fundo",
-      "text": "Enquanto caminhamos até a sala, respire fundo e olhe para trás. Ontem você começou aprendendo a norma e hoje termina tomando decisões éticas."
-    },
-    {
-      "speaker": "natalia",
-      "show": [
-        "natalia"
-      ],
-      "title": "O que você leva daqui",
-      "text": "Errar fez parte do caminho: cada tropeço virou uma lição que você não esquece. E o que você leva daqui vai além de pontos: é um jeito de pensar com rigor, cuidado e coragem."
+      "text": "Enquanto caminhamos, respire fundo e olhe para trás: ontem você começou aprendendo a norma e hoje termina tomando decisões éticas. Cada erro virou lição, e o que você leva daqui é rigor, cuidado e coragem. A sala de reunião é logo ali!"
     }
   ],
+  "arrival": {
+    "speaker": "natalia",
+    "name": "Natalia",
+    "text": "Chegamos! Essa é a sala de reunião e, veja só, estão todos aqui, haha! Fique à vontade, revisor. Estou ansiosa para ver a sua pontuação depois de todos os desafios!"
+  },
   "cast_thanks": [
     {
       "speaker": "jales",
       "title": "A equipe reunida",
-      "text": "Pessoal, nosso revisor chegou! Vamos dar a ele as boas-vindas que merece."
+      "text": "Aí está você! Pessoal, nosso revisor chegou! Vamos dar a ele as boas-vindas que merece."
     },
     {
       "speaker": "priscila",
@@ -119,10 +131,10 @@
       "text": "Em nome de toda a equipe ContalMaster: obrigado por jogar e por superar cada desafio com a gente!"
     }
   ],
-  "ariel_intro": {
-    "speaker": "ariel",
-    "title": "O placar"
+  "score_dialogue": {
+    "jales": "Ariel, você ficou com o placar da jornada, não é? Antes que nosso revisor saia, mostre para ele como foi o desempenho."
   },
+  "closing_intro": "Antes que você vá, quero lhe dizer algo...",
   "tiers": [
     {
       "id": "mestre",

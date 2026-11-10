@@ -21,6 +21,9 @@ class_name NovelStage
 ##   narration          true = sem retratos, texto centralizado (narracao de apoio)
 ##   name               nome exibido (padrao: nome do personagem)
 ##   dim                escurecimento do fundo (0..1)
+##   slide              {id: "left"|"right"}  V0.13.1: quem entra/sai NESTE quadro ANDA pela lateral
+##                      (como quem entra ou sai da sala) em vez de subir/descer. Vale para entrada e saida.
+##   slots              {id: 0..1}  posicao horizontal do rosto so a partir deste quadro (mescla com a do layout)
 ##
 ## "Pular" e opcional (show_skip). Esc NAO e tratado aqui: fica com a cena que hospeda o novel.
 
@@ -32,6 +35,10 @@ const ENTER_SECONDS := 0.48
 const EXIT_SECONDS := 0.36
 const RISE_PIXELS := 78.0
 const DIMMED := Color(0.46, 0.45, 0.56, 1.0)
+## V0.13.1: personagens que ANDAM pela lateral (entrar/sair da sala).
+const SLIDE_ENTER_SECONDS := 0.62
+const SLIDE_EXIT_SECONDS := 0.66
+const SLIDE_DISTANCE := 0.36  # fracao da largura da tela percorrida na entrada/saida
 
 signal _text_done
 signal _next_pressed
@@ -49,6 +56,12 @@ var panel_top: bool = false
 ## Chao do cenario (so variante "v2"): {"front", "back", "ppm", "row_ppm"}; ver Paths.CUTSCENE_FLOOR.
 var floor_info: Dictionary = {"front": 0.72, "back": 0.68, "ppm": 0.31, "row_ppm": 0.27}
 var blur_strength: float = 1.0
+## V0.13.1: se true, exit_all() faz todos SAIREM andando pela lateral (lado mais proximo do slot de cada um).
+var exit_slide: bool = false
+## Lado de saida por personagem no exit_all() ({id: "left"|"right"}); quem nao estiver aqui sai pelo lado do proprio slot.
+var exit_dirs: Dictionary = {}
+## Fracao do tempo de saida que exit_all() espera (0.5 = devolve o controle no meio da saida, para a proxima cena sobrepor).
+var exit_wait: float = 1.0
 
 var _sprites: Dictionary = {}
 var _visible_ids: Array = []
@@ -61,6 +74,8 @@ var _skipped: bool = false
 var _narration: bool = false
 var _type_tween: Tween
 var _dim_tween: Tween
+var _sprite_tweens: Dictionary = {}  # id -> Tween de entrada/saida em andamento
+var _exiting: Dictionary = {}        # id -> true enquanto o personagem esta saindo (nao reposicionar)
 
 var _blur: ColorRect
 var _dimmer: ColorRect
@@ -86,10 +101,14 @@ func configure(options: Dictionary = {}) -> void:
 ## Posicao dos personagens e da caixa por bloco/cenario. Chaves opcionais:
 ##   slots, row_ids, panel_top, floor (Dictionary de Paths.CUTSCENE_FLOOR).
 ## Pode ser chamado entre blocos (CutsceneFinal troca de cenario sem recriar o NovelStage).
+## V0.13.1: tambem aceita exit_slide (bool), exit_dirs (Dictionary) e exit_wait (float) para a saida lateral.
 func apply_layout(layout: Dictionary) -> void:
-	slots = layout.get("slots", {})
+	slots = (layout.get("slots", {}) as Dictionary).duplicate()
 	row_ids = layout.get("row_ids", [])
 	panel_top = bool(layout.get("panel_top", false))
+	exit_slide = bool(layout.get("exit_slide", false))
+	exit_dirs = (layout.get("exit_dirs", {}) as Dictionary).duplicate()
+	exit_wait = clampf(float(layout.get("exit_wait", 1.0)), 0.0, 1.0)
 	var floor_value: Variant = layout.get("floor", null)
 	if floor_value is Dictionary:
 		floor_info = (floor_value as Dictionary).duplicate()
@@ -129,15 +148,20 @@ func play_frames(frames: Array) -> bool:
 
 
 ## Todos os personagens saem (fade + descida) e a caixa de dialogo some.
+## V0.13.1: com exit_slide, cada um sai ANDANDO pela lateral (como se deixasse a sala).
 func exit_all() -> void:
 	for id in _visible_ids.duplicate():
-		_set_sprite_visible(str(id), false, true)
+		var side: String = ""
+		if exit_slide:
+			side = str(exit_dirs.get(str(id), _side_of(str(id))))
+		_set_sprite_visible(str(id), false, true, side)
 	_visible_ids.clear()
 	if _panel != null:
 		var tween: Tween = create_tween()
 		tween.tween_property(_panel, "modulate:a", 0.0, EXIT_SECONDS)
 	if is_inside_tree():
-		await get_tree().create_timer(EXIT_SECONDS + 0.05).timeout
+		var wait: float = (SLIDE_EXIT_SECONDS * exit_wait + 0.05) if exit_slide else (EXIT_SECONDS + 0.05)
+		await get_tree().create_timer(maxf(wait, 0.05)).timeout
 
 
 ## Posicao (area) do botao Pular, para o host ignorar cliques nele.
@@ -151,6 +175,9 @@ func _run_frame(frame: Dictionary) -> void:
 	frame_started.emit(_index)
 	_narration = bool(frame.get("narration", false))
 	_speaker = str(frame.get("speaker", ""))
+	if frame.has("slots"):
+		slots.merge(frame.get("slots", {}) as Dictionary, true)
+	var slide: Dictionary = frame.get("slide", {}) as Dictionary
 	_apply_panel_layout()
 	_fade_dim(float(frame.get("dim", 0.62 if _narration else 0.30)))
 
@@ -166,14 +193,14 @@ func _run_frame(frame: Dictionary) -> void:
 		wanted.append(_speaker)
 	for id in _visible_ids.duplicate():
 		if not wanted.has(id):
-			_set_sprite_visible(str(id), false, true)
+			_set_sprite_visible(str(id), false, true, str(slide.get(str(id), "")))
 	var arriving: Array = []
 	for id in wanted:
 		if not _visible_ids.has(id):
 			arriving.append(id)
 	_visible_ids = wanted
 	for id in arriving:
-		_set_sprite_visible(str(id), true, true)
+		_set_sprite_visible(str(id), true, true, str(slide.get(str(id), "")))
 	_refresh_highlight(true)
 
 	# Painel e texto.
@@ -414,35 +441,76 @@ func _fit_sprite(id: String, sprite: TextureRect, rect: Rect2) -> void:
 		shadow.position = pivot - shadow_size * 0.5 + Vector2(0.0, shadow_size.y * 0.10)
 
 
-func _set_sprite_visible(id: String, make_visible: bool, animate: bool) -> void:
+## Lado ("left"/"right") para onde o personagem anda ao sair: o do proprio slot (centro -> direita).
+func _side_of(id: String) -> String:
+	var default_x: float = 0.26 if id == "jales" else 0.74
+	return "left" if float(slots.get(id, default_x)) < 0.45 else "right"
+
+
+## side = "" -> sobe/desce (padrao); "left"/"right" (V0.13.1) -> entra/sai ANDANDO pela lateral.
+func _set_sprite_visible(id: String, make_visible: bool, animate: bool, side: String = "") -> void:
 	var sprite: TextureRect = _ensure_sprite(id)
 	if sprite == null:
 		return
 	var rect: Rect2 = _sprite_rect(id)
 	_fit_sprite(id, sprite, rect)
-	var tween: Tween = create_tween().set_parallel(true)
+	var old_tween: Tween = _sprite_tweens.get(id, null) as Tween
+	if old_tween != null and old_tween.is_valid():
+		old_tween.kill()
+	_exiting.erase(id)
+	var dir: float = -1.0 if side == "left" else 1.0
+	var slide_px: Vector2 = Vector2(dir * maxf(size.x, 1280.0) * SLIDE_DISTANCE, 0.0)
 	if make_visible:
 		sprite.visible = true
 		if animate and _animations_enabled():
-			sprite.position = rect.position + Vector2(0.0, RISE_PIXELS)
-			sprite.modulate.a = 0.0
-			tween.tween_property(sprite, "position", rect.position, ENTER_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tween.tween_property(sprite, "modulate:a", 1.0, ENTER_SECONDS * 0.8)
+			var tween: Tween = _new_sprite_tween(id)
+			if side != "":
+				sprite.position = rect.position + slide_px
+				sprite.modulate.a = 0.0
+				tween.tween_property(sprite, "position", rect.position, SLIDE_ENTER_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+				tween.tween_property(sprite, "modulate:a", 1.0, SLIDE_ENTER_SECONDS * 0.6)
+			else:
+				sprite.position = rect.position + Vector2(0.0, RISE_PIXELS)
+				sprite.modulate.a = 0.0
+				tween.tween_property(sprite, "position", rect.position, ENTER_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+				tween.tween_property(sprite, "modulate:a", 1.0, ENTER_SECONDS * 0.8)
 		else:
 			sprite.position = rect.position
 			sprite.modulate.a = 1.0
 	else:
 		if animate and _animations_enabled():
-			tween.tween_property(sprite, "position", rect.position + Vector2(0.0, RISE_PIXELS * 0.7), EXIT_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-			tween.tween_property(sprite, "modulate:a", 0.0, EXIT_SECONDS)
-			tween.chain().tween_callback(func() -> void: sprite.visible = false)
+			var tween: Tween = _new_sprite_tween(id)
+			_exiting[id] = true
+			if side != "":
+				# Anda ate a lateral e so some no fim do caminho.
+				tween.tween_property(sprite, "position", rect.position + slide_px, SLIDE_EXIT_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+				tween.tween_property(sprite, "modulate:a", 0.0, SLIDE_EXIT_SECONDS * 0.45).set_delay(SLIDE_EXIT_SECONDS * 0.55)
+				tween.chain().tween_callback(_finish_exit.bind(id, sprite))
+			else:
+				tween.tween_property(sprite, "position", rect.position + Vector2(0.0, RISE_PIXELS * 0.7), EXIT_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+				tween.tween_property(sprite, "modulate:a", 0.0, EXIT_SECONDS)
+				tween.chain().tween_callback(_finish_exit.bind(id, sprite))
 		else:
 			sprite.modulate.a = 0.0
 			sprite.visible = false
 
 
+func _new_sprite_tween(id: String) -> Tween:
+	var tween: Tween = create_tween().set_parallel(true)
+	_sprite_tweens[id] = tween
+	return tween
+
+
+func _finish_exit(id: String, sprite: TextureRect) -> void:
+	_exiting.erase(id)
+	if is_instance_valid(sprite):
+		sprite.visible = false
+
+
 func _refresh_highlight(animate: bool) -> void:
 	for id in _sprites.keys():
+		if _exiting.has(id):
+			continue  # quem esta saindo nao e reposicionado nem recolorido
 		var sprite: TextureRect = _sprites[id] as TextureRect
 		var speaking: bool = str(id) == _speaker or _speaker == ""
 		var target: Color = Color.WHITE if speaking else DIMMED
@@ -457,7 +525,10 @@ func _refresh_highlight(animate: bool) -> void:
 		var base_position: Vector2 = _sprite_rect(str(id)).position
 		if animate and _animations_enabled() and sprite.visible:
 			var tween: Tween = create_tween().set_parallel(true)
-			tween.tween_property(sprite, "modulate", Color(target.r, target.g, target.b, sprite.modulate.a), 0.25)
+			# So RGB: o alpha e da entrada/saida (antes o destaque "brigava" com o fade de entrada).
+			tween.tween_property(sprite, "modulate:r", target.r, 0.25)
+			tween.tween_property(sprite, "modulate:g", target.g, 0.25)
+			tween.tween_property(sprite, "modulate:b", target.b, 0.25)
 			tween.tween_property(sprite, "scale", target_scale, 0.25)
 			if sprite.modulate.a > 0.9:
 				tween.tween_property(sprite, "position", base_position, 0.25)
@@ -579,7 +650,7 @@ func _layout() -> void:
 		var sprite: TextureRect = _sprites[id] as TextureRect
 		var rect: Rect2 = _sprite_rect(str(id))
 		_fit_sprite(str(id), sprite, rect)
-		if sprite.visible and sprite.modulate.a > 0.95:
+		if sprite.visible and sprite.modulate.a > 0.95 and not _exiting.has(id):
 			sprite.position = rect.position
 
 

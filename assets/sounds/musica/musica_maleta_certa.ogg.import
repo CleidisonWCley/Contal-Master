@@ -12,7 +12,7 @@ dest_files=["res://.godot/imported/musica_maleta_certa.ogg-2546cba2c052562bad290
 
 [params]
 
-loop=false
+loop=true
 loop_offset=0
 bpm=0
 beat_count=0

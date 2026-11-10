@@ -46,34 +46,34 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	var theme: Dictionary = THEMES.get(phase_key, DEFAULT_THEME)
-	var kind: String = str(theme.get("kind", "mote"))
-	var amount: int = int(theme.get("amount", 18))
+	var fx_theme: Dictionary = THEMES.get(phase_key, DEFAULT_THEME)
+	var kind: String = str(fx_theme.get("kind", "mote"))
+	var amount: int = int(fx_theme.get("amount", 18))
 	# Duas camadas (accent e secondary) para o brilho nao ficar de uma cor so.
 	for layer in range(2):
 		var color: Color = accent if layer == 0 else secondary.lerp(Color.WHITE, 0.25)
 		var emitter: CPUParticles2D = CPUParticles2D.new()
 		emitter.name = "Fx%d" % layer
 		emitter.amount = maxi(int(round(float(amount) * (0.62 if layer == 0 else 0.38))), 2)
-		emitter.lifetime = float(theme.get("life", 10.0))
+		emitter.lifetime = float(fx_theme.get("life", 10.0))
 		emitter.preprocess = emitter.lifetime  # a tela ja nasce "povoada"
 		emitter.explosiveness = 0.0
 		emitter.randomness = 1.0
 		emitter.local_coords = false
 		emitter.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-		emitter.direction = theme.get("dir", Vector2(0.0, -1.0)) as Vector2
-		emitter.spread = float(theme.get("spread", 25.0))
+		emitter.direction = fx_theme.get("dir", Vector2(0.0, -1.0)) as Vector2
+		emitter.spread = float(fx_theme.get("spread", 25.0))
 		emitter.gravity = Vector2.ZERO
-		var speed: Array = theme.get("speed", [14.0, 36.0])
+		var speed: Array = fx_theme.get("speed", [14.0, 36.0])
 		emitter.initial_velocity_min = float(speed[0])
 		emitter.initial_velocity_max = float(speed[1])
-		var size: Array = theme.get("size", [0.2, 0.5])
-		emitter.scale_amount_min = float(size[0])
-		emitter.scale_amount_max = float(size[1])
-		if float(theme.get("orbit", 0.0)) > 0.0:
-			emitter.orbit_velocity_min = -float(theme.get("orbit", 0.0))
-			emitter.orbit_velocity_max = float(theme.get("orbit", 0.0))
-		emitter.color_ramp = _life_ramp(float(theme.get("alpha", 0.5)) * (1.0 if layer == 0 else 0.8))
+		var fx_size: Array = fx_theme.get("size", [0.2, 0.5])
+		emitter.scale_amount_min = float(fx_size[0])
+		emitter.scale_amount_max = float(fx_size[1])
+		if float(fx_theme.get("orbit", 0.0)) > 0.0:
+			emitter.orbit_velocity_min = -float(fx_theme.get("orbit", 0.0))
+			emitter.orbit_velocity_max = float(fx_theme.get("orbit", 0.0))
+		emitter.color_ramp = _life_ramp(float(fx_theme.get("alpha", 0.5)) * (1.0 if layer == 0 else 0.8))
 		emitter.color = color
 		emitter.texture = _texture_for(kind)
 		emitter.emitting = true

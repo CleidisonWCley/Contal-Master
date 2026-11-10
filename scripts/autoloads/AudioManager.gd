@@ -35,7 +35,8 @@ const SFX := {
 	"errado": Paths.SFX_WRONG,
 	"explosion": Paths.SFX_EXPLOSION,
 	"roleta": Paths.SFX_ROULETTE,
-	"conquista": Paths.SFX_ACHIEVEMENT
+	"conquista": Paths.SFX_ACHIEVEMENT,
+	"porta": Paths.SFX_DOOR
 }
 
 # V0.13.9.5: perfil limpo. A mixagem do Desvio Lógico agora usa volume puro,

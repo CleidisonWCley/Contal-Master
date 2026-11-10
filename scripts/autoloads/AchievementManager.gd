@@ -459,8 +459,8 @@ func _show_notification_card(achievement: Dictionary) -> void:
 	if icon_texture != null:
 		var icon_rect: TextureRect = TextureRect.new()
 		icon_rect.custom_minimum_size = Vector2(54, 54)
-		icon_rect.expand_mode = 1
-		icon_rect.stretch_mode = 5
+		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon_rect.texture = icon_texture
 		row.add_child(icon_rect)
 	else:

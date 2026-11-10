@@ -247,8 +247,8 @@ func _build_scene() -> void:
 	var background_rect: TextureRect = TextureRect.new()
 	background_rect.name = "Background"
 	background_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background_rect.expand_mode = 1
-	background_rect.stretch_mode = 6
+	background_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	var bg_texture: Resource = load(BACKGROUND_PATH)
 	if bg_texture is Texture2D:
 		background_rect.texture = bg_texture as Texture2D

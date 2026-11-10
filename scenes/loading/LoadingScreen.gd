@@ -1,5 +1,5 @@
 extends Control
-## Tela de Loading do Contal Master.
+## Tela de Loading do ContalMaster.
 ## - Fundo em degrade roxo/azul (so cores de UiPalette, nada pesado: esta tela precisa abrir NA HORA).
 ## - Engrenagem gira; o nucleo com o cifrao fica parado (duas camadas: Gear gira, Core nao).
 ## - Barra com trilho BRANCO e preenchimento ROXO + porcentagem.

@@ -48,6 +48,8 @@ const BG_CUT_10_SALA_REUNIAO := CUT_DIR + "10_sala_reuniao.png"
 const BG_CUT_11_CENA_CREDITOS := CUT_DIR + "11_cena_creditos.png"
 ## V0.12: corredor entre o escritorio e a sala de reuniao (novel de apoio da Natalia). O arquivo se chama 012_corredor.png.
 const BG_CUT_12_CORREDOR := CUT_DIR + "012_corredor.png"
+## V0.13.2: cena estatica da CHEGADA a sala de reuniao (Natalia recebendo o jogador). Usada pela ArrivalScene.
+const BG_CUT_13_ENTRADA_SALA := CUT_DIR + "13_entrada_sala_reuniao.png"
 
 ## Background de novel de cada minigame da campanha (chave = key de GameManager.PHASES).
 const CUTSCENE_BG_BY_PHASE := {
@@ -72,6 +74,7 @@ const CUTSCENE_BG_FINAL := {
 	"escritorio_noite": BG_CUT_09_ESCRITORIO,
 	"corredor": BG_CUT_12_CORREDOR,
 	"sala_reuniao": BG_CUT_10_SALA_REUNIAO,
+	"entrada_sala": BG_CUT_13_ENTRADA_SALA,
 	"cena_creditos": BG_CUT_11_CENA_CREDITOS
 }
 
@@ -83,7 +86,8 @@ const CUTSCENE_BG_FINAL := {
 const CUTSCENE_FLOOR := {
 	"escritorio_noite": {"front": 1.05, "back": 1.05, "ppm": 0.55, "row_ppm": 0.40},
 	"corredor":         {"front": 1.05, "back": 1.05, "ppm": 0.58, "row_ppm": 0.40},
-	"sala_reuniao": {"front": 0.76, "back": 0.68, "ppm": 0.30, "row_ppm": 0.265}
+	# V0.13.1: a sala de reuniao usa o MESMO tamanho/chao da cena do escritorio (antes do corredor), sem fileiras.
+	"sala_reuniao":     {"front": 1.05, "back": 1.05, "ppm": 0.55, "row_ppm": 0.55}
 }
 
 ##TAMANHO DAS NOVELS (sprites "_1"). >>> E AQUI QUE SE AJUSTA O TAMANHO DOS PERSONAGENS NAS NOVELS <<<
@@ -114,6 +118,10 @@ const BG_DL_TARDE := "res://assets/background/minegames/desviologico/background_
 const BG_DL_ENTARDECER := "res://assets/background/minegames/desviologico/background_dl_entardecer.png"
 const BG_DL_ANOITECER := "res://assets/background/minegames/desviologico/background_dl_anoitecer.png"
 const BG_DL_NOITE := "res://assets/background/minegames/desviologico/background_dl_noite.png"
+
+# ---- MARCA -------------------------------------------------------
+## Logo do jogo (816x306, fundo transparente): menu inicial e cena final.
+const LOGO_CONTALMASTER := "res://assets/contalmaster_logo.png"
 
 # ---- ICONES ------------------------------------------------------
 const ICON_LOCK := "res://assets/icons/cadeado.png"
@@ -272,6 +280,8 @@ const SFX_ROULETTE := "res://assets/sounds/efeitos/roleta.wav"
 const SFX_ACHIEVEMENT := "res://assets/sounds/efeitos/conquista.ogg"
 const SFX_CAR_ACCELERATION := "res://assets/sounds/efeitos/car_acceleration.ogg"
 const SFX_CAR_ENGINE_LOOP := "res://assets/sounds/efeitos/car_engine_loop.ogg"
+## V0.13.4: porta da sala de reuniao abrindo (ArrivalScene). Gerado por tools/audio/gerar_som_porta.py.
+const SFX_DOOR := "res://assets/sounds/efeitos/porta_abrindo.ogg"
 
 # ---- SAVES (user://) ----------------------------------------
 const SAVE_SCORES := "user://contal_master_scores.json"

@@ -350,7 +350,7 @@ func _target_card_y(view: Vector2, card_h: float) -> float:
 	return view.y - card_h - bottom_gap if _card_at_bottom else top_gap
 
 
-func _place_card(card_y: float, view: Vector2, card_h: float, reserve: float, narrow: bool, compact: bool) -> void:
+func _place_card(card_y: float, view: Vector2, card_h: float, _reserve: float, narrow: bool, _compact: bool) -> void:
 	_card_y = card_y
 	_card.position = Vector2((view.x - _card.size.x) * 0.5, card_y)
 	# O retrato acompanha a altura REAL do cartao (card_h): sobe e desce junto, sempre apoiado na base dele.

@@ -249,8 +249,8 @@ func _build_scene() -> void:
 	background_rect = TextureRect.new()
 	background_rect.name = "Background"
 	background_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background_rect.expand_mode = 1
-	background_rect.stretch_mode = 6
+	background_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	var bg_texture: Resource = load(BACKGROUND_PATH)
 	if bg_texture is Texture2D:
 		background_rect.texture = bg_texture as Texture2D
@@ -371,8 +371,8 @@ func _clear_scene_children() -> void:
 func _create_icon(path: String, min_size: Vector2) -> TextureRect:
 	var icon: TextureRect = TextureRect.new()
 	icon.custom_minimum_size = min_size
-	icon.expand_mode = 1
-	icon.stretch_mode = 5
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var texture: Resource = load(path)
 	if texture is Texture2D:
 		icon.texture = texture as Texture2D
@@ -735,13 +735,13 @@ func _draw_orbit_sparks(center: Vector2, radius: float) -> void:
 	for i in range(orbit_angles.size()):
 		var angle: float = orbit_angles[i]
 		var sparkle_radius: float = radius * 1.12 + sin(angle * 2.0) * 8.0
-		var position: Vector2 = center + Vector2(cos(angle), sin(angle)) * sparkle_radius
+		var spot: Vector2 = center + Vector2(cos(angle), sin(angle)) * sparkle_radius
 		var alpha: float = 0.48 + 0.35 * absf(sin(angle * 1.7))
-		wheel_canvas.draw_circle(position, 3.0, Color(1.0, 1.0, 0.62, alpha))
+		wheel_canvas.draw_circle(spot, 3.0, Color(1.0, 1.0, 0.62, alpha))
 
 func _draw_burst_particles() -> void:
 	for particle in burst_particles:
-		var position: Vector2 = particle["position"]
+		var spot: Vector2 = particle["position"]
 		var life: float = float(particle.get("life", 0.0))
 		var max_life: float = float(particle.get("max_life", 0.78))
 		var radius: float = float(particle.get("radius", 4.0))
@@ -750,7 +750,7 @@ func _draw_burst_particles() -> void:
 		if color_value is Color:
 			color = color_value
 		var alpha: float = clampf(life / max_life, 0.0, 1.0)
-		wheel_canvas.draw_circle(position, radius, Color(color.r, color.g, color.b, alpha))
+		wheel_canvas.draw_circle(spot, radius, Color(color.r, color.g, color.b, alpha))
 
 func _update_orbit(delta: float) -> void:
 	for i in range(orbit_angles.size()):
@@ -759,16 +759,16 @@ func _update_orbit(delta: float) -> void:
 func _update_particles(delta: float) -> void:
 	for i in range(burst_particles.size() - 1, -1, -1):
 		var particle: Dictionary = burst_particles[i]
-		var position: Vector2 = particle["position"]
+		var spot: Vector2 = particle["position"]
 		var velocity: Vector2 = particle["velocity"]
 		var life: float = float(particle.get("life", 0.0))
-		position += velocity * delta
+		spot += velocity * delta
 		velocity *= 0.90
 		life -= delta
 		if life <= 0.0:
 			burst_particles.remove_at(i)
 		else:
-			particle["position"] = position
+			particle["position"] = spot
 			particle["velocity"] = velocity
 			particle["life"] = life
 			burst_particles[i] = particle

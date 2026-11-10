@@ -1,6 +1,6 @@
 extends RefCounted
 class_name UiPalette
-## Tokens de design do Contal Master (paleta definida pela equipe) + helpers de acessibilidade.
+## Tokens de design do ContalMaster (paleta definida pela equipe) + helpers de acessibilidade.
 ## Cores NUNCA devem ser escritas "a mao" nas telas: use UiPalette.X.
 
 # ---- Paleta base -----------------------------------------------------------

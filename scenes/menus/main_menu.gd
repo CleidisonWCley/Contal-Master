@@ -92,7 +92,7 @@ func _set_menu_button(button: Button, label: String, icon_path: String) -> void:
 func _ensure_version_badge() -> void:
 	if version_label != null:
 		return
-	var badge_bbcode: String = GameManager.get_app_version_bbcode() if has_node("/root/GameManager") else BrandText.version_bbcode("0.9.2.1")
+	var badge_bbcode: String = GameManager.get_app_version_bbcode() if has_node("/root/GameManager") else BrandText.version_bbcode()
 	version_label = BrandText.make_label(badge_bbcode, 16, "right", false)
 	version_label.name = "VersionBadge"
 	version_label.z_index = 20
@@ -242,13 +242,13 @@ func _update_particles(delta: float) -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size
 	for i in range(particles.size()):
 		var particle: Dictionary = particles[i]
-		var position: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
-		position.y -= float(particle.get("speed", 30.0)) * delta
-		position.x += sin(elapsed * 1.2 + float(particle.get("wave", 0.0))) * 18.0 * delta
-		if position.y < -28.0:
-			position.y = viewport_size.y + randf_range(20.0, 120.0)
-			position.x = randf_range(0.0, viewport_size.x)
-		particle["position"] = position
+		var pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
+		pos.y -= float(particle.get("speed", 30.0)) * delta
+		pos.x += sin(elapsed * 1.2 + float(particle.get("wave", 0.0))) * 18.0 * delta
+		if pos.y < -28.0:
+			pos.y = viewport_size.y + randf_range(20.0, 120.0)
+			pos.x = randf_range(0.0, viewport_size.x)
+		particle["position"] = pos
 		particles[i] = particle
 
 func _update_logo_animation() -> void:
@@ -265,7 +265,7 @@ func _on_effects_canvas_draw() -> void:
 	var pulse: float = (sin(elapsed * 2.4) + 1.0) * 0.5
 	effects_canvas.draw_rect(Rect2(Vector2.ZERO, viewport_size), Color(0.12, 0.06, 0.20, 0.035 + pulse * 0.025), true)
 	for particle in particles:
-		var position: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
+		var pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
 		var radius: float = float(particle.get("radius", 3.0))
 		var alpha: float = float(particle.get("alpha", 0.55))
 		var kind: int = int(particle.get("kind", 0))
@@ -274,8 +274,8 @@ func _on_effects_canvas_draw() -> void:
 			color = Color(0.54, 0.76, 1.0, alpha * 0.72)
 		elif kind == 2:
 			color = Color(1.0, 1.0, 1.0, alpha * 0.58)
-		effects_canvas.draw_circle(position, radius, color)
-		effects_canvas.draw_circle(position, radius * 2.4, Color(color.r, color.g, color.b, alpha * 0.08))
+		effects_canvas.draw_circle(pos, radius, color)
+		effects_canvas.draw_circle(pos, radius * 2.4, Color(color.r, color.g, color.b, alpha * 0.08))
 
 func _dict_vec2(data: Dictionary, key: String, fallback: Vector2) -> Vector2:
 	var value: Variant = data.get(key, fallback)

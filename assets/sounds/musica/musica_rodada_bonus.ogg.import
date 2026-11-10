@@ -12,7 +12,7 @@ dest_files=["res://.godot/imported/musica_rodada_bonus.ogg-be883f72d4975dc6fbbf4
 
 [params]
 
-loop=false
+loop=true
 loop_offset=0
 bpm=0
 beat_count=0

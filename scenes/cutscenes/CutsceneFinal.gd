@@ -2,13 +2,16 @@ extends Control
 ## Cutscene final Roteiro em res://scripts/data/dialogues/final.json
 ##
 ## Sequencia (todos os blocos usam o NovelStage com os sprites "_2", corpo inteiro, com os PES no chao do cenario):
-##   ESCRITORIO (09, noite)                 CORREDOR (012)                      SALA DE REUNIAO (10)
-##   1. Despedida do Jales                  3. Natalia (natalia_2) conversa     4. Elenco aparece UM A UM agradecendo
-##   2. Natalia chama para a reuniao           com o jogador: 2 quadros         5. Corte para o Ariel -> o score SOBE
-##                                                                              6. Fala final do Jales (4 variacoes)
-##   7. Creditos (rolagem)
-##   8. CENA FINAL (11): elenco reunido, cortina de brilho dourado, titulo "CONTAL MASTER" + "Obrigado por jogar!"
-##   9. A tela escurece -> GAME OVER -> voltar ao menu
+##   ESCRITORIO (09, noite)                 CORREDOR (012)                      SALA DE REUNIAO (10) - SEM cortes solo (V0.13.1)
+##   1. Despedida do Jales                  3. Natalia (natalia_2) conversa     4. Elenco agradece em JANELA DE 3: um entra, o mais
+##   2. Natalia chama para a reuniao           com o jogador: 1 quadro             antigo SAI andando pela lateral; os 3 ultimos ficam
+##      (e SAI andando para o corredor                                          5. Todos saem; Jales volta pela ESQUERDA e Ariel pela
+##       enquanto a cena troca)                                                    DIREITA e conversam para apresentar o placar
+##                                                                              6. O score SOBE
+##                                                                              7. Jales CENTRALIZADO: "Antes que voce va..." + fala final
+##   8. Creditos (rolagem)
+##   9. CENA FINAL (11): elenco reunido, cortina de brilho dourado, LOGO do ContalMaster + "Obrigado por jogar!"
+##  10. A tela escurece -> GAME OVER -> voltar ao menu
 ## Cada bloco escolhe o cenario pela chave "backgrounds" do final.json (ids em Paths.CUTSCENE_BG_FINAL).
 ## "Pular" pula apenas o bloco atual; Esc volta ao menu.
 
@@ -29,7 +32,34 @@ const FINALE_GOLD := Color(1.0, 0.84, 0.34)
 const FINALE_GOLD_DEEP := Color(1.0, 0.70, 0.16)
 const FINALE_MAX_SPARKLES := 140
 const SCORE_COUNT_SECONDS := 2.8
-const CAST_ROW := ["priscila", "anderson", "tiago", "julios", "jales", "ariel", "aline", "cleiton", "natalia"]
+## ---- SALA DE REUNIAO (V0.13.1) --- ajustes manuais ficam aqui ----
+## Quantos personagens ficam em cena ao mesmo tempo durante os agradecimentos.
+const CAST_WINDOW := 3
+## Posicao horizontal (0..1, centro do ROSTO) dos 3 lugares: esquerda, meio, direita.
+const CAST_SLOTS := [0.20, 0.50, 0.80]
+## Jales (esquerda) e Ariel (direita) na conversa do placar.
+const SCORE_SLOT_JALES := 0.27
+const SCORE_SLOT_ARIEL := 0.73
+## Pausa (s) com a sala vazia antes de Jales e Ariel voltarem.
+const EMPTY_ROOM_SECONDS := 0.45
+## Jales centralizado na fala final.
+const CLOSING_SLOT_JALES := 0.50
+## Escritorio: lado por onde a Natalia sai andando rumo ao corredor ("left" ou "right").
+const NATALIA_EXIT_SIDE := "right"
+## Fracao da saida da Natalia que acontece ANTES de o fade para o corredor comecar (0.5 = sobrepoe metade).
+const NATALIA_EXIT_WAIT := 0.5
+## V0.13.2: conversa Jales <-> Natalia no escritorio. Jales na ESQUERDA e Natalia na DIREITA (antes o Jales ficava no centro).
+const MEETING_SLOT_JALES := 0.24
+const MEETING_SLOT_NATALIA := 0.76
+## V0.13.2: cena estatica de CHEGADA a sala de reuniao (ArrivalScene), entre o corredor e os agradecimentos.
+## >>> Para REMOVER a cena: ARRIVAL_ENABLED := false (o fluxo volta a ir direto do corredor para a sala). <<<
+const ARRIVAL_ENABLED := true
+## Pausa (s) com a tela preta antes de a sala de reuniao reaparecer depois da cena de chegada.
+const ARRIVAL_TO_ROOM_SECONDS := 0.35
+## Logo do jogo na cena final (V0.13.1). Tamanho (desktop / compacto), respeitando a proporcao 816x306.
+const LOGO_SIZE := Vector2(760, 285)
+const LOGO_SIZE_COMPACT := Vector2(420, 158)
+const LOGO_BREATH_SCALE := 0.022
 ## Jogos que definem a referencia de pontuacao por dificuldade (mesma escala da conquista Platina).
 const REFERENCE_GAMES := ["show_do_bilhao", "maleta_certa", "perseguicao", "stop", "batalha_naval"]
 const GOLD := Color(1.0, 0.82, 0.16)
@@ -71,7 +101,8 @@ var finale_veil: Control        # veu escuro que a cortina dourada "puxa" para r
 var finale_dim: ColorRect       # escurece a imagem para o titulo ler bem
 var finale_fx: Control          # faixa/cortina dourada + brilhos (mistura aditiva)
 var finale_box: VBoxContainer
-var finale_title_label: RichTextLabel
+var finale_logo: TextureRect              # V0.13.1: logo contalmaster_logo.png (Paths.LOGO_CONTALMASTER)
+var finale_title_label: RichTextLabel     # texto de reserva: so aparece se o logo nao carregar
 var finale_line: ColorRect
 var finale_thanks_label: Label
 var finale_subtitle_label: Label
@@ -124,8 +155,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
 		_return_to_menu()
 		return
-	if act == "novel":
-		return # o NovelStage cuida de clique, Espaco e Enter
+	if act == "novel" or act == "arrival":
+		return # o NovelStage (ou a ArrivalScene) cuida de clique, Espaco e Enter
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_pointer_advance(event.position)
 	elif event is InputEventScreenTouch and event.pressed:
@@ -135,13 +166,13 @@ func _input(event: InputEvent) -> void:
 			KEY_SPACE, KEY_ENTER, KEY_KP_ENTER:
 				_advance_act()
 
-func _handle_pointer_advance(position: Vector2) -> void:
-	if _is_pointer_on_menu_button(position):
+func _handle_pointer_advance(point: Vector2) -> void:
+	if _is_pointer_on_menu_button(point):
 		return
 	_advance_act()
 
-func _is_pointer_on_menu_button(position: Vector2) -> bool:
-	return menu_button != null and menu_button.is_visible_in_tree() and menu_button.get_global_rect().has_point(position)
+func _is_pointer_on_menu_button(point: Vector2) -> bool:
+	return menu_button != null and menu_button.is_visible_in_tree() and menu_button.get_global_rect().has_point(point)
 
 func _animations_enabled() -> bool:
 	return not has_node("/root/SettingsManager") or SettingsManager.animations_enabled()
@@ -197,36 +228,120 @@ func _run_story() -> void:
 	# 1) Despedida do Jales (sozinho, em pe no chao; a mesa fica a esquerda).
 	await _play_block(_frames_of("farewell"), {"slots": {"jales": 0.60}})
 	# 2) Natalia chega (sobe) e chama para a sala de reuniao; o Jales sai de cena no 2o quadro.
+	#    V0.13.1: ao fim, a Natalia SAI ANDANDO pela lateral rumo ao corredor enquanto o fade da proxima cena ja comeca.
 	await _cut()
-	await _play_block(_frames_of("meeting_call"), {"slots": {"jales": 0.52, "natalia": 0.76}})
+	await _play_block(_frames_of("meeting_call"), {
+		"slots": {"jales": MEETING_SLOT_JALES, "natalia": MEETING_SLOT_NATALIA},
+		"exit_slide": true,
+		"exit_dirs": {"natalia": NATALIA_EXIT_SIDE},
+		"exit_wait": NATALIA_EXIT_WAIT
+	})
 	# ---- CORREDOR ----
-	# 3) Corte para o corredor: Natalia (natalia_2) conversa com o jogador em 2 quadros de apoio.
+	# 3) Corte para o corredor: Natalia (natalia_2) conversa com o jogador em 1 quadro de apoio (V0.13.4: resumo da narrativa; eram 2).
 	await _cut(_bg_id("corridor"))
-	await _play_block(_frames_of("corridor"), {"slots": {"natalia": 0.50}})
-	# ---- SALA DE REUNIAO ----
-	# 4) Corte para a sala: o elenco aparece um por um agradecendo.
-	await _cut(_bg_id("cast_thanks"))
-	await _play_block(_cast_frames(), {"row_ids": CAST_ROW})
-	# 5) Corte para o Ariel na sala; ele puxa o score do jogador.
-	await _cut(_bg_id("ariel_intro"))
-	var ariel_frame: Dictionary = (story.get("ariel_intro", {}) as Dictionary).duplicate(true)
-	ariel_frame["speaker"] = "ariel"
-	ariel_frame["text"] = str(tier.get("ariel", "Vamos ver o placar."))
-	ariel_frame["show"] = ["ariel"]
-	await _play_block([ariel_frame], {"slots": {"ariel": 0.50}})
+	#    V0.13.2: ao fim, a Natalia segue andando para a porta (lateral) e a tela escurece para a cena de chegada.
+	await _play_block(_frames_of("corridor"), {
+		"slots": {"natalia": 0.50},
+		"exit_slide": ARRIVAL_ENABLED,
+		"exit_dirs": {"natalia": "right"},
+		"exit_wait": 0.7
+	})
+	# ---- CHEGADA (V0.13.2): tela escura, porta abre, luzes sobem e a Natalia recebe o jogador (card pequeno, sem botao) ----
+	var arrived: bool = false
+	if ARRIVAL_ENABLED:
+		arrived = await _play_arrival()
+	if not is_inside_tree():
+		return
+	# ---- SALA DE REUNIAO (V0.13.1: um unico corte para entrar; dali em diante NAO ha mais cortes solo) ----
+	# 4) Agradecimentos: 3 personagens por vez; o mais antigo sai andando quando entra o proximo.
+	#    Depois da cena de chegada a tela ja esta preta: so troca o cenario e clareia (sem novo corte).
+	if arrived:
+		await _enter_room_from_arrival()
+	else:
+		await _cut(_bg_id("cast_thanks"))
+	await _play_block(_cast_frames(), {"exit_slide": true})
+	if not is_inside_tree():
+		return
+	# Sala vazia por um instante: todos saíram.
+	await get_tree().create_timer(EMPTY_ROOM_SECONDS if _animations_enabled() else 0.05).timeout
+	# 5) Jales volta pela esquerda e Ariel pela direita e conversam para apresentar o placar (mesma cena, sem corte).
+	await _play_block(_score_dialogue_frames(), {
+		"slots": {"jales": SCORE_SLOT_JALES, "ariel": SCORE_SLOT_ARIEL},
+		"exit_slide": true
+	})
 	# 6) O score sobe.
 	await _show_score_act()
-	# 7) Fala final do Jales sobre o desempenho (4 variacoes), depois creditos e cena final.
-	await _cut(_bg_id("jales_closing"))
-	var jales_frames: Array = []
-	for item in tier.get("jales", []):
-		var frame: Dictionary = (item as Dictionary).duplicate(true)
-		frame["speaker"] = "jales"
-		frame["show"] = ["jales"]
-		jales_frames.append(frame)
-	await _play_block(jales_frames, {"slots": {"jales": 0.50}})
+	# 7) Jales CENTRALIZADO, na mesma sala (sem corte): "Antes que você vá..." + fala final (4 variacoes). Depois, creditos.
+	await _play_block(_closing_frames(), {"slots": {"jales": CLOSING_SLOT_JALES}})
 	if is_inside_tree():
 		_show_credits_act()
+
+## V0.13.2: cena de CHEGADA (ArrivalScene). Retorna true se a cena rodou (a tela fica PRETA ao fim) e false se
+## faltou a imagem/roteiro (aí o fluxo segue como antes, com o corte normal). Roteiro: final.json > arrival.
+func _play_arrival() -> bool:
+	var data: Dictionary = story.get("arrival", {}) as Dictionary
+	var text_value: String = str(data.get("text", "")).strip_edges()
+	var path: String = str(Paths.CUTSCENE_BG_FINAL.get(_bg_id("arrival") if _bg_id("arrival") != "" else "entrada_sala", ""))
+	if text_value == "" or path == "" or not ResourceLoader.exists(path):
+		push_warning("CutsceneFinal: cena de chegada ignorada (falta final.json > arrival ou a imagem 13_entrada_sala_reuniao).")
+		return false
+	var texture: Texture2D = _load_texture_safe(path)
+	if texture == null:
+		push_warning("CutsceneFinal: nao foi possivel carregar '%s' (reimporte a imagem no Godot). Cena de chegada ignorada." % path)
+		return false
+	var speaker: String = str(data.get("speaker", "natalia"))
+	var info: Dictionary = TutorialManager.character(speaker)
+	act = "arrival"
+	novel.visible = false
+	score_layer.visible = false
+	var arrival: ArrivalScene = ArrivalScene.new()
+	arrival.name = "ArrivalScene"
+	arrival.z_index = 100  # acima do novel (30); o fade_rect (500) continua por cima de tudo
+	arrival.setup(
+		texture,
+		str(data.get("name", info.get("name", "Natalia"))),
+		info.get("color", Color(0.0, 0.88, 1.0)) as Color,
+		text_value
+	)
+	add_child(arrival)
+	await arrival.play()
+	if not is_inside_tree():
+		return true
+	# A arrival termina com a tela preta: cobre com o fade do host ANTES de remove-la (sem piscar).
+	fade_rect.color = Color(0.0, 0.0, 0.0, 1.0)
+	arrival.queue_free()
+	return true
+
+## Carrega uma imagem sem gerar erro se o cache de importacao (.godot/imported) estiver faltando: nesse caso, no editor,
+## le o PNG direto do disco. Em exportacao o cache sempre existe. Retorna null se nada funcionar.
+func _load_texture_safe(path: String) -> Texture2D:
+	var remap_ok: bool = true
+	var import_path: String = path + ".import"
+	if FileAccess.file_exists(import_path):
+		var config: ConfigFile = ConfigFile.new()
+		if config.load(import_path) == OK:
+			var cached: String = str(config.get_value("remap", "path", ""))
+			remap_ok = cached == "" or FileAccess.file_exists(cached)
+	if remap_ok:
+		var loaded: Resource = load(path)
+		if loaded is Texture2D:
+			return loaded as Texture2D
+	if FileAccess.file_exists(path):
+		var image: Image = Image.load_from_file(ProjectSettings.globalize_path(path))
+		if image != null and not image.is_empty():
+			image.generate_mipmaps()
+			return ImageTexture.create_from_image(image)
+	return null
+
+## Apos a cena de chegada: com a tela preta, volta o cenario da sala de reuniao e clareia.
+func _enter_room_from_arrival() -> void:
+	_set_background(_bg_id("cast_thanks"))
+	if _animations_enabled():
+		await get_tree().create_timer(ARRIVAL_TO_ROOM_SECONDS).timeout
+		var tween: Tween = create_tween()
+		tween.tween_property(fade_rect, "color:a", 0.0, 0.55)
+	else:
+		fade_rect.color.a = 0.0
 
 ## Mostra um bloco de novel. O chao e a posicao da caixa de dialogo vem do cenario atual (Paths.CUTSCENE_FLOOR).
 func _play_block(frames: Array, layout: Dictionary) -> void:
@@ -242,16 +357,84 @@ func _play_block(frames: Array, layout: Dictionary) -> void:
 	novel.visible = true
 	await novel.play_frames(frames)
 
-## Elenco reunido: cada personagem SOBE na tela na hora em que fala; quem ja falou continua em cena.
+## Agradecimentos em JANELA de CAST_WINDOW personagens (V0.13.1): quem fala entra (sobe) num lugar livre; quando a
+## janela esta cheia, o mais antigo SAI andando pela lateral e o novo ocupa o lugar dele. Os ultimos 3 ficam em cena.
+## Cada quadro recebe: show (quem esta em cena), slots (lugar de quem entra) e slide (quem sai e por qual lado).
 func _cast_frames() -> Array:
 	var frames: Array = _frames_of("cast_thanks")
-	var present: Array = []
+	var window: Array = []       # ids em cena, do mais antigo ao mais novo
+	var slot_of: Dictionary = {} # id -> indice do lugar (0 esq, 1 meio, 2 dir)
+	var exits: int = 0
 	for frame in frames:
 		var speaker: String = str(frame.get("speaker", ""))
-		if speaker != "" and not present.has(speaker):
-			present.append(speaker)
-		frame["show"] = present.duplicate()
+		var slide: Dictionary = {}
+		var frame_slots: Dictionary = {}
+		if speaker != "" and not window.has(speaker):
+			if window.is_empty() and exits == 0:
+				slide[speaker] = "left"  # V0.13.2: o primeiro (Jales) vem andando ate o jogador, pela esquerda
+			var place: int = -1
+			if window.size() >= CAST_WINDOW:
+				var leaving: String = str(window.pop_front())
+				place = int(slot_of.get(leaving, 0))
+				slide[leaving] = _door_side(place, exits)
+				exits += 1
+			else:
+				place = _free_place(window, slot_of)
+			slot_of[speaker] = place
+			window.append(speaker)
+			frame_slots[speaker] = float(CAST_SLOTS[clampi(place, 0, CAST_SLOTS.size() - 1)])
+		frame["show"] = window.duplicate()
+		frame["slots"] = frame_slots
+		frame["slide"] = slide
 		frame["dim"] = 0.22
+	return frames
+
+## Primeiro lugar (0..CAST_WINDOW-1) que nenhum dos que estao em cena ocupa.
+func _free_place(window: Array, slot_of: Dictionary) -> int:
+	for place in range(CAST_WINDOW):
+		var taken: bool = false
+		for id in window:
+			if int(slot_of.get(str(id), -1)) == place:
+				taken = true
+				break
+		if not taken:
+			return place
+	return 0
+
+## Lado da "porta" por onde sai quem estava no lugar dado; o do meio alterna (direita, esquerda, direita...).
+func _door_side(place: int, exit_count: int) -> String:
+	if place <= 0:
+		return "left"
+	if place >= CAST_WINDOW - 1:
+		return "right"
+	return "right" if exit_count % 2 == 0 else "left"
+
+## Conversa Jales <-> Ariel para apresentar o placar (mesma sala, Jales na esquerda e Ariel na direita).
+## Textos: final.json > score_dialogue (Jales) e tiers[].ariel (Ariel).
+func _score_dialogue_frames() -> Array:
+	var dialogue: Dictionary = story.get("score_dialogue", {}) as Dictionary
+	var both: Array = ["jales", "ariel"]
+	var slide_in: Dictionary = {"jales": "left", "ariel": "right"}
+	var frames: Array = []
+	var jales_text: String = str(dialogue.get("jales", ""))
+	if jales_text != "":
+		frames.append({"speaker": "jales", "show": both.duplicate(), "slide": slide_in, "dim": 0.22, "text": jales_text})
+		slide_in = {}
+	frames.append({"speaker": "ariel", "show": both.duplicate(), "slide": slide_in, "dim": 0.22, "text": str(tier.get("ariel", "Vamos ver o placar."))})
+	return frames
+
+## Fala final do Jales (4 variacoes por desempenho). A abertura "Antes que voce va, quero lhe dizer algo..."
+## (final.json > closing_intro) e colada no inicio da 1a fala: NAO cria caixa nova. Vazia = desliga.
+func _closing_frames() -> Array:
+	var frames: Array = []
+	var intro: String = str(story.get("closing_intro", "")).strip_edges()
+	for item in tier.get("jales", []):
+		var frame: Dictionary = (item as Dictionary).duplicate(true)
+		frame["speaker"] = "jales"
+		frame["show"] = ["jales"]
+		if frames.is_empty() and intro != "":
+			frame["text"] = "%s %s" % [intro, str(frame.get("text", ""))]
+		frames.append(frame)
 	return frames
 
 ## Cenario (ids de Paths.CUTSCENE_BG_FINAL) do bloco, lido de final.json > backgrounds.
@@ -432,7 +615,7 @@ func _build_credits_layer() -> void:
 	credits_layer.add_child(credits_box)
 
 	_add_credit_rich(BrandText.brand_bbcode(true), 48)
-	_add_credit_rich(GameManager.get_app_version_bbcode() if has_node("/root/GameManager") else BrandText.version_bbcode("0.12.1"), 24)
+	_add_credit_rich(GameManager.get_app_version_bbcode() if has_node("/root/GameManager") else BrandText.version_bbcode(), 24)
 	_add_credit_space(22)
 	_add_credit_label("Game Design & Idealização", 22, Color(0.62, 0.62, 0.68))
 	_add_credit_label("Marcelo Felipe Beckman", 32, Color(1.0, 1.0, 1.0))
@@ -495,10 +678,25 @@ func _build_finale_layer() -> void:
 	finale_box.modulate.a = 0.0
 	finale_layer.add_child(finale_box)
 
-	var title_text: String = str(texts.get("title", "CONTALMASTER"))
-	finale_title_label = BrandText.make_label(BrandText.brand_bbcode(true) if title_text.to_upper() == "CONTAL MASTER" else title_text, 110, "center", true)
-	finale_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	finale_box.add_child(finale_title_label)
+	# V0.13.1: o titulo agora e o LOGO do jogo (assets/contalmaster_logo.png). Se a imagem nao carregar, cai no texto.
+	var logo_texture: Texture2D = load(Paths.LOGO_CONTALMASTER) as Texture2D
+	if logo_texture != null:
+		finale_logo = TextureRect.new()
+		finale_logo.name = "FinaleLogo"
+		finale_logo.texture = logo_texture
+		finale_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		finale_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		finale_logo.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		finale_logo.custom_minimum_size = LOGO_SIZE
+		finale_logo.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		finale_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		finale_box.add_child(finale_logo)
+	else:
+		var title_text: String = str(texts.get("title", BrandText.BRAND_NAME.to_upper()))
+		var is_brand: bool = title_text.replace(" ", "").to_upper() == BrandText.BRAND_NAME.to_upper()
+		finale_title_label = BrandText.make_label(BrandText.brand_bbcode(true) if is_brand else title_text, 110, "center", true)
+		finale_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		finale_box.add_child(finale_title_label)
 
 	var line_holder: CenterContainer = CenterContainer.new()
 	line_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -581,6 +779,8 @@ func _apply_responsive_layout() -> void:
 	ScreenTools.apply_label_font(motivation_label, self, 20, 16)
 	if menu_button != null:
 		ButtonStyles.apply(menu_button, "cutscene_return", ScreenTools.button_size(self, Vector2(320, 58), Vector2(260, 50)), ScreenTools.responsive_font(self, 22, 18))
+	if finale_logo != null:
+		finale_logo.custom_minimum_size = ScreenTools.responsive_size(self, LOGO_SIZE, LOGO_SIZE_COMPACT)
 	if finale_title_label != null:
 		BrandText.set_font_size(finale_title_label, ScreenTools.responsive_font(self, 110, 56))
 	if finale_thanks_label != null:
@@ -664,7 +864,7 @@ func _show_credits_act() -> void:
 ## Decisao criativa: (1) a imagem entra escura; (2) uma cortina de luz dourada atravessa a tela da esquerda
 ## para a direita "puxando" o veu e revelando o elenco, deixando brilhos no caminho; (3) o elenco respira
 ## limpo por um instante; (4) uma segunda cortina, mais suave, passa enquanto a imagem escurece de leve e o
-## titulo CONTAL MASTER + "Obrigado por jogar!" surgem; (5) a tela escurece e vem o GAME OVER.
+## LOGO do ContalMaster (V0.13.1; texto de reserva se faltar a imagem) + "Obrigado por jogar!" surgem; (5) a tela escurece e vem o GAME OVER.
 func _show_finale_act() -> void:
 	if act == "finale" or act == "gameover":
 		return
@@ -854,12 +1054,17 @@ func _update_finale(delta: float) -> void:
 	finale_fx.queue_redraw()
 	if finale_veil_on:
 		finale_veil.queue_redraw()
+	# Logo "respira" bem devagar enquanto esta na tela (barato: so escala, sem shader).
+	if finale_logo != null and finale_stage >= 2:
+		finale_logo.pivot_offset = finale_logo.size * 0.5
+		var breath: float = 1.0 + LOGO_BREATH_SCALE * (0.5 + 0.5 * sin(elapsed * 1.6))
+		finale_logo.scale = Vector2(breath, breath)
 
-func _spawn_sparkle(position: Vector2, strength: float) -> void:
+func _spawn_sparkle(origin: Vector2, strength: float) -> void:
 	if finale_sparkles.size() >= FINALE_MAX_SPARKLES:
 		return
 	finale_sparkles.append({
-		"pos": position,
+		"pos": origin,
 		"vel": Vector2(randf_range(-14.0, 14.0), randf_range(-46.0, -12.0)),
 		"age": 0.0,
 		"life": randf_range(0.9, 2.1),
@@ -883,6 +1088,11 @@ func _on_finale_veil_draw() -> void:
 		return
 	var skew: float = viewport_size.y * 0.16
 	var front: float = _finale_front_x(viewport_size)
+	# V0.13.4: no fim da varredura a borda esquerda ultrapassa a direita (front + skew/2 > largura + skew) e o
+	# poligono vira invertido/degenerado: "Invalid polygon data, triangulation failed" a cada quadro.
+	# Quando a cortina ja passou por toda a tela nao ha mais veu a desenhar.
+	if front + skew * 0.5 >= viewport_size.x + skew - 1.0:
+		return
 	var points: PackedVector2Array = PackedVector2Array([
 		Vector2(front + skew * 0.5, 0.0),
 		Vector2(viewport_size.x + skew, 0.0),
@@ -1001,13 +1211,13 @@ func _update_particles(delta: float) -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size
 	for i in range(particles.size()):
 		var particle: Dictionary = particles[i]
-		var position: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
-		position.y -= float(particle.get("speed", 26.0)) * delta
-		position.x += sin(elapsed * 0.9 + float(i)) * 8.0 * delta
-		if position.y < -18.0:
-			position.y = viewport_size.y + randf_range(15.0, 110.0)
-			position.x = randf_range(0.0, viewport_size.x)
-		particle["position"] = position
+		var pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
+		pos.y -= float(particle.get("speed", 26.0)) * delta
+		pos.x += sin(elapsed * 0.9 + float(i)) * 8.0 * delta
+		if pos.y < -18.0:
+			pos.y = viewport_size.y + randf_range(15.0, 110.0)
+			pos.x = randf_range(0.0, viewport_size.x)
+		particle["position"] = pos
 		particles[i] = particle
 
 func _on_effects_canvas_draw() -> void:
@@ -1021,10 +1231,10 @@ func _on_effects_canvas_draw() -> void:
 		accent = Color(0.78, 0.86, 1.0)
 	effects_canvas.draw_rect(Rect2(Vector2.ZERO, viewport_size), Color(accent.r, accent.g, accent.b, 0.045), true)
 	for particle in particles:
-		var position: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
+		var pos: Vector2 = _dict_vec2(particle, "position", Vector2.ZERO)
 		var radius: float = float(particle.get("radius", 2.4))
 		var alpha: float = float(particle.get("alpha", 0.6))
-		effects_canvas.draw_circle(position, radius, Color(1.0, 1.0, 1.0, alpha))
+		effects_canvas.draw_circle(pos, radius, Color(1.0, 1.0, 1.0, alpha))
 
 func _dict_vec2(data: Dictionary, key: String, fallback: Vector2) -> Vector2:
 	var value: Variant = data.get(key, fallback)

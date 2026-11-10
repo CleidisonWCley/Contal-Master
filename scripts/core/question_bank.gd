@@ -1,5 +1,5 @@
 extends RefCounted
-## ContaLMaster - Banco de perguntas (tema: Revisão Externa de Qualidade pelos Pares, NBC PA 11).
+## ContalMaster - Banco de perguntas (tema: Revisão Externa de Qualidade pelos Pares, NBC PA 11).
 ##
 ## Le os 4 JSONs em res://scripts/core/data/ e entrega cada item JA NO FORMATO que
 ##   pick_rounds(minigame, difficulty, count) -> Array[Dictionary]

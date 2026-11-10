@@ -200,8 +200,8 @@ func _build_scene() -> void:
 	background_rect = TextureRect.new()
 	background_rect.name = "Background"
 	background_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background_rect.expand_mode = 1
-	background_rect.stretch_mode = 6
+	background_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	var bg_texture = load(BACKGROUND_PATH)
 	if bg_texture is Texture2D:
 		background_rect.texture = bg_texture
@@ -315,8 +315,8 @@ func _build_scene() -> void:
 func _create_money_icon() -> TextureRect:
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = Vector2(70, 70)
-	icon.expand_mode = 1
-	icon.stretch_mode = 5
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var texture = load(ICON_PATH)
 	if texture is Texture2D:
 		icon.texture = texture
@@ -578,7 +578,7 @@ func _highlight_answer(selected_button: Button, correct_text: String, is_correct
 		elif button == selected_button and not is_correct:
 			button.add_theme_stylebox_override("disabled", _make_button_style(Color(0.55, 0.0, 0.0, 0.94), Color(1.0, 0.55, 0.55), 3))
 
-func _show_feedback(is_correct: bool, selected_text: String, correct_text: String, correct_reason: String, elapsed_seconds: float, awarded_points: int) -> void:
+func _show_feedback(is_correct: bool, selected_text: String, correct_text: String, correct_reason: String, _elapsed_seconds: float, awarded_points: int) -> void:
 	feedback_title_label.text = "RESPOSTA CORRETA!" if is_correct else "RESPOSTA INCORRETA"
 	feedback_title_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.45) if is_correct else Color(1.0, 0.25, 0.25))
 	var explanation: String = _clean_feedback_explanation(correct_text, correct_reason)

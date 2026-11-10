@@ -1,10 +1,11 @@
 # ==========================================
-# CONTAL MASTER .gitignore
+# ContalMaster .gitignore
 # ==========================================
 
 # Exportações do jogo e executáveis compilados
 *.translation
 *.html
+!web/shell.html
 *.pck
 *.zip
 *.tar.gz

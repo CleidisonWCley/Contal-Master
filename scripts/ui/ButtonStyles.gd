@@ -199,7 +199,7 @@ static func _palette(variant: String) -> Dictionary:
 			return _button_palette(MODE_BACK, MODE_BACK_HOVER, MODE_BACK.darkened(0.14), WHITE, 13, 2)
 		"option":
 			return _button_palette(FREE_OPTION, FREE_OPTION_HOVER, FREE_OPTION.darkened(0.14), WHITE, 12, 2)
-		# ---- Paleta Contal Master (acessivel). menu_* = semitransparentes sobre o cenario.
+		# ---- Paleta ContalMaster (acessivel). menu_* = semitransparentes sobre o cenario.
 		# Letras e icones SEMPRE brancos: a cor de fundo e escurecida ate o branco ter contraste.
 		"menu_play":
 			return _white_text_palette(UiPalette.PRIMARY, UiPalette.MENU_BUTTON_ALPHA, 18)
