@@ -276,6 +276,8 @@ func _animate_card(button: Button, art: UiFrameArt, hot: bool, down: bool) -> vo
 		var old_tween: Variant = button.get_meta("tween")
 		if old_tween is Tween and (old_tween as Tween).is_valid():
 			(old_tween as Tween).kill()
+	if button.has_meta("tween"):
+		button.remove_meta("tween")  # nunca deixa um Tween morto/obsoleto como metadado
 	if not _animations_enabled():
 		button.scale = Vector2.ONE * target_scale
 		art.glow_amount = target_glow

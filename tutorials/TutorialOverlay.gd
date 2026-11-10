@@ -69,6 +69,8 @@ var _card_y: float = 0.0
 var _card_at_bottom: bool = true
 var _type_tween: Tween
 var _move_tween: Tween
+var _fade_tween: Tween
+var _portrait_tweens: Dictionary = {}  # character_id -> Tween (um por retrato; o novo cancela o anterior)
 var _closing: bool = false
 var _built: bool = false
 
@@ -93,12 +95,76 @@ func configure(host_node: Node, tutorial_data: Dictionary, overlay_mode: int, ex
 
 func _ready() -> void:
 	layer = LAYER_INDEX
+	# O tutorial e modal e tem a ultima palavra na tela: nunca pode congelar (tweens + _process) se a arvore
+	# estiver pausada por outro sistema (MinigamePause usa get_tree().paused).
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_ui()
 	_built = true
 	_layout()
-	_root.resized.connect(_layout)
+	_root.resized.connect(_on_root_resized)
 	_root.modulate.a = 0.0
 	visible = false
+	if has_node("/root/SettingsManager") and not SettingsManager.settings_changed.is_connected(_on_settings_changed):
+		SettingsManager.settings_changed.connect(_on_settings_changed)
+
+
+func _exit_tree() -> void:
+	# Nenhum Tween sobrevive ao overlay, e o autoload nao guarda referencia a um no que saiu da arvore.
+	_kill_all_tweens()
+	if has_node("/root/SettingsManager") and SettingsManager.settings_changed.is_connected(_on_settings_changed):
+		SettingsManager.settings_changed.disconnect(_on_settings_changed)
+
+
+func _on_root_resized() -> void:
+	_layout()
+
+
+## Configuracoes > Animacoes desligadas com o tutorial aberto: encerra tudo o que estava animando e
+## deixa o overlay no estado FINAL (opaco, texto completo), em vez de congelado no meio.
+func _on_settings_changed(_settings: Dictionary) -> void:
+	if not _built or _closing or _animations_enabled():
+		return
+	_kill_all_tweens()
+	_text_label.visible_ratio = 1.0
+	if visible and _root.modulate.a > 0.0:
+		_root.modulate.a = 1.0
+	_update_portraits(_current_step, false)
+
+
+func _kill_tween(tween: Tween) -> void:
+	if tween != null and tween.is_valid():
+		tween.kill()
+
+
+func _kill_all_tweens() -> void:
+	_kill_tween(_type_tween)
+	_kill_tween(_move_tween)
+	_kill_tween(_fade_tween)
+	for tween in _portrait_tweens.values():
+		_kill_tween(tween as Tween)
+	_portrait_tweens.clear()
+
+
+## Tamanho util da tela. size 0 (ainda nao calculado) ou absurdamente pequeno: usa o viewport
+## (senao o texto autowrap quebra em 1 letra por linha e o cartao estoura a tela).
+func _view_size() -> Vector2:
+	var view: Vector2 = _root.size if _root != null else Vector2.ZERO
+	if view.x < 320.0 or view.y < 200.0:
+		view = ScreenTools.get_viewport_size(self)
+	return view
+
+
+## Relayout depois do 1o frame: no primeiro frame o Control ainda pode ter size 0 e o texto (autowrap) seria
+## medido com largura errada.
+func _refresh_layout() -> void:
+	if not _built or _closing or not is_inside_tree():
+		return
+	var height_before: float = _card.size.y
+	_layout(false)
+	_move_card(_card_at_bottom, false, true)
+	_resolve_spot(true)
+	if absf(_card.size.y - height_before) > 0.5:
+		_canvas.queue_redraw()
 
 
 ## Inicia o tutorial MODAL com a lista de passos (ja filtrada pelo TutorialManager).
@@ -111,6 +177,7 @@ func start(step_list: Array) -> void:
 	visible = true
 	_apply_step(steps[0], true)
 	_fade_to(1.0)
+	call_deferred("_refresh_layout")
 	step_changed.emit(0)
 
 
@@ -121,6 +188,7 @@ func show_coach(step: Dictionary) -> void:
 	visible = true
 	_apply_step(step, true)
 	_fade_to(1.0)
+	call_deferred("_refresh_layout")
 
 
 func hide_coach() -> void:
@@ -141,13 +209,17 @@ func close(completed: bool = true) -> void:
 	if _closing:
 		return
 	_closing = true
+	_kill_all_tweens()  # um fade-in ainda em curso nao pode brigar com o fade-out
 	if _root != null:
 		_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	finished.emit(completed)
+	if not is_inside_tree():
+		queue_free()
+		return
 	if _root != null and _animations_enabled():
-		var tween: Tween = create_tween()
-		tween.tween_property(_root, "modulate:a", 0.0, 0.18)
-		tween.tween_callback(queue_free)
+		_fade_tween = create_tween()
+		_fade_tween.tween_property(_root, "modulate:a", 0.0, 0.18)
+		_fade_tween.tween_callback(queue_free)
 	else:
 		queue_free()
 
@@ -285,9 +357,7 @@ func _make_portrait(character_id: String) -> TextureRect:
 func _layout(place: bool = true) -> void:
 	if not _built or _root == null:
 		return
-	var view: Vector2 = _root.size
-	if view.x <= 0.0 or view.y <= 0.0:
-		view = ScreenTools.get_viewport_size(self)
+	var view: Vector2 = _view_size()
 	var compact: bool = ScreenTools.is_compact(self)
 	var narrow: bool = view.x < NARROW_WIDTH
 	var coach: bool = mode == Mode.COACH  # dica compacta: nao pode cobrir a pista
@@ -303,6 +373,10 @@ func _layout(place: bool = true) -> void:
 	_margin.add_theme_constant_override("margin_right", int(reserve) + 14)
 	_margin.add_theme_constant_override("margin_top", 12)
 	_margin.add_theme_constant_override("margin_bottom", 10)
+	# Label com autowrap precisa de largura minima: sem ela o minimo de altura explode e o cartao estoura a tela.
+	var label_margin_left: float = 22.0 if (coach or not has_partner) else reserve + 14.0
+	_text_label.custom_minimum_size = Vector2(maxf(card_w - 6.0 - label_margin_left - (reserve + 14.0), 120.0), 0.0)
+	_card.clip_contents = true
 	_text_label.add_theme_font_size_override("font_size", text_size)
 	_name_label.add_theme_font_size_override("font_size", 18 if compact else 20)
 	_style_buttons(compact)
@@ -373,15 +447,14 @@ func _place_card(card_y: float, view: Vector2, card_h: float, _reserve: float, n
 
 
 func _move_card(at_bottom: bool, animate: bool, force: bool = false) -> void:
-	if not force and at_bottom == _card_at_bottom and _card_y != 0.0 and not _current_step.has("card_y") and absf(_card_y - _target_card_y(_root.size, _card.size.y)) < 1.0:
+	if not force and at_bottom == _card_at_bottom and _card_y != 0.0 and not _current_step.has("card_y") and absf(_card_y - _target_card_y(_view_size(), _card.size.y)) < 1.0:
 		return
 	_card_at_bottom = at_bottom
-	var view: Vector2 = _root.size
+	var view: Vector2 = _view_size()
 	var card_h: float = _card.size.y
 	var target_y: float = _target_card_y(view, card_h)
 	var reserve: float = 0.0
-	if _move_tween != null and _move_tween.is_valid():
-		_move_tween.kill()
+	_kill_tween(_move_tween)
 	if animate and _animations_enabled() and _card_y != 0.0:
 		var from_y: float = _card_y
 		_move_tween = create_tween()
@@ -427,7 +500,7 @@ func _apply_step(step: Dictionary, animate: bool) -> void:
 			at_bottom = true
 		_:
 			if _spot_has:
-				at_bottom = _spot_target.get_center().y < _root.size.y * 0.52
+				at_bottom = _spot_target.get_center().y < _view_size().y * 0.52
 	var height_before: float = _card.size.y
 	_layout(false)  # recalcula so a ALTURA do cartao para o texto deste passo; _move_card reposiciona (com animacao)
 	_move_card(at_bottom, animate, absf(_card.size.y - height_before) > 0.5)
@@ -444,19 +517,20 @@ func _update_portraits(step: Dictionary, animate: bool) -> void:
 		var target_color: Color = Color.WHITE if speaking else DIMMED_PORTRAIT
 		target_color.a = 1.0 if is_shown else 0.0
 		var target_scale: Vector2 = Vector2.ONE if speaking else Vector2(0.92, 0.92)
+		_kill_tween(_portrait_tweens.get(character_id, null) as Tween)
 		if animate and _animations_enabled():
 			var tween: Tween = create_tween().set_parallel(true)
 			tween.tween_property(portrait, "modulate", target_color, 0.22)
 			tween.tween_property(portrait, "scale", target_scale, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			_portrait_tweens[character_id] = tween
 		else:
 			portrait.modulate = target_color
 			portrait.scale = target_scale
 
 
 func _start_typing() -> void:
-	if _type_tween != null and _type_tween.is_valid():
-		_type_tween.kill()
-	if not _animations_enabled():
+	_kill_tween(_type_tween)
+	if not _animations_enabled() or _text_label.text == "":
 		_text_label.visible_ratio = 1.0
 		return
 	_text_label.visible_ratio = 0.0
@@ -474,7 +548,7 @@ func _advance() -> void:
 		return
 	_click_sound()
 	if _is_typing():
-		_type_tween.kill()
+		_kill_tween(_type_tween)
 		_text_label.visible_ratio = 1.0
 		return
 	if index >= steps.size() - 1:
@@ -560,11 +634,11 @@ func _process(delta: float) -> void:
 func _resolve_spot(snap: bool) -> void:
 	var rects: Array[Rect2] = []
 	for target_name in _current_step.get("targets", []):
-		_collect_rects(host.get(str(target_name)) if host != null else null, rects)
+		_collect_rects(host.get(str(target_name)) if (host != null and is_instance_valid(host)) else null, rects)
 	if rects.is_empty() and _current_step.has("target_rect"):
 		var norm: Array = _current_step.get("target_rect", [])
 		if norm.size() == 4:
-			var view: Vector2 = _root.size
+			var view: Vector2 = _view_size()
 			rects.append(Rect2(float(norm[0]) * view.x, float(norm[1]) * view.y, float(norm[2]) * view.x, float(norm[3]) * view.y))
 	_spot_outline = bool(_current_step.get("outline", true))
 	if rects.is_empty():
@@ -700,9 +774,10 @@ func _draw_pointer(spot: Rect2, view: Vector2, pulse: float, arrow_color: Color 
 func _fade_to(alpha: float) -> void:
 	if not _built:
 		return
-	if _animations_enabled():
-		var tween: Tween = create_tween()
-		tween.tween_property(_root, "modulate:a", alpha, 0.2)
+	_kill_tween(_fade_tween)
+	if _animations_enabled() and is_inside_tree():
+		_fade_tween = create_tween()
+		_fade_tween.tween_property(_root, "modulate:a", alpha, 0.2)
 	else:
 		_root.modulate.a = alpha
 
