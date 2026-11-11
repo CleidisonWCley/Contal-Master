@@ -1,29 +1,57 @@
-name: "Export and Deploy Web Build"
+name: Export and Deploy Web Build
 
 on:
   push:
-    branches:
-      - main 
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.5.1"
+  ITCH_GAME: "cleyw07.itch.io/contalmaster"   
+  ITCH_CHANNEL: "web"
 
 jobs:
-  export_web:
-    name: Export Web Build to itch.io
+  export_and_deploy:
+    name: Export Web Build and Deploy to itch.io
     runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.5.1     # manter igual ao GODOT_VERSION
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Export Web with Godot Engine
-        uses: firebelley/godot-export@v6.0.0
         with:
-          godot_version: 4.5.1
-          export_debug: false
-          preset: Web
+          lfs: true                         # só importa se usarem Git LFS
 
-      - name: Deploy to itch.io via Butler
-        uses: oferh/butler-to-itch-action@v1.2.0
-        with:
-          value_or_filename: build/web # Diretório onde o Godot gera o export
-          game: cleyw07.itch.io/contalmaster # Ex: cleidison/meu-jogo
-          channel: web
-          api_key: ${{ secrets.ITCHIO_SECRET_API_KEY }}
+      - name: Setup export templates
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable \
+             ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Import project resources
+        run: godot --headless --verbose --import || true
+
+      - name: Export Web
+        run: |
+          mkdir -v -p build/web
+          godot --headless --verbose --export-release "Web" build/web/index.html
+
+      - name: Check build output
+        run: |
+          ls -la build/web
+          test -f build/web/index.html
+
+      - name: Deploy to itch.io (butler)
+        env:
+          BUTLER_API_KEY: ${{ secrets.ITCHIO_SECRET_API_KEY }}
+        run: |
+          butler push build/web "${ITCH_GAME}:${ITCH_CHANNEL}" \
+            --userversion "${GITHUB_SHA::7}"
