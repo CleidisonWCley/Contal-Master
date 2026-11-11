@@ -50,6 +50,7 @@ jobs:
           test -f build/web/index.html
 
       - name: Deploy to itch.io (butler)
+        shell: bash
         env:
           BUTLER_API_KEY: ${{ secrets.ITCHIO_SECRET_API_KEY }}
         run: |
