@@ -1,0 +1,29 @@
+name: "Export and Deploy Web Build"
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  export_web:
+    name: Export Web Build to itch.io
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Export Web with Godot Engine
+        uses: firebelley/godot-export@v6.0.0
+        with:
+          godot_version: 4.5.1
+          export_debug: false
+          preset: Web
+
+      - name: Deploy to itch.io via Butler
+        uses: ManiruzzamanAkash/action-itch-publish@v1
+        with:
+          value_or_filename: build/web # Diretório onde o Godot gera o export
+          game: cleyw07.itch.io/contalmaster 
+          channel: web
+          api_key: ${{ S6jFbaw4BtWOPZEGV616FqTP09iJvjJHtwrUWSUr }}
