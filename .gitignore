@@ -20,9 +20,6 @@
 *.app
 *.iso
 
-# Configurações de exportação com chaves de assinatura ou senhas locais
-export_presets.cfg
-
 # Arquivos de editores e IDEs
 .vscode/
 .idea/
