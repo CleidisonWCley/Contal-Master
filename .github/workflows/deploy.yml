@@ -14,7 +14,7 @@ concurrency:
 
 env:
   GODOT_VERSION: "4.5.1"
-  ITCH_GAME: "cleyw07.itch.io/contalmaster"   
+  ITCH_GAME: "cleyw07/contalmaster"   
   ITCH_CHANNEL: "web"
 
 jobs:
