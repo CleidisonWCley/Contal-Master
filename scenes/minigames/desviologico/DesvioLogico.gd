@@ -436,7 +436,6 @@ func _build_pause_button() -> void:
 	pause_menu = MinigamePause.attach(self, {
 		"tree_pause": false,
 		"can_pause": _can_pause_game,
-		"on_finish": _on_pause_finish_pressed,
 		"on_menu": _on_pause_main_menu_pressed
 	})
 	pause_menu.paused.connect(_on_pause_opened)
@@ -967,22 +966,6 @@ func _on_pause_closed() -> void:
 	engineaudio._set_engine_audio_paused(false)
 	engineaudio._ensure_engine_audio_state()
 	input_locked = state == DLConfig.STATE_ACCELERATION
-
-func _on_pause_finish_pressed() -> void:
-	if has_node("/root/AudioManager"):
-		AudioManager.play_click()
-	gameplay_paused = false
-	engineaudio._stop_engine_audio()
-	input_locked = true
-	if pause_layer != null:
-		pause_layer.visible = false
-	engineaudio._clear_desvio_music_audio_profile()
-	if GameManager.is_free_mode():
-		GameManager.open_free_menu()
-	else:
-		# Desvio Lógico é o último minigame da campanha. Pontos já ganhos foram somados ao ScoreManager.
-		# complete_current_stage(0) preserva o acumulado e segue para a cutscene final.
-		GameManager.complete_current_stage(0)
 
 func _on_pause_main_menu_pressed() -> void:
 	if has_node("/root/AudioManager"):

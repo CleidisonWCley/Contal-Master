@@ -39,6 +39,11 @@ const DIMMED := Color(0.46, 0.45, 0.56, 1.0)
 const SLIDE_ENTER_SECONDS := 0.62
 const SLIDE_EXIT_SECONDS := 0.66
 const SLIDE_DISTANCE := 0.36  # fracao da largura da tela percorrida na entrada/saida
+## V0.14: modo AUTO (Configuracoes > Novel). Tempo de leitura depois da fala terminar de digitar.
+const AUTO_BASE_SECONDS := 1.4
+const AUTO_SECONDS_PER_CHAR := 0.034
+const AUTO_MIN_SECONDS := 2.2
+const AUTO_MAX_SECONDS := 7.0
 
 signal _text_done
 signal _next_pressed
@@ -88,6 +93,7 @@ var _text_label: Label
 var _hint_label: Label
 var _skip_button: Button
 var _elapsed: float = 0.0
+var _auto_token: int = 0  # invalida o temporizador do AUTO quando o quadro muda
 
 
 func configure(options: Dictionary = {}) -> void:
@@ -212,7 +218,7 @@ func _run_frame(frame: Dictionary) -> void:
 	_counter_label.text = "%d/%d" % [_index + 1, _frames.size()]
 	_text_label.text = str(frame.get("text", ""))
 	_panel.modulate.a = 1.0
-	_hint_label.text = "Clique, Espaço ou Enter para continuar" if _index < _frames.size() - 1 else "Clique, Espaço ou Enter para seguir"
+	_hint_label.text = _hint_text(_index < _frames.size() - 1)
 	_hint_label.visible = true
 	_waiting_next = false
 	_start_typing()
@@ -231,8 +237,34 @@ func _run_frame(frame: Dictionary) -> void:
 				_set_sprite_visible(str(id), true, true)
 		_refresh_highlight(true)
 	_waiting_next = true
+	_schedule_auto_advance(_text_label.text.length())
 	await _next_pressed
+	_auto_token += 1
 	_waiting_next = false
+
+
+## V0.14: texto da dica conforme o modo da novel (Clique ou Auto).
+func _hint_text(has_next: bool) -> String:
+	if _is_auto():
+		return "Modo automático — clique, Espaço ou Enter para avançar mais rápido"
+	return "Clique, Espaço ou Enter para continuar" if has_next else "Clique, Espaço ou Enter para seguir"
+
+
+func _is_auto() -> bool:
+	return has_node("/root/SettingsManager") and SettingsManager.novel_auto()
+
+
+## V0.14: no modo AUTO o quadro avanca sozinho depois de um tempo proporcional ao tamanho da fala.
+## Clique/Espaco/Enter continuam funcionando (adiantam). Pular continua disponivel.
+func _schedule_auto_advance(char_count: int) -> void:
+	if not _is_auto() or _skipped or not is_inside_tree():
+		return
+	_auto_token += 1
+	var token: int = _auto_token
+	var wait: float = clampf(AUTO_BASE_SECONDS + float(char_count) * AUTO_SECONDS_PER_CHAR, AUTO_MIN_SECONDS, AUTO_MAX_SECONDS)
+	await get_tree().create_timer(wait).timeout
+	if token == _auto_token and _waiting_next and not _skipped and is_inside_tree():
+		_next_pressed.emit()
 
 
 func _start_typing() -> void:

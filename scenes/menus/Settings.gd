@@ -11,6 +11,7 @@ var sfx_slider: HSlider
 var fullscreen_button: Button
 var animations_button: Button
 var tutorials_button: Button
+var novel_button: Button
 var back_button: Button
 
 var _safe_area: MarginContainer
@@ -106,6 +107,10 @@ func _build_ui() -> void:
 	tutorials_button.name = "TutorialsToggle"
 	tutorials_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	toggles_row_2.add_child(tutorials_button)
+	novel_button = Button.new()
+	novel_button.name = "NovelModeToggle"
+	novel_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	toggles_row_2.add_child(novel_button)
 
 	var back_holder := CenterContainer.new()
 	back_holder.add_theme_constant_override("separation", 0)
@@ -266,6 +271,8 @@ func _refresh_toggles() -> void:
 	_set_toggle(fullscreen_button, "monitor", "Tela cheia", SettingsManager.is_fullscreen())
 	_set_toggle(animations_button, "sparkles", "Animações visuais", SettingsManager.animations_enabled())
 	_set_toggle(tutorials_button, "compass", "Tutoriais", SettingsManager.tutorials_enabled())
+	# V0.14: Novel AUTO (passa sozinha) ou CLIQUE (o jogador avanca).
+	_set_toggle(novel_button, "compass", "Novel automática", SettingsManager.novel_auto())
 
 func _set_toggle(button: Button, icon_name: String, label: String, enabled: bool) -> void:
 	button.text = "%s: %s" % [label, "LIGADO" if enabled else "DESLIGADO"]
@@ -302,6 +309,7 @@ func _connect_signals() -> void:
 	fullscreen_button.pressed.connect(_on_fullscreen_pressed)
 	animations_button.pressed.connect(_on_animations_pressed)
 	tutorials_button.pressed.connect(_on_tutorials_pressed)
+	novel_button.pressed.connect(_on_novel_pressed)
 	back_button.pressed.connect(_on_back_pressed)
 
 func _on_music_volume_changed(value: float) -> void:
@@ -328,6 +336,11 @@ func _on_fullscreen_pressed() -> void:
 
 func _on_tutorials_pressed() -> void:
 	SettingsManager.toggle_tutorials_enabled()
+	_refresh_toggles()
+	_click()
+
+func _on_novel_pressed() -> void:
+	SettingsManager.toggle_novel_auto()
 	_refresh_toggles()
 	_click()
 

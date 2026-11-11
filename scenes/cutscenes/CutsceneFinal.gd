@@ -617,20 +617,31 @@ func _build_credits_layer() -> void:
 	_add_credit_rich(BrandText.brand_bbcode(true), 48)
 	_add_credit_rich(GameManager.get_app_version_bbcode() if has_node("/root/GameManager") else BrandText.version_bbcode(), 24)
 	_add_credit_space(22)
-	_add_credit_label("Game Design & Idealização", 22, Color(0.62, 0.62, 0.68))
-	_add_credit_label("Marcelo Felipe Beckman", 32, Color(1.0, 1.0, 1.0))
-	_add_credit_space(18)
-	_add_credit_label("UI / UX Design", 22, Color(0.62, 0.62, 0.68))
+	# --- IDEALIZAÇÃO, GAME DESIGN & GAMEPLAY ---
+	_add_credit_label("Game Design, Lógica & Novels", 22, Color(0.62, 0.62, 0.68))
 	_add_credit_label("Cleidison Raimundo dos Santos Lima", 32, Color(1.0, 1.0, 1.0))
 	_add_credit_space(18)
-	_add_credit_label("Desenvolvimento & Plataformas", 22, Color(0.62, 0.62, 0.68))
-	_add_credit_label("Victor Gabriel Cabral da Silva", 32, Color(1.0, 1.0, 1.0))
+
+	# --- PROGRAMAÇÃO & DESENVOLVIMENTO ---
+	_add_credit_label("Desenvolvimento & Programação", 22, Color(0.62, 0.62, 0.68))
+	_add_credit_label("Cleidison Raimundo dos Santos Lima", 32, Color(1.0, 1.0, 1.0))
+	_add_credit_label("Victor Gabriel Cabral da Silva (Pair Programming)", 28, Color(0.85, 0.85, 0.90))
 	_add_credit_space(18)
+
+	# --- NARRATIVA & ARTES VISUAIS ---
+	_add_credit_label("Roteiro & Design de Personagens", 22, Color(0.62, 0.62, 0.68))
+	_add_credit_label("Marcelo Felipe Beckman", 32, Color(1.0, 1.0, 1.0))
+	_add_credit_space(18)
+
+	# --- PESQUISA & BANCO DE DADOS PEDAGÓGICO ---
+	_add_credit_label("Pesquisa, Conteúdo & Banco de Dados", 22, Color(0.62, 0.62, 0.68))
+	_add_credit_label("Daniel de Moura Melo Filho", 32, Color(1.0, 1.0, 1.0))
+	_add_credit_label("Fernando Luiz Jales Da Rocha", 32, Color(1.0, 1.0, 1.0))
+	_add_credit_space(18)
+
+	# --- ÁUDIO & EFEITOS SONOROS ---
 	_add_credit_label("Música & Efeitos Sonoros", 22, Color(0.62, 0.62, 0.68))
 	_add_credit_label("Marcos França Gino Gonçalves", 32, Color(1.0, 1.0, 1.0))
-	_add_credit_space(18)
-	_add_credit_label("Suporte da Equipe", 22, Color(0.62, 0.62, 0.68))
-	_add_credit_label("Fernando Luiz Jales Da Rocha", 32, Color(1.0, 1.0, 1.0))
 	_add_credit_space(40)
 
 ## Camada da cena final (V0.11). A imagem em si e o proprio background_rect (11_cena_creditos);

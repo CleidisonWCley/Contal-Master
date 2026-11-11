@@ -9,7 +9,8 @@ const DEFAULT_SETTINGS := {
 	"fullscreen": false,
 	"difficulty": "normal",
 	"animations_enabled": true,
-	"tutorials_enabled": true
+	"tutorials_enabled": true,
+	"novel_auto": false
 }
 
 var settings: Dictionary = DEFAULT_SETTINGS.duplicate(true)
@@ -92,6 +93,16 @@ func tutorials_enabled() -> bool:
 
 func toggle_tutorials_enabled() -> void:
 	set_tutorials_enabled(not tutorials_enabled())
+
+## V0.14: modo das novels (conversas com personagens). false = CLIQUE (o jogador avanca), true = AUTO (passa sozinha).
+func set_novel_auto(value: bool) -> void:
+	set_setting("novel_auto", value)
+
+func novel_auto() -> bool:
+	return bool(settings.get("novel_auto", DEFAULT_SETTINGS["novel_auto"]))
+
+func toggle_novel_auto() -> void:
+	set_novel_auto(not novel_auto())
 
 func set_difficulty(value: String) -> void:
 	if not ["facil", "normal", "dificil"].has(value):
