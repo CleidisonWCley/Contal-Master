@@ -61,7 +61,15 @@ func _ready() -> void:
 	# Deixa 2 quadros desenharem a tela ANTES de iniciar o carregamento (que pode travar o thread principal na web).
 	await get_tree().process_frame
 	await get_tree().process_frame
+	_notify_web_shell()
 	_start_loading()
+
+## V0.14.2 - Avisa o web/shell.html que esta tela JA foi desenhada: o overlay HTML (identico a esta tela)
+## so some agora, sem "buraco" nem troca visual entre o shell e o jogo. Idempotente e inofensivo fora da web.
+func _notify_web_shell() -> void:
+	if not WebLite.is_web():
+		return
+	JavaScriptBridge.eval("if (window.cmShellReady) { window.cmShellReady(); }", true)
 
 func _build_style() -> void:
 	# Fundo: degrade vertical BG -> BG misturado com o roxo da marca.
