@@ -21,7 +21,7 @@ jobs:
           preset: Web
 
       - name: Deploy to itch.io via Butler
-        uses: ManiruzzamanAkash/action-itch-publish@v1
+        uses: oferh/butler-to-itch-action
         with:
           value_or_filename: build/web # Diretório onde o Godot gera o export
           game: cleyw07.itch.io/contalmaster # Ex: cleidison/meu-jogo
