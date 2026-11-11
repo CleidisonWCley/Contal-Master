@@ -117,6 +117,8 @@ func _input(event: InputEvent) -> void:
 				_advance_or_complete_text()
 
 func _handle_pointer_advance(point: Vector2) -> void:
+	if not ClickGuard.accept():
+		return
 	if _is_pointer_on_action_button(point):
 		return
 	_advance_or_complete_text()

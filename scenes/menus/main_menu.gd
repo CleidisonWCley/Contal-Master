@@ -218,7 +218,8 @@ func _on_btnSttings_pressed() -> void:
 func _on_btnexit_pressed() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
-	get_tree().quit()
+	# V0.14.1: na web quit() derruba o runtime; WebBridge encerra com seguranca em qualquer plataforma.
+	WebBridge.request_exit()
 
 func _animations_enabled() -> bool:
 	return not has_node("/root/SettingsManager") or SettingsManager.animations_enabled()

@@ -12,7 +12,8 @@ var engine_acceleration_player: AudioStreamPlayer
 var engine_loop_player: AudioStreamPlayer
 var engine_acceleration_active: bool = false
 var engine_loop_active: bool = false
-var velox_sfx_bus_ready: bool = false
+var _duck_state: bool = false
+var _ensure_next_ms: int = 0
 
 func _configure_desvio_music_audio_profile() -> void:
 	if not g.has_node("/root/AudioManager"):
@@ -74,38 +75,8 @@ func _set_audio_stream_loop(stream: AudioStream, loop_enabled: bool) -> void:
 			return
 
 func _engine_audio_bus() -> StringName:
-	# V0.13.9.3: os sons do Bionix ficam em bus próprio, mas sem filtro.
-	# O filtro da V0.13.9.2 removeu presença e deixou o motor abafado demais.
-	_ensure_velox_sfx_bus()
-	return DLConfig.VELOX_SFX_BUS
-
-func _ensure_velox_sfx_bus() -> void:
-	var bus_index: int = AudioServer.get_bus_index(DLConfig.VELOX_SFX_BUS)
-	if velox_sfx_bus_ready and bus_index != -1:
-		return
-	if bus_index == -1:
-		var new_bus_position: int = AudioServer.get_bus_count()
-		AudioServer.add_bus(new_bus_position)
-		bus_index = AudioServer.get_bus_count() - 1
-		AudioServer.set_bus_name(bus_index, DLConfig.VELOX_SFX_BUS)
-	AudioServer.set_bus_send(bus_index, DLConfig.VELOX_SFX_BUS_SEND)
-	AudioServer.set_bus_volume_db(bus_index, 0.0)
-	AudioServer.set_bus_mute(bus_index, false)
-	AudioServer.set_bus_bypass_effects(bus_index, true)
-	_configure_velox_sfx_effects(bus_index)
-	velox_sfx_bus_ready = true
-
-func _configure_velox_sfx_effects(bus_index: int) -> void:
-	# V0.13.9.3: remove filtros do motor. Os arquivos OGG já estão limpos;
-	# a presença do carro será controlada por volume/pitch, não por low-pass.
-	while AudioServer.get_bus_effect_count(bus_index) > 0:
-		AudioServer.remove_bus_effect(bus_index, 0)
-
-func _set_audio_effect_property_if_present(effect: AudioEffect, property_name: String, value: Variant) -> void:
-	for property: Dictionary in effect.get_property_list():
-		if str(property.get("name", "")) == property_name:
-			effect.set(property_name, value)
-			return
+	# V0.14.1 (web): sem bus criado em tempo de execucao. O motor toca direto no Master.
+	return &"Master"
 
 func _engine_volume_db(base_db: float) -> float:
 	# V0.13.9.3: motor limpo e perceptível; sem filtro que abafe o loop.
@@ -138,12 +109,15 @@ func _engine_acceleration_pitch() -> float:
 	return 1.0
 
 func _set_engine_music_duck(active: bool) -> void:
-	# V0.13.9.3: sem ducking forte. A música fica preservada; o carro é mixado localmente.
+	# V0.14.1: sem ducking e sem trabalho repetido. So age quando o estado muda.
+	if active == _duck_state:
+		return
+	_duck_state = active
 	if not g.has_node("/root/AudioManager"):
 		return
 	if active:
 		_configure_desvio_music_audio_profile()
-	elif AudioManager.has_method("clear_music_duck"):
+	else:
 		AudioManager.clear_music_duck()
 
 func _stop_audio_manager_engine_loops() -> void:
@@ -212,7 +186,11 @@ func _set_engine_audio_paused(paused: bool) -> void:
 func _ensure_engine_audio_state() -> void:
 	if g.gameplay_paused:
 		return
-	_stop_audio_manager_engine_loops()
+	# V0.14.1: era chamado todo frame. Basta checar 4x por segundo (so religa player parado).
+	var now_ms: int = Time.get_ticks_msec()
+	if now_ms < _ensure_next_ms:
+		return
+	_ensure_next_ms = now_ms + 250
 	if g.state == DLConfig.STATE_ACCELERATION and engine_acceleration_active:
 		_set_engine_music_duck(true)
 		if engine_acceleration_player != null and engine_acceleration_player.stream != null:

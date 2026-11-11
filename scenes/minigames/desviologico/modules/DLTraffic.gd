@@ -85,6 +85,10 @@ func _traffic_fixed_next_count() -> int:
 	return int(traffic_wave_count_bag.pop_back())
 
 func _traffic_fixed_count_template() -> Array:
+	# V0.14.1: a mistura de ondas depende do HORARIO (rodada) e da dificuldade.
+	var by_difficulty: Array = DLConfig.TRAFFIC_COUNT_TEMPLATES.get(g.difficulty, [])
+	if by_difficulty.size() > 0:
+		return (by_difficulty[DLConfig.traffic_index(g.current_round)] as Array).duplicate()
 	match g.difficulty:
 		"facil":
 			# Fácil mantém leitura alta: maioria simples, algumas duplas, sem trio.
@@ -245,6 +249,9 @@ func _update_pending_combo_spawns() -> void:
 		return
 
 func _traffic_wave_combo_delay(count: int) -> float:
+	return _traffic_wave_combo_delay_base(count) * float(DLConfig.TRAFFIC_COMBO_DELAY_MULT[DLConfig.traffic_index(g.current_round)])
+
+func _traffic_wave_combo_delay_base(count: int) -> float:
 	# V0.13.13.2: espaçamento vertical maior dentro da onda.
 	# A dificuldade vem da frequência e da leitura menor, não de spawn impossível.
 	match g.difficulty:
@@ -293,7 +300,11 @@ func _other_lane(lane: int) -> int:
 	return DLConfig.LANE_RIGHT if lane == DLConfig.LANE_LEFT else DLConfig.LANE_LEFT
 
 func _max_active_npcs() -> int:
-	return int(g._rules().get("max_npcs", DLConfig.MAX_ACTIVE_NPCS))
+	# V0.14.1: horarios mais tardios permitem mais carros ao mesmo tempo (com teto por dificuldade).
+	var base: int = int(g._rules().get("max_npcs", DLConfig.MAX_ACTIVE_NPCS))
+	var extra: int = int(DLConfig.TRAFFIC_EXTRA_NPCS[DLConfig.traffic_index(g.current_round)])
+	var cap: int = int(DLConfig.TRAFFIC_MAX_NPCS_CAP.get(g.difficulty, base))
+	return mini(base + extra, maxi(base, cap))
 
 func _active_threat_count() -> int:
 	var count := 0
@@ -399,6 +410,9 @@ func _pick_npc_sprite_path() -> String:
 	return selected
 
 func _first_spawn_delay() -> float:
+	return _first_spawn_delay_base() * minf(1.0, float(DLConfig.TRAFFIC_SPAWN_MULT[DLConfig.traffic_index(g.current_round)]) + 0.08)
+
+func _first_spawn_delay_base() -> float:
 	# V0.13.13.2: o primeiro NPC deve aparecer logo após a aceleração,
 	# sempre na direita, para o jogador entrar no ritmo sem corredor vazio.
 	match g.difficulty:
@@ -496,11 +510,13 @@ func _traffic_spawn_retry_delay() -> float:
 	return 0.24
 
 func _spawn_interval() -> float:
-	var base: float = float(g._rules().get("spawn_base", 3.8))
-	var round_reduction: float = float(g.current_round) * 0.035
+	# V0.14.1: o intervalo encolhe a cada horario (Amanhecer = leve ... Noite = caotico).
+	var idx: int = DLConfig.traffic_index(g.current_round)
+	var base: float = float(g._rules().get("spawn_base", 3.8)) * float(DLConfig.TRAFFIC_SPAWN_MULT[idx])
 	var jitter: float = randf_range(0.16, 0.48)
 	if g.difficulty == "normal":
 		jitter = randf_range(0.06, 0.20)
 	elif g.difficulty == "dificil":
 		jitter = randf_range(0.04, 0.14)
-	return maxf(_minimum_spawn_interval(), base - round_reduction + jitter)
+	var floor_value: float = _minimum_spawn_interval() * float(DLConfig.TRAFFIC_MIN_INTERVAL_MULT[idx])
+	return maxf(floor_value, base + jitter)

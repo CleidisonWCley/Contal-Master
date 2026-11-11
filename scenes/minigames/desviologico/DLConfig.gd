@@ -19,7 +19,7 @@ const DEBUG_WATER_POINTS := false
 # ao excesso de ondas sobre o gramado/pista do background único.
 # 0 = desligado, 1 = leve/visível, 2 = médio.
 const WATER_EFFECT_QUALITY := 1
-const WATER_REDRAW_INTERVAL := 0.0334
+const WATER_REDRAW_INTERVAL := 0.0334  # na web o DesvioLogico usa WebLite.water_interval()
 const WATER_USE_MASK_SHADER := false
 const TUTORIAL_ARROW_SPRITES := Paths.DL_TUTORIAL_ARROWS
 const ENGINE_ACCELERATION_SOUND := Paths.SFX_CAR_ACCELERATION
@@ -186,3 +186,54 @@ const SCORE_ROUTE_POINTS := {
 	"normal": {"reached": 10, "failed": -40},
 	"dificil": {"reached": 15, "failed": -60}
 }
+
+# ---------------------------------------------------------------------------
+# V0.14.1: 6 HORARIOS = 6 NIVEIS DE TRAFEGO (indice da rodada: 0 Amanhecer ... 5 Noite).
+# Cada horario e mais movimentado que o anterior. A AREA SEGURA de desvio nao muda: os espacamentos
+# minimos entre carros (DLTraffic._same_lane / _cross_lane / _opposite_critical) continuam valendo.
+# O que sobe: frequencia de spawn, carros simultaneos, tamanho das ondas e pressa dentro da onda.
+# Edite so esta tabela para rebalancear.
+# ---------------------------------------------------------------------------
+const TRAFFIC_LABELS := ["leve", "calmo", "moderado", "intenso", "pesado", "caótico"]
+# Multiplica o intervalo entre ondas (menor = mais carros).
+const TRAFFIC_SPAWN_MULT := [1.14, 1.00, 0.89, 0.79, 0.70, 0.62]
+# Multiplica o intervalo minimo absoluto entre ondas.
+const TRAFFIC_MIN_INTERVAL_MULT := [1.00, 0.97, 0.93, 0.89, 0.85, 0.80]
+# Carros simultaneos extras (somados ao max_npcs da dificuldade, com teto TRAFFIC_MAX_NPCS_CAP).
+const TRAFFIC_EXTRA_NPCS := [0, 0, 0, 1, 1, 1]
+const TRAFFIC_MAX_NPCS_CAP := {"facil": 3, "normal": 4, "dificil": 5}
+# Multiplica o atraso entre carros de uma mesma onda (menor = onda mais apertada, mas ainda escapavel).
+const TRAFFIC_COMBO_DELAY_MULT := [1.00, 0.98, 0.95, 0.92, 0.89, 0.86]
+# Mistura de tamanhos de onda (1 = carro solo, 2 = dupla, 3 = trio escalonado) por dificuldade e horario.
+const TRAFFIC_COUNT_TEMPLATES := {
+	"facil": [
+		[1, 1, 1, 1, 1, 1, 1, 2],
+		[1, 1, 1, 1, 2],
+		[1, 1, 1, 2],
+		[1, 1, 2, 2],
+		[1, 2, 2, 2],
+		[1, 2, 2, 2, 2]
+	],
+	"normal": [
+		[1, 1, 1, 1, 1, 2, 2, 2],
+		[1, 1, 1, 1, 2, 2, 2, 2, 2],
+		[1, 1, 1, 2, 2, 2, 2, 2, 2],
+		[1, 1, 1, 2, 2, 2, 2, 2, 2, 3],
+		[1, 1, 2, 2, 2, 2, 2, 2, 3, 3],
+		[1, 2, 2, 2, 2, 2, 3, 3, 3]
+	],
+	"dificil": [
+		[1, 1, 1, 2, 2, 2, 2, 2, 3],
+		[1, 1, 2, 2, 2, 2, 2, 2, 3],
+		[1, 1, 2, 2, 2, 2, 2, 3, 3],
+		[1, 1, 2, 2, 2, 2, 2, 3, 3, 3],
+		[1, 2, 2, 2, 2, 3, 3, 3, 3],
+		[2, 2, 2, 2, 3, 3, 3, 3, 3]
+	]
+}
+
+static func traffic_index(round_index: int) -> int:
+	return clampi(round_index, 0, TOTAL_ROUNDS - 1)
+
+static func traffic_label(round_index: int) -> String:
+	return str(TRAFFIC_LABELS[traffic_index(round_index)])

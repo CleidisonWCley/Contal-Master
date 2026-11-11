@@ -71,6 +71,8 @@ var pause_button: Button
 var pause_layer: Control
 var pause_menu: MinigamePause
 var fade_rect: ColorRect
+var _frame_toggle: bool = false
+var _texture_cache: Dictionary = {}
 func _ready() -> void:
 	randomize()
 	difficulty = DifficultyManager.get_difficulty() if has_node("/root/DifficultyManager") else "normal"
@@ -100,15 +102,18 @@ func _process(delta: float) -> void:
 			sideprops._update_side_motion_props(motion_delta)
 	if _is_tutorial_car_state():
 		_update_obstacles(delta)
-	if water_layer != null and DLConfig.WATER_EFFECT_QUALITY > 0:
+	if water_layer != null and WebLite.water_quality(DLConfig.WATER_EFFECT_QUALITY) > 0:
 		waterfx.water_redraw_accumulator += delta
-		if waterfx.water_redraw_accumulator >= DLConfig.WATER_REDRAW_INTERVAL:
+		if waterfx.water_redraw_accumulator >= WebLite.water_interval(DLConfig.WATER_REDRAW_INTERVAL):
 			waterfx.water_redraw_accumulator = 0.0
 			water_layer.queue_redraw()
-	if road_layer != null:
-		road_layer.queue_redraw()
-	if side_props_layer != null:
-		side_props_layer.queue_redraw()
+	# V0.14.1 (web): estrada e adereços redesenham em quadros alternados (metade do custo de desenho).
+	_frame_toggle = not _frame_toggle
+	if not WebLite.lite() or _frame_toggle:
+		if road_layer != null:
+			road_layer.queue_redraw()
+		if side_props_layer != null:
+			side_props_layer.queue_redraw()
 	if route_progress_hud != null:
 		route_progress_hud.queue_redraw()
 	if score_hud != null:
@@ -123,6 +128,8 @@ func _notification(what: int) -> void:
 		_update_background_motion_fx(0.0)
 		_layout_car(false)
 	elif what == NOTIFICATION_EXIT_TREE:
+		_clear_obstacles()
+		_texture_cache.clear()
 		engineaudio._stop_engine_audio()
 		engineaudio._clear_desvio_music_audio_profile()
 
@@ -640,7 +647,7 @@ func _start_round(index: int) -> void:
 	car_rect.modulate = Color.WHITE
 	_layout_car(false)
 	_update_hud()
-	status_label.text = "Cenário: %s. Alterne entre esquerda/direita até a decisão." % _stage_name(index)
+	status_label.text = "Cenário: %s (tráfego %s). Alterne entre esquerda/direita até a decisão." % [_stage_name(index), DLConfig.traffic_label(index)]
 	_fade_from_black()
 	if current_round == 0:
 		tutorial.start_sequence()
@@ -704,7 +711,9 @@ func _is_tutorial_car_state() -> bool:
 
 func _set_background(index: int) -> void:
 	var path: String = DLConfig.BACKGROUNDS[clampi(index, 0, DLConfig.BACKGROUNDS.size() - 1)]
-	background_rect.texture = _load_texture(path)
+	# Fundos grandes NAO ficam no cache local: so o atual fica na memoria (importante na web).
+	var resource: Resource = load(path)
+	background_rect.texture = resource as Texture2D
 
 func _update_drive(delta: float) -> void:
 	drive_elapsed += delta
@@ -1413,7 +1422,7 @@ func _stage_name(index: int) -> String:
 func _update_hud() -> void:
 	var difficulty_label := DifficultyManager.get_label(difficulty) if has_node("/root/DifficultyManager") else "Normal"
 	if round_label != null:
-		round_label.text = "Desafio %s/%s • %s" % [current_round + 1, DLConfig.TOTAL_ROUNDS, _stage_name(current_round)]
+		round_label.text = "Desafio %s/%s • %s • Tráfego %s" % [current_round + 1, DLConfig.TOTAL_ROUNDS, _stage_name(current_round), DLConfig.traffic_label(current_round)]
 	if score_label != null:
 		score_label.text = "Dificuldade: %s" % difficulty_label
 		DifficultyManager.apply_difficulty_chip(score_label, difficulty, 15)
@@ -1583,8 +1592,12 @@ func _set_car_sprite(key: String) -> void:
 	car_rect.texture = _load_texture(str(DLConfig.CAR_SPRITES.get(key, DLConfig.CAR_SPRITES["reto"])))
 
 func _load_texture(path: String) -> Texture2D:
+	# V0.14.1: cache local (carros/adereços repetem a cada spawn); o fundo antigo e liberado ao trocar.
+	if _texture_cache.has(path):
+		return _texture_cache[path] as Texture2D
 	var resource: Resource = load(path)
 	if resource is Texture2D:
+		_texture_cache[path] = resource
 		return resource as Texture2D
 	return null
 

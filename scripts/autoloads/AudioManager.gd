@@ -39,24 +39,60 @@ const SFX := {
 	"porta": Paths.SFX_DOOR
 }
 
-# V0.13.9.5: perfil limpo. A mixagem do Desvio Lógico agora usa volume puro,
-# sem low-pass, reverb, stereo enhance ou filtros criados por código.
-const MUSIC_BUS_MASTER := &"Master"
-const DESVIO_MUSIC_BUS := &"DesvioMusic"
+# V0.14.1 (web): UM unico player de musica, pool fixo de efeitos (sem criar/liberar nos a cada som),
+# cache de streams, NENHUMA chamada ao AudioServer em loop e nenhum bus criado em tempo de execucao.
+# A musica do Desvio Logico e as dos outros jogos passam pelo mesmo caminho (Master): nao existe mais
+# "perfil" que possa derrubar as demais. Um watchdog religa a musica se o navegador a interromper.
 const DESVIO_MUSIC_VOLUME_OFFSET_DB := 0.0
+const SFX_POOL_SIZE := 8
+const WATCHDOG_INTERVAL := 0.75
+const WATCHDOG_MAX_RESTARTS := 8
 
 var music_player: AudioStreamPlayer
 var current_music_key: String = ""
 var music_volume_offset_db: float = 0.0
 var desvio_music_profile_active: bool = false
 
+var _wants_music: bool = false
+var _suspended: bool = false
+var _sfx_pool: Array[AudioStreamPlayer] = []
+var _sfx_cache: Dictionary = {}
+var _sfx_next: int = 0
+var _watchdog_timer: float = 0.0
+var _watchdog_restarts: int = 0
+var _last_music_db: float = 999.0
+
 func _ready() -> void:
 	music_player = AudioStreamPlayer.new()
 	music_player.name = "MusicPlayer"
 	add_child(music_player)
+	for i in range(SFX_POOL_SIZE):
+		var player := AudioStreamPlayer.new()
+		player.name = "SfxPool_%d" % i
+		# Cliques precisam soar tambem com o jogo pausado.
+		player.process_mode = Node.PROCESS_MODE_ALWAYS
+		add_child(player)
+		_sfx_pool.append(player)
 	_apply_volumes()
 	if has_node("/root/SettingsManager"):
 		SettingsManager.settings_changed.connect(_on_settings_changed)
+
+func _process(delta: float) -> void:
+	# Watchdog: se a musica deveria estar tocando e parou (web/aba/contexto de audio), religa.
+	_watchdog_timer += delta
+	if _watchdog_timer < WATCHDOG_INTERVAL:
+		return
+	_watchdog_timer = 0.0
+	if not _wants_music or _suspended or get_tree().paused or music_player.stream == null:
+		return
+	if music_player.playing:
+		_watchdog_restarts = 0
+		return
+	if _watchdog_restarts >= WATCHDOG_MAX_RESTARTS:
+		return
+	_watchdog_restarts += 1
+	music_player.stream_paused = false
+	music_player.play()
 
 func _on_settings_changed(_settings: Dictionary) -> void:
 	_apply_volumes()
@@ -67,7 +103,11 @@ func _apply_volumes() -> void:
 	var base_volume_db: float = 0.0
 	if has_node("/root/SettingsManager"):
 		base_volume_db = _volume_to_db(SettingsManager.get_music_volume())
-	music_player.volume_db = clampf(base_volume_db + music_volume_offset_db, -80.0, 6.0)
+	var target: float = clampf(base_volume_db + music_volume_offset_db, -80.0, 6.0)
+	if is_equal_approx(target, _last_music_db):
+		return
+	_last_music_db = target
+	music_player.volume_db = target
 
 func _volume_to_db(value: float) -> float:
 	value = clamp(value, 0.0, 1.0)
@@ -79,116 +119,102 @@ func _volume_to_db(value: float) -> float:
 func music_key_for_phase(phase_key: String) -> String:
 	return str(PHASE_MUSIC.get(phase_key, "loop_start"))
 
-
 func play_music(key: String, force_restart: bool = false) -> void:
 	if not MUSIC.has(key):
 		push_warning("Música não mapeada: %s" % key)
 		return
+	_wants_music = true
 	if current_music_key == key and music_player.playing and not force_restart:
 		return
-
 	var stream_resource: Resource = load(MUSIC[key])
-	if stream_resource == null:
-		push_warning("Arquivo de música não encontrado: %s" % MUSIC[key])
+	if stream_resource == null or not stream_resource is AudioStream:
+		push_warning("Arquivo de música inválido: %s" % MUSIC[key])
 		return
-	if not stream_resource is AudioStream:
-		push_warning("Recurso carregado não é áudio: %s" % MUSIC[key])
-		return
-
 	var stream: AudioStream = stream_resource as AudioStream
 	_enable_music_loop(stream)
-
 	current_music_key = key
+	_watchdog_restarts = 0
 	music_player.stop()
+	music_player.stream_paused = false
 	music_player.stream = stream
 	apply_desvio_music_profile(key == "desvio_logico")
 	music_player.play()
 
-
 func _enable_music_loop(stream: AudioStream) -> void:
-	# Garante loop infinito para músicas de menu e minigames.
-	# Em Godot 4, OGG/MP3 normalmente expõem a propriedade `loop`,
-	# enquanto WAV usa `loop_mode`. O projeto usa OGG nas músicas, mas
-	# esta função mantém compatibilidade caso algum áudio mude depois.
-	if stream == null:
-		return
-	for property: Dictionary in stream.get_property_list():
-		var property_name: String = str(property.get("name", ""))
-		if property_name == "loop":
-			stream.set("loop", true)
-			return
-		if property_name == "loop_mode":
-			stream.set("loop_mode", 1)
-			return
+	if stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = true
+	elif stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = true
+	elif stream is AudioStreamWAV:
+		(stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
 
 func set_music_volume_offset_db(offset_db: float) -> void:
+	if is_equal_approx(offset_db, music_volume_offset_db):
+		return
 	music_volume_offset_db = offset_db
 	_apply_volumes()
 
-
 func clear_music_volume_offset() -> void:
-	music_volume_offset_db = 0.0
-	_apply_volumes()
-
+	set_music_volume_offset_db(0.0)
 
 func clear_music_duck() -> void:
-	# Compatibilidade com versões anteriores do Desvio Lógico.
-	# O refinamento atual não usa ducking forte; só reaplica o volume do perfil ativo.
+	# Compatibilidade: sem ducking. So reaplica o volume atual (barato, so age se mudou).
 	_apply_volumes()
 
-
+## Compatibilidade com o Desvio Logico: agora so ajusta o offset de volume (sem bus, sem AudioServer).
 func apply_desvio_music_profile(active: bool) -> void:
 	desvio_music_profile_active = active
-	if music_player == null:
-		return
-	# V0.13.9.6: perfil totalmente limpo. A música do Desvio Lógico volta ao Master
-	# e qualquer bus/effect criado por versões anteriores é apenas limpo, sem ser usado.
-	music_player.bus = MUSIC_BUS_MASTER
-	_cleanup_desvio_music_bus_effects()
-	music_volume_offset_db = DESVIO_MUSIC_VOLUME_OFFSET_DB if active else 0.0
-	_apply_volumes()
+	set_music_volume_offset_db(DESVIO_MUSIC_VOLUME_OFFSET_DB if active else 0.0)
 
-
-func _cleanup_desvio_music_bus_effects() -> void:
-	var bus_index: int = AudioServer.get_bus_index(DESVIO_MUSIC_BUS)
-	if bus_index == -1:
-		return
-	AudioServer.set_bus_volume_db(bus_index, 0.0)
-	AudioServer.set_bus_mute(bus_index, false)
-	AudioServer.set_bus_bypass_effects(bus_index, true)
-	while AudioServer.get_bus_effect_count(bus_index) > 0:
-		AudioServer.remove_bus_effect(bus_index, 0)
-
-
-func _set_effect_property_if_present(_effect: AudioEffect, _property_name: String, _value: Variant) -> void:
-	# Mantido por compatibilidade com patches antigos, sem uso no perfil limpo.
+## Compatibilidade (loops antigos de motor): nao ha mais loops no AudioManager.
+func stop_loop_sfx(_loop_id: String) -> void:
 	return
 
-
 func stop_music() -> void:
+	_wants_music = false
 	current_music_key = ""
 	apply_desvio_music_profile(false)
 	if music_player != null:
 		music_player.stop()
 
+func stop_all_sfx() -> void:
+	for player in _sfx_pool:
+		player.stop()
+
+## Aba escondida / pagina fechando (WebBridge): pausa e retoma a musica sem perder a posicao.
+func set_suspended(value: bool) -> void:
+	_suspended = value
+	if music_player != null:
+		music_player.stream_paused = value
+	if not value:
+		_watchdog_timer = WATCHDOG_INTERVAL
+
 func play_sfx(key: String) -> void:
+	if _suspended:
+		return
 	if not SFX.has(key):
 		push_warning("Efeito sonoro não mapeado: %s" % key)
 		return
-
-	var stream = load(SFX[key])
+	var stream: AudioStream = _sfx_cache.get(key, null) as AudioStream
 	if stream == null:
-		push_warning("Arquivo de efeito não encontrado: %s" % SFX[key])
-		return
-
-	var player := AudioStreamPlayer.new()
-	player.name = "Sfx_%s" % key
+		stream = load(SFX[key]) as AudioStream
+		if stream == null:
+			push_warning("Arquivo de efeito não encontrado: %s" % SFX[key])
+			return
+		_sfx_cache[key] = stream
+	var player: AudioStreamPlayer = _next_sfx_player()
 	player.stream = stream
 	if has_node("/root/SettingsManager"):
 		player.volume_db = _volume_to_db(SettingsManager.get_sfx_volume())
-	add_child(player)
-	player.finished.connect(player.queue_free)
 	player.play()
+
+func _next_sfx_player() -> AudioStreamPlayer:
+	for player in _sfx_pool:
+		if not player.playing:
+			return player
+	var chosen: AudioStreamPlayer = _sfx_pool[_sfx_next]
+	_sfx_next = (_sfx_next + 1) % _sfx_pool.size()
+	return chosen
 
 func play_click() -> void:
 	play_sfx("click")

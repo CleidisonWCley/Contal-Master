@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="ContalMaster"
-config/version="0.13.4"
+config/version="0.14.1"
 run/main_scene="res://scenes/loading/LoadingScreen.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 boot_splash/bg_color=Color(0.25662142, 0.14212537, 0.42546546, 1)
@@ -23,6 +23,7 @@ config/icon="res://assets/contalmaster_icon.png"
 ScoreManager="*res://scripts/autoloads/ScoreManager.gd"
 SettingsManager="*res://scripts/autoloads/SettingsManager.gd"
 AudioManager="*res://scripts/autoloads/AudioManager.gd"
+WebBridge="*res://scripts/autoloads/WebBridge.gd"
 DifficultyManager="*res://scripts/autoloads/DifficultyManager.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
 AchievementManager="*res://scripts/autoloads/AchievementManager.gd"

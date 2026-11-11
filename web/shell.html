@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>$GODOT_PROJECT_NAME</title>
+		<style>
+html, body, #canvas { margin: 0; padding: 0; border: 0; }
+body { color: white; background-color: #100B1F; overflow: hidden; touch-action: none; }
+#canvas { display: block; }
+#canvas:focus { outline: none; }
+
+/* V0.14.1 - tela de carregamento COMPACTA: icone + barra com a MESMA largura, centralizados
+   (casam com o icone/barra do itch.io em vez de ocupar a tela inteira). */
+#status { position: absolute; inset: 0; background-color: #100B1F; display: flex; flex-direction: column;
+	justify-content: center; align-items: center; gap: 14px; visibility: hidden; transition: opacity .35s ease; }
+#status.fade { opacity: 0; }
+#status-icon { width: 160px; height: 160px; object-fit: contain; border-radius: 28px; }
+#status-bar { width: 160px; height: 10px; border-radius: 6px; background: #FFFFFF; overflow: hidden; display: none; }
+#status-fill { width: 0%; height: 100%; background: #8B3DFF; border-radius: 6px; transition: width .12s linear; }
+#status-percent { font-family: 'Noto Sans', Arial, sans-serif; font-size: 14px; color: #CFC2E8; min-height: 18px; display: none; }
+#status-notice { display: none; background-color: #5b3943; border-radius: .5rem; border: 1px solid #9b3943; color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif; line-height: 1.3; margin: 0 2rem; overflow: hidden;
+	padding: 1rem; text-align: center; z-index: 1; }
+@media (max-height: 380px) { #status-icon { width: 96px; height: 96px; } #status-bar { width: 96px; } }
+		</style>
+		$GODOT_HEAD_INCLUDE
+	</head>
+	<body>
+		<canvas id="canvas">Your browser does not support the canvas tag.</canvas>
+		<noscript>Your browser does not support JavaScript.</noscript>
+		<div id="status">
+			<img id="status-icon" src="index.icon.png" alt="" onerror="this.style.display='none'">
+			<div id="status-bar"><div id="status-fill"></div></div>
+			<div id="status-percent"></div>
+			<div id="status-notice"></div>
+		</div>
+		<script src="$GODOT_URL"></script>
+		<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusBar = document.getElementById('status-bar');
+	const statusFill = document.getElementById('status-fill');
+	const statusPercent = document.getElementById('status-percent');
+	const statusNotice = document.getElementById('status-notice');
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) { return; }
+		if (mode === 'hidden') {
+			statusOverlay.classList.add('fade');
+			setTimeout(function () { statusOverlay.remove(); }, 400);
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusBar.style.display = mode === 'progress' ? 'block' : 'none';
+		statusPercent.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) { statusNotice.removeChild(statusNotice.lastChild); }
+		text.split('\n').forEach(function (line) {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+	function displayFailureNotice(err) {
+		console.error(err);
+		setStatusNotice(err instanceof Error ? err.message : (typeof err === 'string' ? err : 'An unknown error occurred.'));
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let reg;
+			try { reg = navigator.serviceWorker.getRegistration(); } catch (err) { reg = Promise.reject(new Error('Service worker registration failed.')); }
+			Promise.race([
+				reg.then(function (r) { if (r != null) { return Promise.reject(new Error('Service worker already exists.')); } return r; }).then(function () { return engine.installServiceWorker(); }),
+				new Promise(function (resolve) { setTimeout(function () { resolve(); }, 2000); }),
+			]).then(function () { window.location.reload(); }).catch(function (err) { console.error('Error while registering service worker:', err); });
+		} else {
+			displayFailureNotice('Error\nThe following features required to run Godot projects on the Web are missing:\n' + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					const pct = Math.min(100, Math.round(current / total * 100));
+					statusFill.style.width = pct + '%';
+					statusPercent.textContent = pct + '%';
+				}
+			},
+		}).then(function () { setStatusMode('hidden'); }, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
+</html>

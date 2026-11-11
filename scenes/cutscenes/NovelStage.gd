@@ -289,7 +289,7 @@ func _on_type_finished() -> void:
 
 
 func _advance() -> void:
-	if _skipped:
+	if _skipped or not ClickGuard.accept():
 		return
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
