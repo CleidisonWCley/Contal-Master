@@ -23,7 +23,7 @@ const FILE_MATRIZ := "matriz_riscos.json"
 
 const DIFFICULTIES: Array[String] = ["facil", "normal", "dificil"]
 const DEFAULT_ROUND_COUNT := 6
-const STOP_OPTIONS_PER_ITEM := 5
+const STOP_OPTIONS_PER_ITEM := 6   # V0.14.4.2: o STOP mostra sempre 6 opcoes (grade 3x2)
 const RECENT_MEMORY_MAX := 60
 
 const ACCENT_MAP := {
@@ -141,7 +141,7 @@ static func pick_rounds(minigame: String, difficulty: String, count: int = DEFAU
 	return picked
 
 
-## Termos do dicionario agrupados pela inicial (usado pelo STOP para montar distratores).
+## Termos do dicionario + distratores_stop agrupados pela inicial (opcoes erradas do STOP).
 static func get_stop_terms_by_initial() -> Dictionary:
 	ensure_loaded()
 	return _stop_terms.duplicate(true)
@@ -307,6 +307,20 @@ static func _build_dicionario(data: Dictionary) -> void:
 			"explanation": definicao,
 			"referencia": str(it.get("referencia", "")),
 		})
+	# V0.14.4.2: termos extras (so opcoes erradas do STOP), para toda inicial ter 6+ opcoes.
+	var extras: Dictionary = data.get("distratores_stop", {})
+	for key in extras.keys():
+		var initial_key: String = str(key).to_upper()
+		if not _stop_terms.has(initial_key):
+			_stop_terms[initial_key] = []
+		var bucket: Array = _stop_terms[initial_key]
+		for extra in extras[key]:
+			var extra_text: String = str(extra).strip_edges()
+			if extra_text != "" and not bucket.has(extra_text):
+				bucket.append(extra_text)
+	for initial_key in _stop_terms.keys():
+		if (_stop_terms[initial_key] as Array).size() < STOP_OPTIONS_PER_ITEM:
+			_errors.append("STOP: inicial %s tem menos de %d termos" % [initial_key, STOP_OPTIONS_PER_ITEM])
 
 
 static func _build_matriz(data: Dictionary) -> void:

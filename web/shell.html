@@ -64,6 +64,28 @@ body { color: #FFF9FF; background-color: #100B1F; overflow: hidden; touch-action
 const GODOT_CONFIG = $GODOT_CONFIG;
 const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
 const engine = new Engine(GODOT_CONFIG);
+/* V0.14.5 - Perda de contexto WebGL (o navegador/GPU derrubou os graficos: pouca memoria de video).
+   O Godot 4 nao consegue restaurar sozinho e mostrava um alert() bloqueante. Aqui interceptamos o evento ANTES
+   do motor (fase de captura), evitamos o alert e mostramos uma tela com botao "Recarregar". As fases concluidas
+   ja estao salvas. */
+window.addEventListener('webglcontextlost', function (ev) {
+	ev.preventDefault();
+	ev.stopImmediatePropagation();
+	if (document.getElementById('cm-ctxlost')) { return; }
+	const box = document.createElement('div');
+	box.id = 'cm-ctxlost';
+	box.style.cssText = 'position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;box-sizing:border-box;text-align:center;background:rgba(16,11,31,.96);color:#FFF9FF;font-family:\'Noto Sans\',Arial,sans-serif;';
+	const msg = document.createElement('div');
+	msg.style.cssText = 'max-width:520px;font-size:18px;line-height:1.4;';
+	msg.textContent = 'O navegador interrompeu os gr\u00e1ficos do jogo (pouca mem\u00f3ria de v\u00eddeo). As fases conclu\u00eddas est\u00e3o salvas. Recarregue para continuar.';
+	const btn = document.createElement('button');
+	btn.textContent = 'Recarregar';
+	btn.style.cssText = 'font-size:20px;padding:12px 28px;border:0;border-radius:12px;background:#8B3DFF;color:#FFF9FF;cursor:pointer;';
+	btn.addEventListener('click', function () { window.location.reload(); });
+	box.appendChild(msg); box.appendChild(btn);
+	document.body.appendChild(box);
+}, true);
+
 
 (function () {
 	const statusOverlay = document.getElementById('status');

@@ -126,7 +126,7 @@ func _draw_living_water_surface(viewport_size: Vector2) -> void:
 func _draw_water_horizon_glow(side: int, viewport_size: Vector2, horizon_y: float, max_y: float, scale_factor: float, stage_intensity: float) -> void:
 	# Brilho orgânico no topo do mar, próximo da cidade/reflexo do horizonte.
 	# São linhas quebradas e pulsantes, não um retângulo global.
-	var glow_rows: int = 9 if DLConfig.WATER_EFFECT_QUALITY == 1 else 12
+	var glow_rows: int = _lod(9 if DLConfig.WATER_EFFECT_QUALITY == 1 else 12, 4)
 	for row in range(glow_rows):
 		var row_t: float = float(row) / maxf(float(glow_rows - 1), 1.0)
 		var y: float = lerpf(horizon_y + viewport_size.y * 0.010, horizon_y + viewport_size.y * 0.115, row_t)
@@ -157,7 +157,7 @@ func _draw_water_horizon_glow(side: int, viewport_size: Vector2, horizon_y: floa
 func _draw_water_soft_surface(side: int, viewport_size: Vector2, horizon_y: float, max_y: float, scale_factor: float, stage_intensity: float) -> void:
 	# Faixas suaves agora são micro-segmentadas. Evita uma linha inteira
 	# atravessar visualmente o gramado/mureta do background único.
-	var band_count: int = 19 if DLConfig.WATER_EFFECT_QUALITY == 1 else 25
+	var band_count: int = _lod(19 if DLConfig.WATER_EFFECT_QUALITY == 1 else 25, 8)
 	for i in range(band_count):
 		var band_key: float = float(i) + (31.0 if side > 0 else 7.0)
 		var depth_t: float = float(i) / maxf(float(band_count - 1), 1.0)
@@ -188,7 +188,7 @@ func _draw_water_soft_surface(side: int, viewport_size: Vector2, horizon_y: floa
 func _draw_water_animated_waves(side: int, viewport_size: Vector2, horizon_y: float, max_y: float, scale_factor: float, stage_intensity: float) -> void:
 	# V1.0.2.3: o mar usa brilhos horizontais curtos, não ondas senoidais.
 	# As linhas aparecem e somem em pontos diferentes para dar vida sem invadir estrada/HUD.
-	var shimmer_count: int = 64 if DLConfig.WATER_EFFECT_QUALITY == 1 else 88
+	var shimmer_count: int = _lod(64 if DLConfig.WATER_EFFECT_QUALITY == 1 else 88, 20)
 	for i in range(shimmer_count):
 		var shimmer_key: float = float(i) + (19.0 if side > 0 else 5.0)
 		var raw_depth: float = fmod(shimmer_key * 0.61803398875, 1.0)
@@ -234,7 +234,7 @@ func _draw_water_light_reflection_zone(side: int, viewport_size: Vector2, horizo
 		if absf(light_ratio - (0.25 if side < 0 else 0.75)) > 0.34:
 			return
 	var center_x: float = viewport_size.x * light_ratio
-	var ray_count: int = 12 if DLConfig.WATER_EFFECT_QUALITY == 1 else 18
+	var ray_count: int = _lod(12 if DLConfig.WATER_EFFECT_QUALITY == 1 else 18, 5)
 	for i in range(ray_count):
 		var depth: float = float(i) / maxf(float(ray_count - 1), 1.0)
 		var y: float = lerpf(horizon_y + viewport_size.y * 0.006, max_y - viewport_size.y * 0.055, depth)
@@ -257,7 +257,7 @@ func _draw_water_light_reflection_zone(side: int, viewport_size: Vector2, horizo
 		g.water_layer.draw_line(Vector2(start_x, y), Vector2(end_x, y), _water_glint_color(alpha), maxf(0.45, lerpf(0.64, 0.22, depth) * scale_factor))
 
 func _draw_water_surface_glints(side: int, viewport_size: Vector2, horizon_y: float, max_y: float, scale_factor: float, stage_intensity: float) -> void:
-	var glint_count: int = 42 if DLConfig.WATER_EFFECT_QUALITY == 1 else 62
+	var glint_count: int = _lod(42 if DLConfig.WATER_EFFECT_QUALITY == 1 else 62, 14)
 	for i in range(glint_count):
 		var glint_key: float = float(i) + (43.0 if side > 0 else 11.0)
 		var depth_t: float = fmod(glint_key * 0.41421356237, 1.0)
@@ -286,7 +286,7 @@ func _draw_water_surface_glints(side: int, viewport_size: Vector2, horizon_y: fl
 func _draw_water_peripheral_shimmers(side: int, viewport_size: Vector2, horizon_y: float, max_y: float, scale_factor: float, stage_intensity: float) -> void:
 	# V1.0.2.4: reforço discreto nos cantos superiores/inferiores do mar.
 	# Mantém linhas curtas e horizontais, sem voltar para ondas grandes.
-	var extra_count: int = 24 if DLConfig.WATER_EFFECT_QUALITY == 1 else 34
+	var extra_count: int = _lod(24 if DLConfig.WATER_EFFECT_QUALITY == 1 else 34, 8)
 	for i in range(extra_count):
 		var extra_key: float = float(i) + (71.0 if side > 0 else 23.0)
 		var cluster: float = fmod(extra_key * 0.73205080757, 1.0)
@@ -349,7 +349,11 @@ func _draw_water_poly_wave(start_x: float, end_x: float, base_y: float, amplitud
 		var x: float = start_x + span * t
 		var y: float = base_y + sin(phase + t * TAU) * amplitude
 		points.append(Vector2(x, y))
-	g.water_layer.draw_polyline(points, color, width, true)
+	g.water_layer.draw_polyline(points, color, width, not WebLite.lite())
+
+## V0.14.5: quantidade de elementos da agua ajustada ao perfil (web = 60 %, aparelho fraco = 35 %), com minimo.
+func _lod(base: int, minimum: int) -> int:
+	return maxi(int(round(float(base) * WebLite.water_density())), minimum)
 
 func _water_stage_intensity() -> float:
 	match g.current_round:

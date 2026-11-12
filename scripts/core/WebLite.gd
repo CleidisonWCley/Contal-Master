@@ -85,6 +85,13 @@ static func blur_enabled() -> bool:
 static func water_quality(default_quality: int) -> int:
 	return mini(default_quality, 1) if lite() else default_quality
 
+## V0.14.5: densidade do efeito de agua (fracao da quantidade de linhas/brilhos desenhados). Desktop = 1.0.
+## Cada redesenho da agua gera centenas de comandos de desenho; na web isso pesava igual ao desktop.
+static func water_density() -> float:
+	if low_end():
+		return 0.35
+	return 0.6 if lite() else 1.0
+
 ## Intervalo entre redesenhos da agua (segundos). No aparelho fraco, no maximo 5 redesenhos por segundo.
 static func water_interval(default_interval: float) -> float:
 	if low_end():

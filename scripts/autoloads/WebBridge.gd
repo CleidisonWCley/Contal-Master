@@ -370,10 +370,13 @@ func _debug_tick(delta: float) -> void:
 		return
 	_debug_timer = 0.0
 	_last_scene_path = path
-	print("[CM-DEBUG] cena=%s | mem=%.0fMB | texturas=%.0fMB | nos=%d | fps=%d | %s" % [
+	# V0.14.5: + VRAM total e chamadas de desenho por quadro (diagnostico de "WebGL context lost").
+	print("[CM-DEBUG] cena=%s | mem=%.0fMB | texturas=%.0fMB | vram=%.0fMB | desenhos=%d | nos=%d | fps=%d | %s" % [
 		path.get_file(),
 		float(OS.get_static_memory_usage()) / 1048576.0,
 		Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0,
+		Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
+		int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
 		int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
 		int(Performance.get_monitor(Performance.TIME_FPS)),
 		WebLite.describe()

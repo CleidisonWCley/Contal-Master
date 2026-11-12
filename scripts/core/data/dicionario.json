@@ -3,10 +3,24 @@
   "versao": "1.0",
   "idioma": "pt-BR",
   "fonte": "NBC PA 11 – Revisão Externa de Qualidade pelos Pares (CFC, 8/12/2017, vigente desde 1/1/2019); Instruções aos Revisores (Anexo 2); Base de Conhecimento do jogo; provas EQT/QTG como apoio.",
+  "observacao_stop": "distratores_stop: termos da mesma inicial usados so como opcoes erradas do STOP (nao viram palavras da Forca). Cada inicial precisa ter 6+ termos no total (termos + distratores).",
   "consumidores": [
     "forca_tecnica",
     "stop"
   ],
+  "distratores_stop": {
+    "A": ["Asseguração", "Auditoria interna", "Ajustes de auditoria", "Amortização", "Apuração do resultado"],
+    "C": ["Conciliação bancária", "Controle interno", "Contingência", "Custo histórico"],
+    "D": ["Depreciação", "Demonstrações contábeis", "Duplicata", "Débito", "Diário contábil"],
+    "E": ["Estoque", "Estimativa contábil", "Encerramento do exercício", "Exercício social", "Equivalência patrimonial"],
+    "F": ["Fluxo de caixa", "Fornecedores", "Folha de pagamento", "Faturamento", "Fundo de reserva"],
+    "I": ["Inventário", "Imobilizado", "Impostos a recuperar", "Inadimplência"],
+    "L": ["Lucro líquido", "Liquidez", "Livro Razão", "Lançamento contábil", "Lucros acumulados"],
+    "O": ["Orçamento", "Obrigações a pagar", "Operações descontinuadas", "Outras receitas", "Obrigações fiscais"],
+    "P": ["Passivo circulante", "Patrimônio líquido", "Provisão", "Prestação de contas", "Provisão para devedores"],
+    "R": ["Receita", "Reserva de lucros", "Resultado do exercício", "Reconhecimento de receita", "Realizável a longo prazo"],
+    "S": ["Saldo inicial", "Subvenção governamental", "Sociedade anônima", "Saldo devedor", "Superávit"]
+  },
   "termos": [
     {
       "id": "DC-001",
