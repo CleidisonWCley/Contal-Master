@@ -44,6 +44,11 @@ var _shown_percent: float = 0.0
 var _loading: bool = false
 var _finished: bool = false
 var _failed: bool = false
+## V0.14.3: fila de carregamento = recursos pesados (pre-aquecimento) + a cena (SEMPRE o ultimo item).
+var _items: Array[String] = []
+var _item_index: int = 0
+var _item_requested: bool = false
+var _packed: PackedScene = null
 
 func _ready() -> void:
 	# Sobrevive a get_tree().paused (ex.: saiu de um minigame pausado).
@@ -120,10 +125,17 @@ func _update_pivot() -> void:
 	gear.pivot_offset = gear.size * 0.5
 
 func _start_loading() -> void:
-	var err: Error = ResourceLoader.load_threaded_request(_path)
-	if err != OK:
-		_fail("Não foi possível iniciar o carregamento (%s)." % error_string(err))
-		return
+	# V0.14.3: antes da cena, "aquece" (carrega) as imagens/musica pesadas que ela usaria no _ready,
+	# UM recurso por quadro. A barra anda de verdade e nenhum quadro engole varios segundos de uma vez
+	# (causa do "travou ao clicar em Continuar" em aparelhos de 4 GB, sobretudo na web sem threads).
+	_items.clear()
+	for warm_path in SceneLoader.take_pending_warm():
+		var warm_str: String = str(warm_path)
+		if warm_str != "" and warm_str != _path and not _items.has(warm_str) and ResourceLoader.exists(warm_str):
+			_items.append(warm_str)
+	_items.append(_path)
+	_item_index = 0
+	_item_requested = false
 	_loading = true
 
 func _process(delta: float) -> void:
@@ -133,25 +145,64 @@ func _process(delta: float) -> void:
 	if not _loading or _finished or _failed:
 		return
 
-	var progress: Array = []
-	var status: ResourceLoader.ThreadLoadStatus = ResourceLoader.load_threaded_get_status(_path, progress)
-	var target_percent: float = _shown_percent
-	match status:
-		ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-			if progress.size() > 0:
-				target_percent = minf(float(progress[0]) * 100.0, 99.0)
-		ResourceLoader.THREAD_LOAD_LOADED:
-			target_percent = 100.0
-		_:
-			_fail("Não foi possível carregar o jogo. Verifique a conexão e tente de novo.")
-			return
+	var target_percent: float = _advance_loading()
+	if _failed:
+		return
 
 	_shown_percent = move_toward(_shown_percent, target_percent, BAR_SPEED * delta)
 	progress_bar.value = _shown_percent
 	percent_label.text = "%d%%" % int(round(_shown_percent))
 
-	if status == ResourceLoader.THREAD_LOAD_LOADED and _shown_percent >= 100.0 and _elapsed >= MIN_SHOW_SECONDS:
+	if _packed != null and _shown_percent >= 100.0 and _elapsed >= MIN_SHOW_SECONDS:
 		_finish()
+
+## Avanca UM passo da fila por quadro e devolve o progresso alvo (0..100).
+## Depois de cada ResourceLoader.load_threaded_request() devolvemos o controle ao motor: na web sem threads o
+## pedido carrega o recurso inteiro na hora, e este "return" deixa o navegador desenhar um quadro entre um e outro.
+func _advance_loading() -> float:
+	if _packed != null:
+		return 100.0
+	var total: float = float(_items.size())
+	var item: String = _items[_item_index]
+	var is_scene: bool = _item_index == _items.size() - 1
+
+	if not _item_requested:
+		var err: Error = ResourceLoader.load_threaded_request(item)
+		if err != OK:
+			if is_scene:
+				_fail("Não foi possível iniciar o carregamento (%s)." % error_string(err))
+			else:
+				_item_index += 1  # recurso de pre-aquecimento e opcional: segue sem ele
+			return _shown_percent
+		_item_requested = true
+		return minf(float(_item_index) / total * 100.0, 99.0)
+
+	var progress: Array = []
+	var status: ResourceLoader.ThreadLoadStatus = ResourceLoader.load_threaded_get_status(item, progress)
+	if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		var fraction: float = float(progress[0]) if progress.size() > 0 else 0.0
+		return minf((float(_item_index) + fraction) / total * 100.0, 99.0)
+
+	if status == ResourceLoader.THREAD_LOAD_LOADED:
+		var loaded: Resource = ResourceLoader.load_threaded_get(item)
+		if is_scene:
+			_packed = loaded as PackedScene
+			if _packed == null:
+				_fail("A cena carregou, mas não pôde ser aberta.")
+				return _shown_percent
+			return 100.0
+		SceneLoader.hold_warm(loaded)
+		_item_index += 1
+		_item_requested = false
+		return minf(float(_item_index) / total * 100.0, 99.0)
+
+	# FAILED ou INVALID_RESOURCE
+	if is_scene:
+		_fail("Não foi possível carregar o jogo. Verifique a conexão e tente de novo.")
+	else:
+		_item_index += 1
+		_item_requested = false
+	return _shown_percent
 
 func _spin(delta: float) -> void:
 	if has_node("/root/SettingsManager") and not SettingsManager.animations_enabled():
@@ -174,11 +225,10 @@ func _rotate_tip(delta: float) -> void:
 func _finish() -> void:
 	_finished = true
 	set_process(false)
-	var packed: PackedScene = ResourceLoader.load_threaded_get(_path) as PackedScene
-	if packed == null:
+	if _packed == null:
 		_fail("A cena carregou, mas não pôde ser aberta.")
 		return
-	get_tree().change_scene_to_packed(packed)
+	get_tree().change_scene_to_packed(_packed)
 
 func _fail(message: String) -> void:
 	_failed = true

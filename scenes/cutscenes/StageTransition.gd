@@ -271,6 +271,9 @@ func _fade_in_title() -> void:
 func _update_background_drift() -> void:
 	if background_image == null or background_image.texture == null:
 		return
+	# V0.14.3: no aparelho fraco o cenario fica parado (o zoom mexia a imagem 1920x1080 inteira a cada quadro).
+	if WebLite.low_end():
+		return
 	if not _animations_enabled() or BACKGROUND_DRIFT_PER_SECOND <= 0.0:
 		background_image.scale = Vector2.ONE
 		return

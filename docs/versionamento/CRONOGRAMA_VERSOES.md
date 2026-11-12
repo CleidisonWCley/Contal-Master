@@ -47,6 +47,10 @@ Depois: criar o doc `docs/versionamento/V<versão>_<assunto>.md`, atualizar **es
 | 0.13.2 / 0.13.2.1 | Cena de chegada à sala (porta, luzes) e conversa Jales/Natalia; hotfix do carregamento da imagem 13 | `V0_13_2_chegada_sala_reuniao.md` |
 | 0.13.3 | Trilhas sonoras da nova identidade (correção do `musica_stop` + padronização + compressão) e unificação das linhas 0.13.1 e 0.13.2 | `V0_13_3_trilhas_sonoras_e_unificacao.md` |
 | **0.13.4** | **Som da porta na chegada à sala, corredor com 1 quadro, correção dos erros de console (véu da cortina dourada, sirenes da Perseguição e meta `tween` do menu de modo); registra as correções do `preparar_musicas.py`** | `V0_13_4_porta_corredor_correcoes_console.md` |
+| 0.14.1 | Otimização para Web (itch.io): WebBridge, AudioManager leve, texturas reduzidas, tráfego por horário | `V0_14_1_OTIMIZACAO_WEB.md` |
+| 0.14.2 | Tela de carregamento unificada | `V0_14_2_TELA_CARREGAMENTO_UNIFICADA.md` |
+| 0.14.3 | Aparelhos fracos (4 GB), tela cheia/redimensionamento e clique duplo no Continuar | `V0_14_3_OTIMIZACAO_APARELHOS_FRACOS_E_FULLSCREEN.md` |
+| **0.14.4** | **Unificação com o patch 0.14.2 do Desvio Lógico: bolinhas de tráfego, ritmo da música por horário, respostas A/B abaixo da pergunta, 2 postes por lado** | `V0_14_4_UNIFICACAO_DESVIO_LOGICO_0_14_2.md` |
 
 ### Observações do histórico
 

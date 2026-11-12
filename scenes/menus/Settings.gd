@@ -267,7 +267,10 @@ func _refresh_difficulty_buttons() -> void:
 func _option_style(fill: Color, border: Color) -> StyleBoxFlat:
 	return UiKit.panel_style(fill, border, 14, 2, 4)
 
+var _shown_fullscreen: bool = false
+
 func _refresh_toggles() -> void:
+	_shown_fullscreen = SettingsManager.is_fullscreen()
 	_set_toggle(fullscreen_button, "monitor", "Tela cheia", SettingsManager.is_fullscreen())
 	_set_toggle(animations_button, "sparkles", "Animações visuais", SettingsManager.animations_enabled())
 	_set_toggle(tutorials_button, "compass", "Tutoriais", SettingsManager.tutorials_enabled())
@@ -311,6 +314,12 @@ func _connect_signals() -> void:
 	tutorials_button.pressed.connect(_on_tutorials_pressed)
 	novel_button.pressed.connect(_on_novel_pressed)
 	back_button.pressed.connect(_on_back_pressed)
+	# V0.14.3: o navegador pode sair da tela cheia sozinho (Esc): o botao acompanha o estado real.
+	SettingsManager.settings_changed.connect(_on_settings_changed)
+
+func _on_settings_changed(_changed_settings: Dictionary) -> void:
+	if SettingsManager.is_fullscreen() != _shown_fullscreen:
+		_refresh_toggles()
 
 func _on_music_volume_changed(value: float) -> void:
 	SettingsManager.set_music_volume(value)

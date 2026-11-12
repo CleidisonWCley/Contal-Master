@@ -15,9 +15,17 @@ const DEFAULT_SETTINGS := {
 
 var settings: Dictionary = DEFAULT_SETTINGS.duplicate(true)
 
+## V0.14.3: instante (ms) do ultimo pedido de tela cheia feito pelo jogador (ver sync_fullscreen_state).
+var _fs_request_msec: int = -100000
+
 func _ready() -> void:
 	load_settings()
-	apply_window_settings()
+	if OS.has_feature("web"):
+		# V0.14.3 (web): o navegador so libera tela cheia em resposta a um toque/clique do jogador. Ao abrir o jogo
+		# nao tentamos entrar sozinhos (falhava em silencio e a opcao ficava "LIGADA" sem estar). Comeca desligada.
+		settings["fullscreen"] = false
+	else:
+		apply_window_settings()
 
 func load_settings() -> void:
 	settings = DEFAULT_SETTINGS.duplicate(true)
@@ -48,6 +56,7 @@ func save_settings() -> void:
 func set_setting(key: String, value: Variant) -> void:
 	settings[key] = value
 	if key == "fullscreen":
+		_fs_request_msec = Time.get_ticks_msec()
 		apply_window_settings()
 	save_settings()
 	settings_changed.emit(settings)
@@ -121,3 +130,14 @@ func apply_window_settings() -> void:
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, false)
+
+## V0.14.3 (web): o navegador pode entrar/sair da tela cheia sem o jogo pedir (Esc, gesto do celular, F11...).
+## Alinha o valor salvo com o estado REAL, sem reaplicar (nada de laco) e sem gravar em disco. Ignora avisos nos
+## 1,2 s seguintes a um pedido do jogador: a tela cheia ainda esta "entrando" e o aviso traria o estado antigo.
+func sync_fullscreen_state(real_fullscreen: bool) -> void:
+	if is_fullscreen() == real_fullscreen:
+		return
+	if Time.get_ticks_msec() - _fs_request_msec < 1200:
+		return
+	settings["fullscreen"] = real_fullscreen
+	settings_changed.emit(settings)

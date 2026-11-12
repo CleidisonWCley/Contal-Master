@@ -90,6 +90,25 @@ var phase_start_score: int = 0
 ## Resultado da ultima campanha concluida ({"saved", "previous_score", "total_score"...}); a cutscene final usa para o recorde.
 var last_campaign_result: Dictionary = {}
 
+## V0.14.3: true enquanto a fase atual ainda NAO foi concluida. complete_current_stage() so vale uma vez por fase:
+## em aparelho lento o jogador toca em "Continuar" de novo enquanto a tela congela e antes isso avancava a campanha
+## DUAS fases (campaign_index += 2) e gravava a pontuacao em dobro. Volta a true em _load_phase().
+var _stage_open: bool = true
+## Cortina (CanvasLayer) que cobre a tela entre o clique em "Continuar" e a LoadingScreen.
+var _exit_shield: CanvasLayer = null
+
+## V0.14.3: imagem principal de cada minigame, carregada pela LoadingScreen ANTES da cena (ver SceneLoader).
+const PHASE_WARM := {
+	"show_do_bilhao": [Paths.BG_SHOW_DO_BILHAO],
+	"batalha_naval": [Paths.BG_BATALHA_NAVAL],
+	"maleta_certa": [Paths.BG_MALETA_CERTA],
+	"roleta_risco": [Paths.BG_ROLETA_RISCO],
+	"perseguicao": [Paths.BG_PERSEGUICAO],
+	"forca_tecnica": [Paths.BG_FORCA],
+	"stop": [Paths.BG_STOP],
+	"desvio_logico": [Paths.BG_DL_AMANHECER]
+}
+
 func get_app_version_label() -> String:
 	return BrandText.version_plain()
 
@@ -167,6 +186,16 @@ func start_free_minigame(index: int) -> void:
 	_load_phase(free_phases[index])
 
 func complete_current_stage(points: int) -> void:
+	# Ver _stage_open: so a PRIMEIRA chamada por fase conta.
+	if not _stage_open:
+		return
+	_stage_open = false
+	# V0.14.3: cobre a tela e para a fase ANTES do trabalho pesado (salvar, trocar de cena, carregar). O navegador
+	# ganha 2 quadros para mostrar o clique, em vez de congelar com o botao "pressionado" na tela.
+	await _begin_stage_exit()
+	_finish_stage(points)
+
+func _finish_stage(points: int) -> void:
 	var completed_phase_key: String = current_phase_key
 	if points != 0:
 		ScoreManager.add_points(points)
@@ -189,13 +218,14 @@ func complete_current_stage(points: int) -> void:
 			current_phase_key = "final"
 			if has_node("/root/AudioManager"):
 				AudioManager.play_music("musica_final")
-			_change_scene(FINAL_SCENE)
+			_change_scene(FINAL_SCENE, _warm_for_final())
 	else:
 		var free_result: Dictionary = ScoreManager.save_free_mode_score(completed_phase_key, difficulty, stage_points)
 		if has_node("/root/AchievementManager"):
 			AchievementManager.record_free_mode_completion(completed_phase_key, difficulty, free_result)
 		ScoreManager.reset_score()
 		open_free_menu()
+	_release_exit_shield_later()
 
 func is_campaign_mode() -> bool:
 	return current_mode == GameMode.CAMPAIGN
@@ -260,12 +290,15 @@ func get_free_phases() -> Array:
 func _open_stage_transition() -> void:
 	if campaign_index < PHASES.size():
 		current_phase_key = str(PHASES[campaign_index].get("key", ""))
-		if has_node("/root/AudioManager"):
+		# V0.14.3 (web): nao carrega a musica "loop_start" aqui. Ela era trocada logo em seguida pela musica da fase
+		# (StageTransition) e custava um load() + decodificacao de ~2,8 MB no quadro do clique. Na web a musica
+		# anterior segue ate a transicao assumir; fora da web o comportamento e o de sempre.
+		if not WebLite.is_web() and has_node("/root/AudioManager"):
 			AudioManager.play_music("loop_start")
-		_change_scene(STAGE_TRANSITION_SCENE)
+		_change_scene(STAGE_TRANSITION_SCENE, _warm_for_transition(current_phase_key))
 	else:
 		current_phase_key = "final"
-		_change_scene(FINAL_SCENE)
+		_change_scene(FINAL_SCENE, _warm_for_final())
 
 func _load_current_campaign_stage() -> void:
 	if campaign_index < PHASES.size():
@@ -274,17 +307,106 @@ func _load_current_campaign_stage() -> void:
 		current_phase_key = "final"
 		if has_node("/root/AudioManager"):
 			AudioManager.play_music("musica_final")
-		_change_scene(FINAL_SCENE)
+		_change_scene(FINAL_SCENE, _warm_for_final())
 
 func _load_phase(phase: Dictionary) -> void:
+	_stage_open = true
 	current_phase_key = str(phase.get("key", ""))
 	phase_start_score = ScoreManager.get_score()
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music(str(phase.get("music", "menu")))
-	_change_scene(str(phase.get("scene", MAIN_MENU_SCENE)))
+	_change_scene(str(phase.get("scene", MAIN_MENU_SCENE)), _warm_for_minigame(current_phase_key))
 
-func _change_scene(scene_path: String) -> void:
+func _change_scene(scene_path: String, warm_paths: Array = []) -> void:
 	# V0.13: minigames e cutscenes passam pela tela de Loading (SceneLoader decide); menus trocam direto.
-	var result: Error = SceneLoader.change_scene(get_tree(), scene_path)
+	# V0.14.3: warm_paths = recursos pesados que a LoadingScreen carrega antes (ver SceneLoader).
+	var result: Error = SceneLoader.change_scene(get_tree(), scene_path, warm_paths)
 	if result != OK:
 		push_error("Falha ao carregar cena %s. Código: %s" % [scene_path, result])
+		_restore_after_failed_change()
+
+# ---------------------------------------------------------------- V0.14.3: saida de fase e pre-carregamento
+## Cobre a tela, para a fase atual e espera 2 quadros (o navegador desenha a cortina antes do trabalho pesado).
+func _begin_stage_exit() -> void:
+	_raise_exit_shield()
+	var scene: Node = get_tree().current_scene
+	if scene != null:
+		scene.process_mode = Node.PROCESS_MODE_DISABLED  # sem _process/_input/timers: nada roda enquanto sai
+		if scene is CanvasItem:
+			(scene as CanvasItem).visible = false  # e nao desenha mais (CanvasLayers ficam sob a cortina)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+func _raise_exit_shield() -> void:
+	if _exit_shield != null and is_instance_valid(_exit_shield):
+		return
+	_exit_shield = CanvasLayer.new()
+	_exit_shield.name = "ExitShield"
+	_exit_shield.layer = 128
+	_exit_shield.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_exit_shield)
+	var rect: ColorRect = ColorRect.new()
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.color = UiPalette.BG
+	rect.mouse_filter = Control.MOUSE_FILTER_STOP  # toques extras durante a troca nao chegam em lugar nenhum
+	_exit_shield.add_child(rect)
+
+## Solta a cortina so depois de a cena nova ter desenhado (3 quadros).
+func _release_exit_shield_later() -> void:
+	for _i in range(3):
+		await get_tree().process_frame
+	_drop_exit_shield()
+
+func _drop_exit_shield() -> void:
+	if _exit_shield != null and is_instance_valid(_exit_shield):
+		_exit_shield.queue_free()
+	_exit_shield = null
+
+## Se a troca de cena falhar, devolve o jogo ao estado anterior em vez de deixar tela preta/travada.
+func _restore_after_failed_change() -> void:
+	_stage_open = true
+	var scene: Node = get_tree().current_scene
+	if scene != null:
+		scene.process_mode = Node.PROCESS_MODE_INHERIT
+		if scene is CanvasItem:
+			(scene as CanvasItem).visible = true
+	_drop_exit_shield()
+
+## Recursos pesados da transicao: cenario da novel, sprites (Jales + anfitriao) e a musica da fase.
+func _warm_for_transition(phase_key: String) -> Array:
+	var list: Array = []
+	var bg_path: String = str(Paths.CUTSCENE_BG_BY_PHASE.get(phase_key, ""))
+	if bg_path != "":
+		list.append(bg_path)
+	for character_id in _novel_character_ids(phase_key):
+		var data: Dictionary = TutorialManager.sprite_set(str(character_id), "v1")
+		var sprite_path: String = str(data.get("path", ""))
+		if sprite_path != "":
+			list.append(sprite_path)
+	if has_node("/root/AudioManager"):
+		var music_key: String = AudioManager.music_key_for_phase(phase_key)
+		var music_path: String = str(AudioManager.MUSIC.get(music_key, ""))
+		if music_path != "":
+			list.append(music_path)
+	return list
+
+## Mesmos personagens que StageTransition._build_novel_frames() usa: Jales + anfitriao do minigame.
+func _novel_character_ids(phase_key: String) -> Array:
+	var ids: Array = ["jales"]
+	var path: String = str(Paths.DIALOGUE_MINIGAMES.get(phase_key, ""))
+	if path == "" or not FileAccess.file_exists(path):
+		return ids
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if parsed is Dictionary:
+		var character: Dictionary = (parsed as Dictionary).get("character", {}) as Dictionary
+		var host: String = str(character.get("name", "")).to_lower()
+		if host != "" and not ids.has(host):
+			ids.append(host)
+	return ids
+
+func _warm_for_minigame(phase_key: String) -> Array:
+	return (PHASE_WARM.get(phase_key, []) as Array).duplicate()
+
+## A cena final abre no escritorio a noite (final.json > backgrounds > farewell).
+func _warm_for_final() -> Array:
+	return [Paths.BG_CUT_09_ESCRITORIO]

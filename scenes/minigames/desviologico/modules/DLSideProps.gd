@@ -112,7 +112,7 @@ func _reset_side_props() -> void:
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 
-	# V0.13.7.2: postes deixam de ser spawns aleatórios e passam a formar 3 profundidades fixas.
+	# V0.13.7.2: postes deixam de ser spawns aleatórios e passam a formar profundidades fixas (V0.14.4: 2 por lado, ver DLConfig.POST_DEPTH_SLOTS).
 	# Cada profundidade possui um par proporcional: poste esquerdo + poste direito.
 	# Quando o poste mais próximo é ultrapassado, ele recicla para o fundo mantendo a distância visual.
 	for slot_t in DLConfig.POST_DEPTH_SLOTS:

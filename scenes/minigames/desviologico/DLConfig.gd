@@ -123,7 +123,8 @@ const SPAWN_HORIZON_SAFETY_OPPOSITE_RATIO := {
 const SIDE_PROP_COUNT := 9
 const LEFT_POST_RETRY_DELAY := 1.85
 const LEFT_POST_VISIBLE_MAX_T := 0.92
-const POST_DEPTH_SLOTS := [0.10, 0.50, 0.86]
+# V0.14.2: apenas 2 postes por lado, com distancia bem visivel entre eles (eram 3). Ciclista inalterado.
+const POST_DEPTH_SLOTS := [0.12, 0.62]
 const STATE_TUTORIAL_INTRO := "tutorial_intro"
 const STATE_TUTORIAL_LEFT := "tutorial_left"
 const STATE_TUTORIAL_RIGHT := "tutorial_right"
@@ -237,3 +238,18 @@ static func traffic_index(round_index: int) -> int:
 
 static func traffic_label(round_index: int) -> String:
 	return str(TRAFFIC_LABELS[traffic_index(round_index)])
+
+# V0.14.2: cor das bolinhas de trafego (azul -> amarelo -> vermelho).
+# Horarios 1-2 = azul, 3-4 = amarelo, 5-6 = vermelho.
+static func traffic_dot_color(round_index: int) -> Color:
+	var i: int = traffic_index(round_index)
+	if i <= 1:
+		return Color(0.27, 0.62, 1.0)
+	if i <= 3:
+		return Color(1.0, 0.82, 0.20)
+	return Color(1.0, 0.27, 0.24)
+
+# V0.14.2: ritmo da musica por horario. Sobe de forma gradual e perceptivel (1.00 -> 1.12), sem acelerar demais.
+const MUSIC_TEMPO_STEP := 0.024
+static func music_tempo_for_round(round_index: int) -> float:
+	return 1.0 + MUSIC_TEMPO_STEP * float(traffic_index(round_index))

@@ -8,9 +8,29 @@ extends Node
 ##    Apertar Voltar de novo com a confirmacao aberta sai de verdade.
 ##  - Aba escondida / pagina fechando: pausa a musica e persiste o progresso.
 ##  - Diagnostico: abra a pagina com ?debug=1 e veja no console (F12) memoria, texturas, nos e FPS.
+##
+## V0.14.3:
+##  - Tela cheia / redimensionamento: sair da tela cheia (Esc, F11, gesto do celular), girar o aparelho, mexer na barra de
+##    enderecos ou voltar de outra aba/janela agora re-mede a tela em varios instantes (os navegadores atualizam
+##    innerWidth/innerHeight DEPOIS do evento), avisa o jogo (sinal display_refit) e alinha a opcao "Tela cheia" das
+##    Configuracoes com o estado REAL do navegador.
+##  - Aba escondida durante um minigame: abre o PAUSE sozinho (ao voltar, o jogo esta parado e nada "pulou").
+##  - Medidor de FPS: se um minigame/cutscene roda abaixo de ~36 FPS por 8 s seguidos, liga o perfil de aparelho fraco
+##    (WebLite.mark_slow_device) e limita o motor a 30 FPS (ritmo estavel em vez de oscilar).
 
 signal exit_confirm_opened
 signal exit_confirm_closed
+## V0.14.3: a tela do navegador mudou (tela cheia, rotacao, voltar de outra aba...). size = tamanho atual da janela.
+signal display_refit(size: Vector2)
+## V0.14.3: o medidor de FPS ligou o perfil de aparelho fraco.
+signal performance_degraded(measured_fps: float)
+
+const REFIT_DELAY := 0.15
+const PERF_WINDOW_SECONDS := 4.0
+const PERF_SLOW_FPS := 36.0
+const PERF_SLOW_WINDOWS_NEEDED := 2
+const PERF_GRACE_SECONDS := 3.0
+const SLOW_DEVICE_MAX_FPS := 30
 
 var _cb_visibility: JavaScriptObject
 var _cb_pagehide: JavaScriptObject
@@ -21,6 +41,14 @@ var _debug: bool = false
 var _debug_timer: float = 0.0
 var _last_scene_path: String = ""
 var _saved_max_fps: int = 0
+var _cb_display: JavaScriptObject
+var _hidden: bool = false
+var _refit_timer: float = -1.0
+var _perf_time: float = 0.0
+var _perf_frames: int = 0
+var _perf_grace: float = PERF_GRACE_SECONDS
+var _perf_slow_windows: int = 0
+var _perf_scene: String = ""
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -30,7 +58,7 @@ func _ready() -> void:
 		_debug = bool(JavaScriptBridge.eval("new URLSearchParams(window.location.search).has('debug')", true))
 	elif OS.get_cmdline_user_args().has("--debug"):
 		_debug = true
-	set_process(_debug)
+	set_process(_debug or WebLite.is_web())
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -93,10 +121,12 @@ func _install_web_hooks() -> void:
 	_cb_visibility = JavaScriptBridge.create_callback(_on_js_visibility)
 	_cb_pagehide = JavaScriptBridge.create_callback(_on_js_pagehide)
 	_cb_back = JavaScriptBridge.create_callback(_on_js_back)
+	_cb_display = JavaScriptBridge.create_callback(_on_js_display)
 	var window: JavaScriptObject = JavaScriptBridge.get_interface("window")
 	window.__cm_onVisibility = _cb_visibility
 	window.__cm_onPageHide = _cb_pagehide
 	window.__cm_onBack = _cb_back
+	window.__cm_onDisplay = _cb_display
 	var js: String = """
 (function () {
   if (window.__cmHooked) { return; }
@@ -111,16 +141,136 @@ func _install_web_hooks() -> void:
 })();
 """
 	JavaScriptBridge.eval(js, true)
+	_install_display_hooks()
 
 func _on_js_visibility(args: Array) -> void:
 	var hidden: bool = args.size() > 0 and bool(args[0])
+	_hidden = hidden
 	if has_node("/root/AudioManager"):
 		AudioManager.set_suspended(hidden)
+	if hidden:
+		# V0.14.3: aba escondida/app em segundo plano durante um minigame -> abre o pause. Ao voltar, o jogo esta
+		# parado (o navegador congela os quadros escondidos e o tempo "pulava" para tras do jogador).
+		_auto_pause_current_minigame()
+	else:
+		_perf_reset()
+		_refit_timer = REFIT_DELAY
 
 func _on_js_pagehide(_args: Array) -> void:
 	_persist()
 	if has_node("/root/AudioManager"):
 		AudioManager.set_suspended(true)
+
+# ---------------------------------------------------------------- V0.14.3: tela cheia / redimensionamento
+func _install_display_hooks() -> void:
+	var js: String = """
+(function () {
+  if (window.__cmDisplayHooked) { return; }
+  window.__cmDisplayHooked = true;
+  var timers = [];
+  function isFs() {
+	return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+			  document.mozFullScreenElement || document.msFullscreenElement);
+  }
+  // Os navegadores atualizam innerWidth/innerHeight DEPOIS do evento (sair da tela cheia, barra de enderecos do
+  // celular, girar o aparelho). Re-medimos em varios instantes: o evento 'resize' sintetico faz o Godot ler o
+  // tamanho novo, e o jogo recebe o estado real da tela cheia.
+  function nudge() {
+	timers.forEach(clearTimeout);
+	timers = [0, 120, 350, 800, 1600].map(function (ms) {
+	  return setTimeout(function () {
+		try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+		try { window.__cm_onDisplay(isFs()); } catch (e) {}
+	  }, ms);
+	});
+  }
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(function (name) {
+	document.addEventListener(name, nudge);
+  });
+  window.addEventListener('orientationchange', nudge);
+  window.addEventListener('pageshow', nudge);
+  window.addEventListener('focus', nudge);
+  if (window.visualViewport) { window.visualViewport.addEventListener('resize', nudge); }
+})();
+"""
+	JavaScriptBridge.eval(js, true)
+
+## O JS avisa que a tela mudou. args[0] = o navegador esta em tela cheia (Fullscreen API) agora?
+func _on_js_display(args: Array) -> void:
+	if _exit_done:
+		return
+	var real_fullscreen: bool = args.size() > 0 and bool(args[0])
+	if has_node("/root/SettingsManager"):
+		SettingsManager.sync_fullscreen_state(real_fullscreen)
+	_refit_timer = REFIT_DELAY  # junta as rajadas de avisos num unico refit
+
+func _apply_refit() -> void:
+	_refit_timer = -1.0
+	var root: Window = get_tree().root
+	var canvas_size: Vector2i = DisplayServer.window_get_size()
+	if canvas_size.x > 0 and canvas_size.y > 0 and canvas_size != root.size:
+		# O canvas ja tem o tamanho novo, mas a janela do jogo ainda nao percebeu: forca os Controls a recalcularem.
+		root.size_changed.emit()
+	display_refit.emit(Vector2(root.size))
+
+func _auto_pause_current_minigame() -> void:
+	var scene: Node = get_tree().current_scene
+	if scene == null:
+		return
+	var pause_node: Node = scene.get_node_or_null("MinigamePause")
+	if pause_node != null and pause_node is MinigamePause:
+		var pause: MinigamePause = pause_node as MinigamePause
+		if not pause.is_open:
+			pause.open()  # respeita pause.can_pause (nao abre em tutorial/intro/fim de fase)
+
+# ---------------------------------------------------------------- V0.14.3: medidor de FPS (aparelho fraco)
+func _perf_reset(grace: float = PERF_GRACE_SECONDS) -> void:
+	_perf_time = 0.0
+	_perf_frames = 0
+	_perf_slow_windows = 0
+	_perf_grace = grace
+
+func _is_heavy_scene(path: String) -> bool:
+	for prefix: String in SceneLoader.HEAVY_PREFIXES:
+		if path.begins_with(prefix):
+			return true
+	return false
+
+func _sample_performance(delta: float) -> void:
+	if WebLite.is_slow_measured() or _exit_done or _hidden:
+		return
+	var scene: Node = get_tree().current_scene
+	var path: String = scene.scene_file_path if scene != null else ""
+	if path != _perf_scene:
+		_perf_scene = path
+		_perf_reset()
+		return
+	# So mede minigames e cutscenes, rodando (pause, LoadingScreen e menus parados nao contam).
+	if get_tree().paused or not _is_heavy_scene(path):
+		_perf_reset(1.0)
+		return
+	if _perf_grace > 0.0:
+		_perf_grace -= delta
+		return
+	_perf_time += delta
+	_perf_frames += 1
+	if _perf_time < PERF_WINDOW_SECONDS:
+		return
+	var fps: float = float(_perf_frames) / _perf_time
+	_perf_time = 0.0
+	_perf_frames = 0
+	if fps < PERF_SLOW_FPS:
+		_perf_slow_windows += 1
+	else:
+		_perf_slow_windows = 0
+	if _perf_slow_windows >= PERF_SLOW_WINDOWS_NEEDED:
+		_degrade_for_slow_device(fps)
+
+func _degrade_for_slow_device(fps: float) -> void:
+	WebLite.mark_slow_device()
+	Engine.max_fps = SLOW_DEVICE_MAX_FPS
+	print("[CM-PERF] FPS medio %.0f: perfil de aparelho fraco ligado (limite %d FPS)." % [fps, SLOW_DEVICE_MAX_FPS])
+	performance_degraded.emit(fps)
 
 ## Botao Voltar do navegador.
 func _on_js_back(_args: Array) -> void:
@@ -203,6 +353,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # ---------------------------------------------------------------- diagnostico (?debug=1)
 func _process(delta: float) -> void:
+	if _refit_timer >= 0.0:
+		_refit_timer -= delta
+		if _refit_timer < 0.0:
+			_apply_refit()
+	if WebLite.is_web():
+		_sample_performance(delta)
+	if _debug:
+		_debug_tick(delta)
+
+func _debug_tick(delta: float) -> void:
 	_debug_timer += delta
 	var scene: Node = get_tree().current_scene
 	var path: String = scene.scene_file_path if scene != null else ""
@@ -210,10 +370,11 @@ func _process(delta: float) -> void:
 		return
 	_debug_timer = 0.0
 	_last_scene_path = path
-	print("[CM-DEBUG] cena=%s | mem=%.0fMB | texturas=%.0fMB | nos=%d | fps=%d" % [
+	print("[CM-DEBUG] cena=%s | mem=%.0fMB | texturas=%.0fMB | nos=%d | fps=%d | %s" % [
 		path.get_file(),
 		float(OS.get_static_memory_usage()) / 1048576.0,
 		Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0,
 		int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),
-		int(Performance.get_monitor(Performance.TIME_FPS))
+		int(Performance.get_monitor(Performance.TIME_FPS)),
+		WebLite.describe()
 	])

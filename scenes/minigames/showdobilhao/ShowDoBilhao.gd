@@ -628,7 +628,7 @@ func _create_money_particles() -> void:
 	var viewport_size := get_viewport_rect().size
 	if viewport_size.x <= 0 or viewport_size.y <= 0:
 		viewport_size = Vector2(1280, 720)
-	for i in range(MONEY_PARTICLE_COUNT):
+	for i in range(WebLite.scaled_count(MONEY_PARTICLE_COUNT)):
 		var label := Label.new()
 		label.text = "$"
 		label.add_theme_font_size_override("font_size", randi_range(24, 54))

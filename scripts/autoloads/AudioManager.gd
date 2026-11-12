@@ -61,6 +61,8 @@ var _sfx_next: int = 0
 var _watchdog_timer: float = 0.0
 var _watchdog_restarts: int = 0
 var _last_music_db: float = 999.0
+var _tempo_target: float = 1.0
+var _tempo_speed: float = 0.0  # variacao de pitch_scale por segundo
 
 func _ready() -> void:
 	music_player = AudioStreamPlayer.new()
@@ -78,6 +80,7 @@ func _ready() -> void:
 		SettingsManager.settings_changed.connect(_on_settings_changed)
 
 func _process(delta: float) -> void:
+	_update_tempo(delta)
 	# Watchdog: se a musica deveria estar tocando e parou (web/aba/contexto de audio), religa.
 	_watchdog_timer += delta
 	if _watchdog_timer < WATCHDOG_INTERVAL:
@@ -137,6 +140,8 @@ func play_music(key: String, force_restart: bool = false) -> void:
 	music_player.stop()
 	music_player.stream_paused = false
 	music_player.stream = stream
+	if not is_equal_approx(music_player.pitch_scale, 1.0) or not is_equal_approx(_tempo_target, 1.0):
+		set_music_tempo(1.0, 0.0)
 	apply_desvio_music_profile(key == "desvio_logico")
 	music_player.play()
 
@@ -147,6 +152,25 @@ func _enable_music_loop(stream: AudioStream) -> void:
 		(stream as AudioStreamMP3).loop = true
 	elif stream is AudioStreamWAV:
 		(stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+
+## Ritmo da musica (1.0 = normal). Troca de forma suave em glide_seconds. Em Godot o pitch_scale muda
+## velocidade e tom juntos; com passos pequenos (ate ~1.12) soa como "musica mais animada".
+func set_music_tempo(scale: float, glide_seconds: float = 2.0) -> void:
+	_tempo_target = clampf(scale, 0.5, 1.5)
+	if glide_seconds <= 0.01 or music_player == null:
+		_tempo_speed = 0.0
+		if music_player != null:
+			music_player.pitch_scale = _tempo_target
+		return
+	_tempo_speed = absf(_tempo_target - music_player.pitch_scale) / glide_seconds
+
+func _update_tempo(delta: float) -> void:
+	if music_player == null or _tempo_speed <= 0.0:
+		return
+	music_player.pitch_scale = move_toward(music_player.pitch_scale, _tempo_target, _tempo_speed * delta)
+	if is_equal_approx(music_player.pitch_scale, _tempo_target):
+		music_player.pitch_scale = _tempo_target
+		_tempo_speed = 0.0
 
 func set_music_volume_offset_db(offset_db: float) -> void:
 	if is_equal_approx(offset_db, music_volume_offset_db):
@@ -172,6 +196,7 @@ func stop_loop_sfx(_loop_id: String) -> void:
 
 func stop_music() -> void:
 	_wants_music = false
+	set_music_tempo(1.0, 0.0)
 	current_music_key = ""
 	apply_desvio_music_profile(false)
 	if music_player != null:

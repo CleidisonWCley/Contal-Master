@@ -571,7 +571,7 @@ func _create_water_particles() -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
-	for _i in range(WATER_PARTICLE_COUNT):
+	for _i in range(WebLite.scaled_count(WATER_PARTICLE_COUNT)):
 		var particle: ColorRect = ColorRect.new()
 		particle.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var radius: float = randf_range(3.0, 8.0)

@@ -48,7 +48,9 @@ func _ready() -> void:
 func _build() -> void:
 	var fx_theme: Dictionary = THEMES.get(phase_key, DEFAULT_THEME)
 	var kind: String = str(fx_theme.get("kind", "mote"))
-	var amount: int = int(fx_theme.get("amount", 18))
+	# V0.14.3: aparelho fraco/web = menos particulas (WebLite.fx_scale) e pre-aquecimento curto (era 10 s simulados
+	# de uma vez no primeiro quadro da transicao, um pico de CPU logo apos o Continuar).
+	var amount: int = maxi(int(round(float(fx_theme.get("amount", 18)) * WebLite.fx_scale())), 4)
 	# Duas camadas (accent e secondary) para o brilho nao ficar de uma cor so.
 	for layer in range(2):
 		var color: Color = accent if layer == 0 else secondary.lerp(Color.WHITE, 0.25)
@@ -56,7 +58,7 @@ func _build() -> void:
 		emitter.name = "Fx%d" % layer
 		emitter.amount = maxi(int(round(float(amount) * (0.62 if layer == 0 else 0.38))), 2)
 		emitter.lifetime = float(fx_theme.get("life", 10.0))
-		emitter.preprocess = emitter.lifetime  # a tela ja nasce "povoada"
+		emitter.preprocess = WebLite.preprocess_seconds(emitter.lifetime)  # a tela ja nasce "povoada"
 		emitter.explosiveness = 0.0
 		emitter.randomness = 1.0
 		emitter.local_coords = false

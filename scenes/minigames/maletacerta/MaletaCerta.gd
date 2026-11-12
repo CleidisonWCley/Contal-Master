@@ -572,7 +572,7 @@ func _create_mala_particles() -> void:
 	if viewport_size.x <= 0 or viewport_size.y <= 0:
 		viewport_size = Vector2(1280, 720)
 	var texture = load(ICON_PATH)
-	for i in range(MALA_PARTICLE_COUNT):
+	for i in range(WebLite.scaled_count(MALA_PARTICLE_COUNT)):
 		var icon := TextureRect.new()
 		icon.custom_minimum_size = Vector2(randf_range(26, 44), randf_range(26, 44))
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

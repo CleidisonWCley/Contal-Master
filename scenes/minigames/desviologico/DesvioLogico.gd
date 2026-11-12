@@ -56,6 +56,7 @@ var status_label: Label
 var decision_layer: Control
 var option_a_button: Button
 var option_b_button: Button
+var answers_box: HBoxContainer
 var feedback_layer: Control
 var feedback_title_label: Label
 var feedback_body_label: Label
@@ -71,6 +72,9 @@ var pause_button: Button
 var pause_layer: Control
 var pause_menu: MinigamePause
 var fade_rect: ColorRect
+var traffic_dots: Control
+var _dots_accum: float = 0.0
+var _decision_layout_token: int = 0
 var _frame_toggle: bool = false
 var _texture_cache: Dictionary = {}
 func _ready() -> void:
@@ -78,6 +82,9 @@ func _ready() -> void:
 	difficulty = DifficultyManager.get_difficulty() if has_node("/root/DifficultyManager") else "normal"
 	_build_scene()
 	_prepare_questions()
+	get_viewport().size_changed.connect(_on_display_changed)
+	if has_node("/root/WebBridge") and WebBridge.has_signal("display_refit"):
+		WebBridge.display_refit.connect(_on_display_changed)
 	if has_node("/root/AudioManager"):
 		AudioManager.play_music("desvio_logico")
 		engineaudio._configure_desvio_music_audio_profile()
@@ -87,6 +94,10 @@ func _process(delta: float) -> void:
 	if gameplay_paused:
 		return
 	waterfx.water_time += delta
+	_dots_accum += delta
+	if traffic_dots != null and _dots_accum >= _dots_redraw_interval():
+		_dots_accum = 0.0
+		traffic_dots.queue_redraw()
 	var was_accelerating: bool = state == DLConfig.STATE_ACCELERATION
 	if was_accelerating:
 		_update_acceleration_start(delta)
@@ -130,6 +141,7 @@ func _notification(what: int) -> void:
 	elif what == NOTIFICATION_EXIT_TREE:
 		_clear_obstacles()
 		_texture_cache.clear()
+		AudioManager.set_music_tempo(1.0, 0.0)
 		engineaudio._stop_engine_audio()
 		engineaudio._clear_desvio_music_audio_profile()
 
@@ -352,8 +364,20 @@ func _build_status_panel() -> void:
 	title_label = _make_label("DESVIO LÓGICO", 16, Color(0.0, 0.95, 1.0), HORIZONTAL_ALIGNMENT_LEFT)
 	box.add_child(title_label)
 
+	# V0.14.2: "Desafio X/6 • Horário" e as bolinhas de tráfego (azul → amarelo → vermelho) na MESMA linha.
+	var round_row := HBoxContainer.new()
+	round_row.add_theme_constant_override("separation", 10)
+	box.add_child(round_row)
 	round_label = _make_label("Desafio 1/6", 17, Color(1.0, 0.93, 0.55), HORIZONTAL_ALIGNMENT_LEFT)
-	box.add_child(round_label)
+	round_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	round_row.add_child(round_label)
+	traffic_dots = Control.new()
+	traffic_dots.name = "TrafficDots"
+	traffic_dots.custom_minimum_size = Vector2(86, 18)
+	traffic_dots.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	traffic_dots.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	traffic_dots.draw.connect(_on_traffic_dots_draw)
+	round_row.add_child(traffic_dots)
 
 	score_label = _make_label("Dificuldade: Normal", 15, Color(0.93, 0.98, 1.0), HORIZONTAL_ALIGNMENT_LEFT)
 	DifficultyManager.apply_difficulty_chip(score_label, difficulty, 15)
@@ -366,6 +390,33 @@ func _build_status_panel() -> void:
 	status_label = _make_label("Dirija até a decisão.", 13, Color(0.84, 0.90, 1.0, 0.88), HORIZONTAL_ALIGNMENT_LEFT)
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(status_label)
+
+func _dot(center: Vector2, radius: float, color: Color, alpha: float) -> void:
+	traffic_dots.draw_circle(center, radius, Color(color.r, color.g, color.b, alpha))
+
+func _on_traffic_dots_draw() -> void:
+	# 6 bolinhas = 6 horários. Acesas até o horário atual; a atual pulsa. Azul (1-2), amarelo (3-4), vermelho (5-6).
+	var count: int = DLConfig.TOTAL_ROUNDS
+	var pulse: float = 0.5 + 0.5 * sin(float(Time.get_ticks_msec()) / 1000.0 * 4.2)
+	var step: float = traffic_dots.size.x / float(count)
+	for i in range(count):
+		var center := Vector2(step * (float(i) + 0.5), traffic_dots.size.y * 0.5)
+		var color: Color = DLConfig.traffic_dot_color(i)
+		if i < current_round:
+			_dot(center, 4.0, color, 0.95)
+		elif i == current_round:
+			_dot(center, 6.5 + 2.0 * pulse, color, 0.20 + 0.18 * pulse)
+			_dot(center, 4.6, color, 1.0)
+		else:
+			_dot(center, 3.2, color, 0.22)
+
+## V0.14.4: a pulsação da bolinha atual não precisa de 15 redesenhos/s na web nem em aparelho fraco.
+func _dots_redraw_interval() -> float:
+	if WebLite.low_end():
+		return 0.20
+	if WebLite.lite():
+		return 0.10
+	return 0.066
 
 func _build_lane_click_layer() -> void:
 	lane_click_layer = Control.new()
@@ -458,21 +509,78 @@ func _build_decision_layer() -> void:
 	decision_layer.visible = false
 	add_child(decision_layer)
 
+	# V0.14.2: as respostas ficam numa linha centralizada ABAIXO do painel da pergunta (antes ficavam
+	# em ancoras fixas e a pergunta, com z maior, cobria os botoes). A largura cresce pros lados conforme o texto.
+	decision_layer.z_index = 68
+	answers_box = HBoxContainer.new()
+	answers_box.name = "AnswersBox"
+	answers_box.anchor_left = 0.02
+	answers_box.anchor_right = 0.98
+	answers_box.anchor_top = 0.0
+	answers_box.anchor_bottom = 0.0
+	answers_box.offset_top = 150.0
+	answers_box.offset_bottom = 150.0
+	answers_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	answers_box.add_theme_constant_override("separation", 28)
+	answers_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	decision_layer.add_child(answers_box)
+
 	option_a_button = _make_choice_button("A")
-	option_a_button.anchor_left = 0.11
-	option_a_button.anchor_top = 0.17
-	option_a_button.anchor_right = 0.46
-	option_a_button.anchor_bottom = 0.31
 	option_a_button.pressed.connect(_on_choice_pressed.bind("A"))
-	decision_layer.add_child(option_a_button)
+	answers_box.add_child(option_a_button)
 
 	option_b_button = _make_choice_button("B")
-	option_b_button.anchor_left = 0.54
-	option_b_button.anchor_top = 0.17
-	option_b_button.anchor_right = 0.89
-	option_b_button.anchor_bottom = 0.31
 	option_b_button.pressed.connect(_on_choice_pressed.bind("B"))
-	decision_layer.add_child(option_b_button)
+	answers_box.add_child(option_b_button)
+
+func _layout_decision_answers() -> void:
+	if answers_box == null or option_a_button == null or question_panel == null or not decision_layer.visible:
+		return
+	var vp: Vector2 = get_viewport_rect().size
+	var font: Font = option_a_button.get_theme_font("font")
+	var fsize: int = option_a_button.get_theme_font_size("font_size")
+	var widest: float = 0.0
+	for button in [option_a_button, option_b_button]:
+		for line in (button as Button).text.split("\n"):
+			widest = maxf(widest, font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x)
+	# Cresce pros lados com o texto; limitado a ~46% da tela cada (depois disso quebra linha).
+	var max_w: float = maxf(120.0, vp.x * 0.46)
+	var want: float = minf(maxf(widest + 64.0, minf(300.0, max_w)), max_w)
+	for button in [option_a_button, option_b_button]:
+		var b: Button = button as Button
+		b.custom_minimum_size = Vector2(want, 92.0)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.size = b.custom_minimum_size
+	# Mesma altura nas duas respostas (a que quebrar mais linhas define a altura das duas).
+	var tall: float = 92.0
+	for button in [option_a_button, option_b_button]:
+		tall = maxf(tall, (button as Button).get_combined_minimum_size().y)
+	for button in [option_a_button, option_b_button]:
+		(button as Button).custom_minimum_size.y = tall
+	# Logo abaixo do painel da pergunta (que cresce com o texto da pergunta).
+	var top_px: float = question_panel.get_global_rect().end.y + 14.0
+	answers_box.offset_top = top_px
+	answers_box.offset_bottom = top_px + 1.0  # a altura final vem do conteudo (container nunca fica menor que o minimo)
+	answers_box.queue_sort()
+
+func _schedule_decision_layout() -> void:
+	# Duas passagens: o painel da pergunta so recalcula o tamanho apos o texto novo ser aplicado.
+	# V0.14.4: token evita duas rotinas simultaneas; guardas evitam erro se a cena sair durante o await.
+	_decision_layout_token += 1
+	var token: int = _decision_layout_token
+	_layout_decision_answers()
+	for _i in range(2):
+		if not is_inside_tree():
+			return
+		await get_tree().process_frame
+		if token != _decision_layout_token or not is_inside_tree() or state != DLConfig.STATE_DECISION:
+			return
+		_layout_decision_answers()
+
+## V0.14.4: tela cheia / rotacao / barra de endereco (web) mudam o tamanho: refaz a linha de respostas.
+func _on_display_changed(_size: Vector2 = Vector2.ZERO) -> void:
+	if decision_layer != null and decision_layer.visible:
+		_schedule_decision_layout()
 
 func _build_feedback_layer() -> void:
 	feedback_layer = Control.new()
@@ -647,7 +755,9 @@ func _start_round(index: int) -> void:
 	car_rect.modulate = Color.WHITE
 	_layout_car(false)
 	_update_hud()
-	status_label.text = "Cenário: %s (tráfego %s). Alterne entre esquerda/direita até a decisão." % [_stage_name(index), DLConfig.traffic_label(index)]
+	status_label.text = "Alterne entre esquerda/direita até a decisão."
+	# V0.14.2: ritmo da música sobe gradualmente a cada horário.
+	AudioManager.set_music_tempo(DLConfig.music_tempo_for_round(index), 2.5)
 	_fade_from_black()
 	if current_round == 0:
 		tutorial.start_sequence()
@@ -839,6 +949,7 @@ func _enter_decision_phase() -> void:
 	question_label.text = str(q.get("pergunta", "Escolha o melhor caminho técnico."))
 	_set_car_sprite("reto")
 	_layout_car(false)
+	_schedule_decision_layout()
 	tutorial.on_decision_phase()
 
 func _on_choice_pressed(choice: String) -> void:
@@ -1422,7 +1533,9 @@ func _stage_name(index: int) -> String:
 func _update_hud() -> void:
 	var difficulty_label := DifficultyManager.get_label(difficulty) if has_node("/root/DifficultyManager") else "Normal"
 	if round_label != null:
-		round_label.text = "Desafio %s/%s • %s • Tráfego %s" % [current_round + 1, DLConfig.TOTAL_ROUNDS, _stage_name(current_round), DLConfig.traffic_label(current_round)]
+		round_label.text = "Desafio %s/%s • %s" % [current_round + 1, DLConfig.TOTAL_ROUNDS, _stage_name(current_round)]
+	if traffic_dots != null:
+		traffic_dots.queue_redraw()
 	if score_label != null:
 		score_label.text = "Dificuldade: %s" % difficulty_label
 		DifficultyManager.apply_difficulty_chip(score_label, difficulty, 15)

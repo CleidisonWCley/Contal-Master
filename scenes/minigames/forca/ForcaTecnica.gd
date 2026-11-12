@@ -948,7 +948,7 @@ func _create_symbol_particles() -> void:
 	var viewport_size: Vector2 = get_viewport_rect().size
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
-	for i in range(SYMBOL_PARTICLE_COUNT):
+	for i in range(WebLite.scaled_count(SYMBOL_PARTICLE_COUNT)):
 		var label: Label = Label.new()
 		label.text = str(TECH_SYMBOLS[i % TECH_SYMBOLS.size()])
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE

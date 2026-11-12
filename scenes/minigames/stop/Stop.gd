@@ -791,7 +791,7 @@ func _create_letter_particles() -> void:
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 	var chars: Array[String] = ["S", "T", "O", "P", "?", "!", "$", "#"]
-	for i in range(LETTER_PARTICLE_COUNT):
+	for i in range(WebLite.scaled_count(LETTER_PARTICLE_COUNT)):
 		var label: Label = Label.new()
 		label.text = chars[randi_range(0, chars.size() - 1)]
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
