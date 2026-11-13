@@ -130,8 +130,52 @@ static func character(character_id: String) -> Dictionary:
 	return CHARACTERS.get(character_id, {})
 
 
-## Proporcao (largura / altura) dos sprites "_3" (1664 x 2080) usados nos retratos e nas novels.
+## (legado) proporcao dos sprites "_3" antigos (1664 x 2080). Os retratos dos tutoriais NAO usam mais: ver BUST_FRAMES.
 const BUST_ASPECT := 0.80
+
+## ENQUADRAMENTO dos retratos "_3" dos TUTORIAIS (medido nos PNGs atuais, 1120 x 1500, pixels com alpha > 24).
+## Os sprites novos NAO ocupam o canvas do mesmo jeito: o desenho vai de ~76% (Cleiton, Aline) a ~99% (Priscila) da
+## altura do PNG, com margem vazia diferente em cima. Por isso o retrato NAO e mais dimensionado pelo canvas inteiro
+## e sim pelo DESENHO VISIVEL (cabeca ate o corte da cintura), assim todo mundo ocupa o card do mesmo jeito.
+##  - "rect" = retangulo do desenho em FRACAO do canvas (x, y, largura, altura; 0..1). Em fracao, continua valido se o
+##    PNG for reexportado em outra resolucao com o mesmo enquadramento. Se o desenho for REFEITO, remeça (ver
+##    docs/TABELA_TAMANHOS_PERSONAGENS.md) ou apague a entrada: sem ela, o jogo mede o PNG sozinho (bust_frame).
+##  - "fit"  = ajuste manual de tamanho no card (1.0 = padrao; 1.1 = 10% maior; 0.9 = 10% menor).
+## A diferenca de altura entre personagens (CharacterHeights.bust_scale) continua sendo aplicada por cima.
+const BUST_FRAMES := {
+	"jales": {"rect": Rect2(0.0875, 0.1093, 0.7991, 0.8493), "fit": 1.0},
+	"priscila": {"rect": Rect2(0.0098, 0.0067, 0.9768, 0.9907), "fit": 1.0},
+	"anderson": {"rect": Rect2(0.0848, 0.1093, 0.8304, 0.8493), "fit": 1.0},
+	"tiago": {"rect": Rect2(0.0045, 0.0393, 0.9875, 0.9580), "fit": 1.0},
+	"julios": {"rect": Rect2(0.1125, 0.0367, 0.7937, 0.9300), "fit": 1.0},
+	"ariel": {"rect": Rect2(0.0955, 0.0367, 0.8152, 0.9213), "fit": 1.0},
+	"cleiton": {"rect": Rect2(0.0500, 0.2013, 0.9000, 0.7573), "fit": 1.0},
+	"aline": {"rect": Rect2(0.0500, 0.1900, 0.9000, 0.7687), "fit": 1.0},
+	"natalia": {"rect": Rect2(0.0705, 0.0507, 0.8875, 0.9467), "fit": 1.0}
+}
+
+## Cache das medicoes feitas em tempo de execucao (personagens sem entrada em BUST_FRAMES).
+static var _measured_frames: Dictionary = {}
+
+
+## Enquadramento do retrato "_3": {"rect": Rect2 em fracao do canvas, "fit": float}.
+## Usa BUST_FRAMES; se o personagem nao estiver la, mede o PNG (area nao transparente) e guarda em cache.
+static func bust_frame(character_id: String, texture: Texture2D = null) -> Dictionary:
+	var entry: Dictionary = BUST_FRAMES.get(character_id, {})
+	if not entry.is_empty():
+		return entry
+	if _measured_frames.has(character_id):
+		return _measured_frames[character_id]
+	var measured: Dictionary = {"rect": Rect2(0.0, 0.0, 1.0, 1.0), "fit": 1.0}
+	if texture != null:
+		var image: Image = texture.get_image()
+		if image != null and not image.is_empty():
+			var used: Rect2i = image.get_used_rect()
+			var size: Vector2 = Vector2(image.get_size())
+			if used.size.x > 0 and used.size.y > 0 and size.x > 0.0 and size.y > 0.0:
+				measured["rect"] = Rect2(Vector2(used.position) / size, Vector2(used.size) / size)
+	_measured_frames[character_id] = measured
+	return measured
 
 ## V0.11.1: sprites por VARIANTE, medidos nos PNGs (alpha > 24). REGRA DE NUMERACAO:
 ##   "_1" = corpo inteiro das NOVELS (transicoes dos minigames e introducao; tamanhos de canvas diferentes por personagem);

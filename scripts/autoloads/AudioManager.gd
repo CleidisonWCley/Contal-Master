@@ -67,6 +67,10 @@ var _tempo_speed: float = 0.0  # variacao de pitch_scale por segundo
 func _ready() -> void:
 	music_player = AudioStreamPlayer.new()
 	music_player.name = "MusicPlayer"
+	# V0.14.6: musica longa em modo Stream. No modo Sample (padrao web) o Godot 4.5 decodifica a
+	# faixa INTEIRA (30 a 118 MB em float32 estereo, x3 copias no registro) e duplica o buffer a cada
+	# reinicio; isso derruba abas em aparelhos fracos. Stream decodifica aos poucos.
+	music_player.playback_type = AudioServer.PLAYBACK_TYPE_STREAM
 	add_child(music_player)
 	for i in range(SFX_POOL_SIZE):
 		var player := AudioStreamPlayer.new()
@@ -94,7 +98,8 @@ func _process(delta: float) -> void:
 	if _watchdog_restarts >= WATCHDOG_MAX_RESTARTS:
 		return
 	_watchdog_restarts += 1
-	music_player.stream_paused = false
+	if music_player.stream_paused:
+		music_player.stream_paused = false
 	music_player.play()
 
 func _on_settings_changed(_settings: Dictionary) -> void:
@@ -138,7 +143,8 @@ func play_music(key: String, force_restart: bool = false) -> void:
 	current_music_key = key
 	_watchdog_restarts = 0
 	music_player.stop()
-	music_player.stream_paused = false
+	if music_player.stream_paused:
+		music_player.stream_paused = false
 	music_player.stream = stream
 	if not is_equal_approx(music_player.pitch_scale, 1.0) or not is_equal_approx(_tempo_target, 1.0):
 		set_music_tempo(1.0, 0.0)
@@ -209,7 +215,7 @@ func stop_all_sfx() -> void:
 ## Aba escondida / pagina fechando (WebBridge): pausa e retoma a musica sem perder a posicao.
 func set_suspended(value: bool) -> void:
 	_suspended = value
-	if music_player != null:
+	if music_player != null and music_player.stream_paused != value:
 		music_player.stream_paused = value
 	if not value:
 		_watchdog_timer = WATCHDOG_INTERVAL

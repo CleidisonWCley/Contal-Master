@@ -151,7 +151,7 @@ func close_coach() -> void:
 	coach = null
 
 func spawn_car(lane: int) -> void:
-	var viewport_height: float = maxf(g.get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(g.STAGE_SIZE.y, 720.0)
 	var y: float = viewport_height * 0.370
 	g.traffic._spawn_npc_at(lane, y, true, 0.34)
 	if g.obstacle_data.size() > 0:

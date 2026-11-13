@@ -108,7 +108,7 @@ func _side_prop_marker_named(prop_type: String, side: int, point_name: String) -
 
 func _reset_side_props() -> void:
 	side_props.clear()
-	var viewport_size: Vector2 = g.get_viewport_rect().size
+	var viewport_size: Vector2 = g.STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 
@@ -176,7 +176,7 @@ func _side_prop_spawn_y(prop_type: String, side: int, viewport_size: Vector2) ->
 func _update_side_motion_props(delta: float) -> void:
 	if side_props.is_empty():
 		_reset_side_props()
-	var viewport_size: Vector2 = g.get_viewport_rect().size
+	var viewport_size: Vector2 = g.STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 	for i in range(side_props.size()):
@@ -269,7 +269,7 @@ func _left_side_visual_conflict(prop_type: String) -> bool:
 func _on_side_props_layer_draw() -> void:
 	if g.side_props_layer == null:
 		return
-	var viewport_size: Vector2 = g.get_viewport_rect().size
+	var viewport_size: Vector2 = g.STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		return
 	_draw_fixed_bifurcation_sign(viewport_size)
@@ -334,7 +334,7 @@ func _draw_side_prop_sprite(prop_type: String, base: Vector2, depth_t: float, si
 	if texture == null:
 		_draw_side_prop_fallback(prop_type, base, depth_t, side)
 		return
-	var viewport_size: Vector2 = g.get_viewport_rect().size
+	var viewport_size: Vector2 = g.STAGE_SIZE
 	var scale_factor: float = clampf(minf(viewport_size.x / 1280.0, viewport_size.y / 720.0), 0.75, 1.18)
 	var target_height: float = 62.0 * scale_factor
 	if prop_type == DLConfig.PROP_POST or prop_type == DLConfig.PROP_POST_LEFT:

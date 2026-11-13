@@ -7,7 +7,7 @@ extends RefCounted
 ## Ao subir de versao, altere os DOIS: project.godot e DEFAULT_VERSION abaixo.
 
 const BRAND_NAME := "ContalMaster"
-const DEFAULT_VERSION := "0.14.4.2"
+const DEFAULT_VERSION := "0.14.6"
 
 
 ## Versao atual do jogo (le project.godot; se faltar, usa DEFAULT_VERSION).

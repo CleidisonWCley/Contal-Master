@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dyskg1t1lmxko"
-path="res://.godot/imported/priscila_3.png-cc006105444665b01a517cd7cfb303cc.ctex"
+uid="uid://cghwfu1wmtui"
+path="res://.godot/imported/priscila_3.png-5970d628e8827b706a3526688b0e5534.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/personagens/Priscilla/priscila_3.png"
-dest_files=["res://.godot/imported/priscila_3.png-cc006105444665b01a517cd7cfb303cc.ctex"]
+source_file="res://assets/sprites/personagens/priscila/priscila_3.png"
+dest_files=["res://.godot/imported/priscila_3.png-5970d628e8827b706a3526688b0e5534.ctex"]
 
 [params]
 
@@ -36,5 +36,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=1152
+process/size_limit=0
 detect_3d/compress_to=1

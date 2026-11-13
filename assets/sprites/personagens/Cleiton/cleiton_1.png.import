@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://km4hbwicv4k"
-path="res://.godot/imported/cleiton_1.png-24f0ee4674ec148675d56ef1181715b6.ctex"
+uid="uid://c0tcvdc16ugdf"
+path="res://.godot/imported/cleiton_1.png-af1f349379879a64e07a845ab2ceb2dc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/personagens/Cleiton/cleiton_1.png"
-dest_files=["res://.godot/imported/cleiton_1.png-24f0ee4674ec148675d56ef1181715b6.ctex"]
+source_file="res://assets/sprites/personagens/cleiton/cleiton_1.png"
+dest_files=["res://.godot/imported/cleiton_1.png-af1f349379879a64e07a845ab2ceb2dc.ctex"]
 
 [params]
 
@@ -36,5 +36,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=1536
+process/size_limit=0
 detect_3d/compress_to=1

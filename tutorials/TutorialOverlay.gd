@@ -28,9 +28,13 @@ const LAYER_INDEX := 95  # acima do MinigamePause (90)
 const TYPE_CHARS_PER_SECOND := 72.0
 const SPOT_PADDING := 10.0
 const NARROW_WIDTH := 760.0
-const PORTRAIT_ASPECT := TutorialManager.BUST_ASPECT  # largura / altura do sprite "_3" (1664 x 2080)
-## O sprite "_3" inteiro tem margem em cima; esta escala mantem o rosto do tamanho que o retrato recortado tinha.
-const PORTRAIT_SCALE := 1.25
+## Enquadramento: o retrato e dimensionado pelo DESENHO VISIVEL do sprite "_3" (TutorialManager.BUST_FRAMES), nao pelo canvas
+## inteiro. A altura visivel (cabeca ate o corte da cintura) e a do cartao + estes "transbordos"; depois entram a altura
+## real do personagem (CharacterHeights.bust_scale) e o ajuste "fit" de cada um.
+const PORTRAIT_OVERFLOW_BOTTOM := 34.0  # cartao embaixo: a cabeca passa do topo do cartao por ~34 px
+const PORTRAIT_OVERFLOW_TOP := -8.0  # cartao no topo: a cabeca fica um pouco DENTRO do cartao
+const PORTRAIT_FOOT_GAP := 4.0  # folga entre a base do desenho e a base do cartao
+const SCREEN_SAFE_MARGIN := 4.0  # o desenho nunca encosta/passa da borda da tela
 const DIM_COLOR := Color(0.035, 0.02, 0.08, 0.72)
 const DIMMED_PORTRAIT := Color(0.34, 0.32, 0.44, 1.0)
 
@@ -363,27 +367,30 @@ func _layout(place: bool = true) -> void:
 	var coach: bool = mode == Mode.COACH  # dica compacta: nao pode cobrir a pista
 	var card_w: float = minf(view.x * 0.94, 820.0 if coach else 1060.0)
 	var base_card_h: float = (140.0 if compact else 166.0) if coach else (166.0 if compact else 190.0)
-	var portrait_w: float = (base_card_h + 34.0) * PORTRAIT_SCALE * PORTRAIT_ASPECT
 	var shift: float = clampf((view.x - card_w) * 0.5, 0.0, 56.0)
-	var reserve: float = 0.0 if narrow else maxf(portrait_w - shift - 2.0, 80.0)
+	# a area reservada ao retrato vem da LARGURA REAL do desenho de cada personagem (host a direita,
+	# parceiro a esquerda), na altura minima do cartao. Antes era uma largura unica calculada pelo canvas.
+	var estimate_h: float = base_card_h + PORTRAIT_OVERFLOW_BOTTOM
+	var reserve_right: float = 0.0 if narrow else _portrait_reserve(host_id, estimate_h, shift)
+	var reserve_left: float = 0.0 if narrow else _portrait_reserve(partner_id, estimate_h, shift)
 	var text_size: int = 17 if compact else 21
 
 	var has_partner: bool = partner_id != "" and partner_id != host_id and _portraits.has(partner_id)
-	_margin.add_theme_constant_override("margin_left", (22 if (coach or not has_partner) else int(reserve) + 14))
-	_margin.add_theme_constant_override("margin_right", int(reserve) + 14)
+	_margin.add_theme_constant_override("margin_left", (22 if (coach or not has_partner) else int(reserve_left) + 14))
+	_margin.add_theme_constant_override("margin_right", int(reserve_right) + 14)
 	_margin.add_theme_constant_override("margin_top", 12)
 	_margin.add_theme_constant_override("margin_bottom", 10)
 	# Label com autowrap precisa de largura minima: sem ela o minimo de altura explode e o cartao estoura a tela.
-	var label_margin_left: float = 22.0 if (coach or not has_partner) else reserve + 14.0
-	_text_label.custom_minimum_size = Vector2(maxf(card_w - 6.0 - label_margin_left - (reserve + 14.0), 120.0), 0.0)
+	var label_margin_left: float = 22.0 if (coach or not has_partner) else reserve_left + 14.0
+	_text_label.custom_minimum_size = Vector2(maxf(card_w - 6.0 - label_margin_left - (reserve_right + 14.0), 120.0), 0.0)
 	_card.clip_contents = true
 	_text_label.add_theme_font_size_override("font_size", text_size)
 	_name_label.add_theme_font_size_override("font_size", 18 if compact else 20)
 	_style_buttons(compact)
 	# V0.11.1: a altura do cartao ACOMPANHA o texto (antes o cartao crescia e o retrato ficava preso na altura antiga).
-	var card_h: float = _refit_card(view, card_w, base_card_h, text_size, compact, 22.0 if (coach or not has_partner) else reserve + 14.0, reserve + 14.0)
+	var card_h: float = _refit_card(view, card_w, base_card_h, text_size, compact, label_margin_left, reserve_right + 14.0)
 	if place:
-		_place_card(_target_card_y(view, card_h), view, card_h, reserve, narrow, compact)
+		_place_card(_target_card_y(view, card_h), view, card_h, reserve_right, narrow, compact)
 
 
 ## Altura que o cartao precisa para mostrar nome + texto inteiro + botoes (minimo = altura base).
@@ -427,23 +434,72 @@ func _target_card_y(view: Vector2, card_h: float) -> float:
 func _place_card(card_y: float, view: Vector2, card_h: float, _reserve: float, narrow: bool, _compact: bool) -> void:
 	_card_y = card_y
 	_card.position = Vector2((view.x - _card.size.x) * 0.5, card_y)
-	# O retrato acompanha a altura REAL do cartao (card_h): sobe e desce junto, sempre apoiado na base dele.
-	var base_portrait_h: float = (card_h + (34.0 if _card_at_bottom else -8.0)) * PORTRAIT_SCALE
-	base_portrait_h = minf(base_portrait_h, card_y + card_h - 4.0)  # nunca sobe para fora da tela
+	# O retrato acompanha a altura REAL do cartao (card_h) e e dimensionado pelo DESENHO VISIVEL:
+	# todos tem a mesma altura de "cabeca ate o corte da cintura" (mais a diferenca de altura real de cada um),
+	# com a base do desenho apoiada na base do cartao, qualquer que seja a margem vazia do PNG.
+	var base_visible_h: float = card_h + (PORTRAIT_OVERFLOW_BOTTOM if _card_at_bottom else PORTRAIT_OVERFLOW_TOP)
+	var visible_heights: Dictionary = {}
+	var tallest: float = 0.0
+	for character_id in _portraits.keys():
+		var h: float = _portrait_visible_height(str(character_id), base_visible_h)
+		visible_heights[character_id] = h
+		tallest = maxf(tallest, h)
+	# Conjunto: se o mais alto nao cabe na tela (cartao la em cima), TODOS encolhem juntos e a proporcao entre eles se mantem.
+	var max_visible_h: float = card_y + card_h - PORTRAIT_FOOT_GAP - SCREEN_SAFE_MARGIN
+	var group_k: float = 1.0 if (tallest <= max_visible_h or tallest <= 0.0) else max_visible_h / tallest
 	var shift: float = clampf(_card.position.x, 0.0, 56.0)
 	for character_id in _portraits.keys():
 		var portrait: TextureRect = _portraits[character_id] as TextureRect
-		# V0.11.1: altura real de cada personagem (CharacterHeights), de forma suavizada nos retratos _3.
-		var portrait_h: float = base_portrait_h * CharacterHeights.bust_scale(str(character_id))
-		var portrait_w: float = portrait_h * PORTRAIT_ASPECT
-		var left_x: float = _card.position.x - shift
-		var right_x: float = _card.position.x + _card.size.x - portrait_w + shift
-		var portrait_y: float = card_y + card_h - portrait_h - 4.0
-		portrait.size = Vector2(portrait_w, portrait_h)
-		portrait.pivot_offset = Vector2(portrait_w * 0.5, portrait_h)
-		portrait.position = Vector2(left_x if character_id == partner_id and character_id != host_id else right_x, portrait_y)
+		var geometry: Dictionary = _portrait_geometry(str(character_id), float(visible_heights[character_id]) * group_k)
+		var canvas_size: Vector2 = geometry["canvas"]
+		var art: Rect2 = geometry["art"]  # desenho visivel, em coordenadas do retrato
+		var on_left: bool = character_id == partner_id and character_id != host_id
+		var portrait_x: float
+		if on_left:
+			var left_edge: float = maxf(_card.position.x - shift, SCREEN_SAFE_MARGIN)
+			portrait_x = left_edge - art.position.x
+		else:
+			var right_edge: float = minf(_card.position.x + _card.size.x + shift, view.x - SCREEN_SAFE_MARGIN)
+			portrait_x = right_edge - art.end.x
+		var portrait_y: float = card_y + card_h - PORTRAIT_FOOT_GAP - art.end.y
+		portrait.size = canvas_size
+		portrait.pivot_offset = Vector2(art.position.x + art.size.x * 0.5, art.end.y)  # escala (fala) apoiada nos pes/base do desenho
+		portrait.position = Vector2(portrait_x, portrait_y)
 		if narrow:
 			portrait.visible = false
+
+
+## Altura VISIVEL (px) do desenho de um personagem: base do cartao x altura real (CharacterHeights) x ajuste "fit".
+func _portrait_visible_height(character_id: String, base_visible_h: float) -> float:
+	var frame: Dictionary = _portrait_frame(character_id)
+	return maxf(base_visible_h, 1.0) * CharacterHeights.bust_scale(character_id) * float(frame.get("fit", 1.0))
+
+
+## Geometria do retrato para uma altura visivel: {"canvas": tamanho do PNG ja escalado, "art": retangulo do desenho nele}.
+func _portrait_geometry(character_id: String, visible_h: float) -> Dictionary:
+	var portrait: TextureRect = _portraits.get(character_id, null) as TextureRect
+	var tex_size: Vector2 = Vector2(1.0, 1.0)
+	if portrait != null and portrait.texture != null:
+		tex_size = portrait.texture.get_size()
+	var rect: Rect2 = _portrait_frame(character_id).get("rect", Rect2(0.0, 0.0, 1.0, 1.0))
+	var art_h_px: float = maxf(rect.size.y * tex_size.y, 1.0)
+	var px_scale: float = visible_h / art_h_px
+	var canvas_size: Vector2 = tex_size * px_scale
+	return {"canvas": canvas_size, "art": Rect2(rect.position * canvas_size, rect.size * canvas_size)}
+
+
+func _portrait_frame(character_id: String) -> Dictionary:
+	var portrait: TextureRect = _portraits.get(character_id, null) as TextureRect
+	return TutorialManager.bust_frame(character_id, portrait.texture if portrait != null else null)
+
+
+## Largura que o texto do cartao deve deixar livre para o retrato (minimo 80 px; tambem vale se o personagem nao existe).
+func _portrait_reserve(character_id: String, base_visible_h: float, shift: float) -> float:
+	if character_id == "" or not _portraits.has(character_id):
+		return 80.0
+	var geometry: Dictionary = _portrait_geometry(character_id, _portrait_visible_height(character_id, base_visible_h))
+	var art: Rect2 = geometry["art"]
+	return maxf(art.size.x - shift - 2.0, 80.0)
 
 
 func _move_card(at_bottom: bool, animate: bool, force: bool = false) -> void:

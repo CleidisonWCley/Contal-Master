@@ -325,7 +325,7 @@ func _active_obstacle_count() -> int:
 	return count
 
 func _spawn_has_player_clearance(lane: int, spawn_y: float) -> bool:
-	var viewport_height: float = maxf(g.get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(g.STAGE_SIZE.y, 720.0)
 	var player_center_y: float = _player_current_center_y()
 	var safety_ratio: float = float(DLConfig.SPAWN_HORIZON_SAFETY_RATIO.get(g.difficulty, 0.22))
 	if lane != g.current_lane:
@@ -335,11 +335,11 @@ func _spawn_has_player_clearance(lane: int, spawn_y: float) -> bool:
 func _player_current_center_y() -> float:
 	if g.car_rect != null and is_instance_valid(g.car_rect):
 		return g.car_rect.position.y + g.car_rect.size.y * 0.5
-	var viewport_height: float = maxf(g.get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(g.STAGE_SIZE.y, 720.0)
 	return viewport_height * g.car_y_ratio
 
 func _can_spawn_at_lane(lane: int, spawn_y: float) -> bool:
-	var viewport_height: float = maxf(g.get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(g.STAGE_SIZE.y, 720.0)
 	var same_lane_min: float = viewport_height * _same_lane_spacing_ratio()
 	var cross_lane_min: float = viewport_height * _cross_lane_spacing_ratio()
 	if not _spawn_has_player_clearance(lane, spawn_y):
@@ -372,7 +372,7 @@ func _spawn_npc_at(lane: int, y: float, initial_traffic: bool = false, speed_mul
 	node.position = g._obstacle_position(lane, y, obstacle_size)
 	node.modulate = Color(1.0, 1.0, 1.0, 0.66 if initial_traffic else 0.50)
 	g.obstacles_layer.add_child(node)
-	var viewport_height: float = maxf(g.get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(g.STAGE_SIZE.y, 720.0)
 	g.obstacle_data.append({
 		"node": node,
 		"lane": lane,

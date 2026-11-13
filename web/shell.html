@@ -59,6 +59,22 @@ body { color: #FFF9FF; background-color: #100B1F; overflow: hidden; touch-action
 			<div id="status-percent">0%</div>
 			<div id="status-notice"></div>
 		</div>
+		<script>
+/* V0.14.6: limita a resolucao interna do canvas (Edge/Chrome com zoom ou escala 125-200% criam
+   canvas de 4K+ para um jogo desenhado em 1280x720). Menos pixels = menos GPU, menos
+   "WebGL context lost" e menos travadas. Ajuste manual: ?dpr=1 | ?dpr=1.5 | ?dpr=2 */
+(function () {
+	try {
+		const real = window.devicePixelRatio || 1;
+		const q = parseFloat(new URLSearchParams(location.search).get('dpr'));
+		const weak = (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+		const cap = (q > 0) ? q : (weak ? 1.25 : 1.5);
+		if (real > cap) {
+			Object.defineProperty(window, 'devicePixelRatio', { configurable: true, get: function () { return cap; } });
+		}
+	} catch (e) { /* mantem o valor nativo */ }
+})();
+		</script>
 		<script src="$GODOT_URL"></script>
 		<script>
 const GODOT_CONFIG = $GODOT_CONFIG;

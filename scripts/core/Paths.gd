@@ -165,10 +165,10 @@ const INSIGNIA_GOLD := "res://assets/insignias/ouro_conquist.png"
 const INSIGNIA_PLATINUM := "res://assets/insignias/platina_conquist.png"
 
 # ---- SPRITES - Personagens (tutoriais e apresentacoes dos minigames) ---------
-# ATENCAO: as pastas Priscilla / Ariel / Cleiton / Natalia comecam com MAIUSCULA no disco (Linux/Android diferenciam).
+# PADRAO: pastas e arquivos de personagens em MINUSCULO (Linux/Android/Web diferenciam maiuscula de minuscula). Nao use maiuscula aqui.
 const CHAR_JALES_1 := "res://assets/sprites/personagens/jales/jales_1.png"
 const CHAR_JALES := CHAR_JALES_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
-const CHAR_PRISCILA_1 := "res://assets/sprites/personagens/Priscilla/priscila_1.png"
+const CHAR_PRISCILA_1 := "res://assets/sprites/personagens/priscila/priscila_1.png"
 const CHAR_PRISCILA := CHAR_PRISCILA_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
 const CHAR_ANDERSON_1 := "res://assets/sprites/personagens/anderson/anderson_1.png"
 const CHAR_ANDERSON := CHAR_ANDERSON_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
@@ -176,13 +176,13 @@ const CHAR_TIAGO_1 := "res://assets/sprites/personagens/tiago/tiago_1.png"
 const CHAR_TIAGO := CHAR_TIAGO_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
 const CHAR_JULIOS_1 := "res://assets/sprites/personagens/julios/julios_1.png"
 const CHAR_JULIOS := CHAR_JULIOS_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
-const CHAR_ARIEL_1 := "res://assets/sprites/personagens/Ariel/ariel_1.png"
+const CHAR_ARIEL_1 := "res://assets/sprites/personagens/ariel/ariel_1.png"
 const CHAR_ARIEL := CHAR_ARIEL_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
-const CHAR_CLEITON_1 := "res://assets/sprites/personagens/Cleiton/cleiton_1.png"
+const CHAR_CLEITON_1 := "res://assets/sprites/personagens/cleiton/cleiton_1.png"
 const CHAR_CLEITON := CHAR_CLEITON_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
 const CHAR_ALINE_1 := "res://assets/sprites/personagens/aline/aline_1.png"
 const CHAR_ALINE := CHAR_ALINE_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
-const CHAR_NATALIA_1 := "res://assets/sprites/personagens/Natalia/natalia_1.png"
+const CHAR_NATALIA_1 := "res://assets/sprites/personagens/natalia/natalia_1.png"
 const CHAR_NATALIA := CHAR_NATALIA_1  # alias: "CHAR_X" = sprite _1 (novels e introducao)
 
 ## REGRA DE NUMERACAO DOS SPRITES: "_1" = corpo inteiro das NOVELS (transicoes dos minigames e introducao);
@@ -190,23 +190,23 @@ const CHAR_NATALIA := CHAR_NATALIA_1  # alias: "CHAR_X" = sprite _1 (novels e in
 ## variantes dos sprites. "_2" = corpo inteiro (cena final, equipe reunida). "_3" = recorte da cintura para cima
 ## (novels e tutoriais) e e usado INTEIRO, sem recorte por codigo, para nao perder nenhum detalhe do desenho.
 const CHAR_JALES_2 := "res://assets/sprites/personagens/jales/jales_2.png"
-const CHAR_PRISCILA_2 := "res://assets/sprites/personagens/Priscilla/priscila_2.png"
+const CHAR_PRISCILA_2 := "res://assets/sprites/personagens/priscila/priscila_2.png"
 const CHAR_ANDERSON_2 := "res://assets/sprites/personagens/anderson/anderson_2.png"
 const CHAR_TIAGO_2 := "res://assets/sprites/personagens/tiago/tiago_2.png"
 const CHAR_JULIOS_2 := "res://assets/sprites/personagens/julios/julios_2.png"
-const CHAR_ARIEL_2 := "res://assets/sprites/personagens/Ariel/ariel_2.png"
-const CHAR_CLEITON_2 := "res://assets/sprites/personagens/Cleiton/cleiton_2.png"
+const CHAR_ARIEL_2 := "res://assets/sprites/personagens/ariel/ariel_2.png"
+const CHAR_CLEITON_2 := "res://assets/sprites/personagens/cleiton/cleiton_2.png"
 const CHAR_ALINE_2 := "res://assets/sprites/personagens/aline/aline_2.png"
-const CHAR_NATALIA_2 := "res://assets/sprites/personagens/Natalia/natalia_2.png"
+const CHAR_NATALIA_2 := "res://assets/sprites/personagens/natalia/natalia_2.png"
 const CHAR_JALES_3 := "res://assets/sprites/personagens/jales/jales_3.png"
-const CHAR_PRISCILA_3 := "res://assets/sprites/personagens/Priscilla/priscila_3.png"
+const CHAR_PRISCILA_3 := "res://assets/sprites/personagens/priscila/priscila_3.png"
 const CHAR_ANDERSON_3 := "res://assets/sprites/personagens/anderson/anderson_3.png"
 const CHAR_TIAGO_3 := "res://assets/sprites/personagens/tiago/tiago_3.png"
 const CHAR_JULIOS_3 := "res://assets/sprites/personagens/julios/julios_3.png"
-const CHAR_ARIEL_3 := "res://assets/sprites/personagens/Ariel/ariel_3.png"
-const CHAR_CLEITON_3 := "res://assets/sprites/personagens/Cleiton/cleiton_3.png"
+const CHAR_ARIEL_3 := "res://assets/sprites/personagens/ariel/ariel_3.png"
+const CHAR_CLEITON_3 := "res://assets/sprites/personagens/cleiton/cleiton_3.png"
 const CHAR_ALINE_3 := "res://assets/sprites/personagens/aline/aline_3.png"
-const CHAR_NATALIA_3 := "res://assets/sprites/personagens/Natalia/natalia_3.png"
+const CHAR_NATALIA_3 := "res://assets/sprites/personagens/natalia/natalia_3.png"
 
 # ---- SPRITES - Desvio Logico -------------------------------------
 const DL_CAR_STRAIGHT := "res://assets/sprites/desvio_logico/carro_desvio_reto.png"

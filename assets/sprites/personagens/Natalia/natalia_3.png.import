@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dg4kolf17yy4y"
-path="res://.godot/imported/natalia_3.png-bba94107ecb2b26292e77603d12b178f.ctex"
+uid="uid://ct63xntw1gef5"
+path="res://.godot/imported/natalia_3.png-74283d11159edd12b1bd6fcfaa7ea377.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/personagens/Natalia/natalia_3.png"
-dest_files=["res://.godot/imported/natalia_3.png-bba94107ecb2b26292e77603d12b178f.ctex"]
+source_file="res://assets/sprites/personagens/natalia/natalia_3.png"
+dest_files=["res://.godot/imported/natalia_3.png-74283d11159edd12b1bd6fcfaa7ea377.ctex"]
 
 [params]
 
@@ -36,5 +36,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=1152
+process/size_limit=0
 detect_3d/compress_to=1

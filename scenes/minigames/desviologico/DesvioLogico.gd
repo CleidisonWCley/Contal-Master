@@ -34,6 +34,12 @@ var lane_change_active: bool = false
 var lane_change_tween: Tween
 var car_tilt_tween: Tween
 var last_turn_choice: String = ""
+## V0.14.6: o cenario inteiro do Desvio Logico vive num "palco" fixo de 1280x720 (16:9), centralizado
+## e escalado de forma uniforme. Pista, faixas, postes, agua, trafego e carro usam as coordenadas do
+## palco, entao ficam alinhados com a arte de fundo em QUALQUER proporcao de janela/navegador.
+const STAGE_SIZE: Vector2 = Vector2(1280.0, 720.0)
+var stage: Control
+var bg_fill: TextureRect
 var background_rect: TextureRect
 var dimmer: ColorRect
 var water_layer: Control
@@ -136,6 +142,7 @@ func _process(delta: float) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
+		_update_stage_transform()
 		_update_background_motion_fx(0.0)
 		_layout_car(false)
 	elif what == NOTIFICATION_EXIT_TREE:
@@ -184,19 +191,38 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 func _build_scene() -> void:
+	# Faixas laterais/superiores (quando a janela nao e 16:9): mesma arte, escurecida, so decorativa.
+	bg_fill = TextureRect.new()
+	bg_fill.name = "BackgroundFill"
+	bg_fill.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg_fill.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	bg_fill.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	bg_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg_fill.modulate = Color(0.30, 0.30, 0.36, 1.0)
+	bg_fill.visible = false
+	add_child(bg_fill)
+
+	stage = Control.new()
+	stage.name = "Stage"
+	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.size = STAGE_SIZE
+	add_child(stage)
+	_update_stage_transform()
+	_hide_editor_previews()
+
 	background_rect = TextureRect.new()
 	background_rect.name = "Background"
 	background_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 	background_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	add_child(background_rect)
+	stage.add_child(background_rect)
 
 	dimmer = ColorRect.new()
 	dimmer.name = "Dimmer"
 	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dimmer.color = Color(0.0, 0.0, 0.0, 0.018)
 	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(dimmer)
+	stage.add_child(dimmer)
 
 	# V1.0.2.5.1: shader/máscara d'água removido após teste visual.
 	# Mantemos apenas os brilhos horizontais desenhados pela camada WaterSurfaceOverlay.
@@ -209,21 +235,21 @@ func _build_scene() -> void:
 	water_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	water_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	water_layer.draw.connect(waterfx._on_water_layer_draw)
-	add_child(water_layer)
+	stage.add_child(water_layer)
 
 	road_layer = Control.new()
 	road_layer.name = "LaneOverlay"
 	road_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	road_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	road_layer.draw.connect(_on_road_layer_draw)
-	add_child(road_layer)
+	stage.add_child(road_layer)
 
 	side_props_layer = Control.new()
 	side_props_layer.name = "SideMotionProps"
 	side_props_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	side_props_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	side_props_layer.draw.connect(sideprops._on_side_props_layer_draw)
-	add_child(side_props_layer)
+	stage.add_child(side_props_layer)
 
 	sideprops._load_side_prop_textures()
 	tutorial.load_textures()
@@ -232,7 +258,7 @@ func _build_scene() -> void:
 	obstacles_layer.name = "Obstacles"
 	obstacles_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	obstacles_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(obstacles_layer)
+	stage.add_child(obstacles_layer)
 
 	car_rect = TextureRect.new()
 	car_rect.name = "Velox01"
@@ -241,7 +267,7 @@ func _build_scene() -> void:
 	car_rect.custom_minimum_size = Vector2(116, 86)
 	car_rect.z_index = 20
 	car_rect.texture = _load_texture(DLConfig.CAR_SPRITES["reto"])
-	add_child(car_rect)
+	stage.add_child(car_rect)
 
 	_build_lane_click_layer()
 	_build_hud()
@@ -579,6 +605,7 @@ func _schedule_decision_layout() -> void:
 
 ## V0.14.4: tela cheia / rotacao / barra de endereco (web) mudam o tamanho: refaz a linha de respostas.
 func _on_display_changed(_size: Vector2 = Vector2.ZERO) -> void:
+	_update_stage_transform()
 	if decision_layer != null and decision_layer.visible:
 		_schedule_decision_layout()
 
@@ -824,6 +851,8 @@ func _set_background(index: int) -> void:
 	# Fundos grandes NAO ficam no cache local: so o atual fica na memoria (importante na web).
 	var resource: Resource = load(path)
 	background_rect.texture = resource as Texture2D
+	if bg_fill != null:
+		bg_fill.texture = background_rect.texture
 
 func _update_drive(delta: float) -> void:
 	drive_elapsed += delta
@@ -1106,10 +1135,39 @@ func _handle_pointer(pointer_position: Vector2) -> void:
 	var lane: int = _lane_from_x(pointer_position.x)
 	_handle_lane_or_choice(lane)
 
+## Reposiciona/escala o palco 16:9 dentro da janela atual (contain). Barato: so roda ao redimensionar.
+func _update_stage_transform() -> void:
+	if stage == null:
+		return
+	var vp: Vector2 = get_viewport_rect().size
+	if vp.x <= 1.0 or vp.y <= 1.0:
+		vp = STAGE_SIZE
+	var k: float = minf(vp.x / STAGE_SIZE.x, vp.y / STAGE_SIZE.y)
+	stage.scale = Vector2(k, k)
+	stage.position = ((vp - STAGE_SIZE * k) * 0.5).round()
+	if bg_fill != null:
+		# So desenha a faixa decorativa quando a janela nao e exatamente 16:9.
+		bg_fill.visible = absf(vp.x - STAGE_SIZE.x * k) > 1.0 or absf(vp.y - STAGE_SIZE.y * k) > 1.0
+
+func _stage_scale() -> float:
+	return stage.scale.x if stage != null else 1.0
+
+## Posicao do ponteiro (coordenadas da janela) convertida para coordenadas do palco.
+func _viewport_to_stage(p: Vector2) -> Vector2:
+	if stage == null:
+		return p
+	return (p - stage.position) / maxf(stage.scale.x, 0.001)
+
+## Previews do editor (fundo e postes de exemplo) ficavam desenhando por baixo do jogo.
+func _hide_editor_previews() -> void:
+	for path: String in ["BackgroundPreview", "SidePropMarkers/LeftPostPreview", "SidePropMarkers/RightPostPreview"]:
+		var node: Node = get_node_or_null(path)
+		if node is CanvasItem:
+			(node as CanvasItem).visible = false
+
 func _is_gameplay_pointer(pointer_position: Vector2) -> bool:
-	var viewport_size: Vector2 = get_viewport_rect().size
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		viewport_size = Vector2(1280, 720)
+	var viewport_size: Vector2 = STAGE_SIZE
+	pointer_position = _viewport_to_stage(pointer_position)
 	if state == DLConfig.STATE_DRIVE:
 		return pointer_position.y >= viewport_size.y * 0.26
 	if state == DLConfig.STATE_TUTORIAL_LEFT or state == DLConfig.STATE_TUTORIAL_RIGHT:
@@ -1223,7 +1281,7 @@ func _snap_bionix_to_decision_point() -> void:
 	car_rect.position = _car_position_for_lane(DLConfig.LANE_CENTER, _car_decision_stop_y_ratio(), car_size)
 
 func _animate_turn_exit(choice: String) -> void:
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 	var target_lane: int = DLConfig.LANE_LEFT if choice == "A" else DLConfig.LANE_RIGHT
@@ -1276,7 +1334,7 @@ func _animate_turn_exit(choice: String) -> void:
 func _update_background_motion_fx(_delta: float) -> void:
 	if background_rect == null:
 		return
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 	background_rect.pivot_offset = viewport_size * 0.5
@@ -1315,7 +1373,7 @@ func _update_car_motion_fx(delta: float) -> void:
 		car_rect.position = car_rect.position.lerp(target, minf(1.0, delta * follow_rate))
 
 func _car_position_for_lane(lane: int, y_ratio: float, car_size: Vector2) -> Vector2:
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 	var center_y: float = viewport_size.y * y_ratio
@@ -1329,7 +1387,7 @@ func _car_position_for_lane(lane: int, y_ratio: float, car_size: Vector2) -> Vec
 	return Vector2(lane_x - car_size.x * 0.5, center_y - car_size.y * 0.5)
 
 func _obstacle_spawn_y() -> float:
-	var viewport_height: float = maxf(get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(STAGE_SIZE.y, 720.0)
 	# NPC nasce já dentro da área da estrada, não colado na cidade/água.
 	return viewport_height * 0.355 + randf_range(-4.0, 5.0)
 
@@ -1337,14 +1395,14 @@ func _obstacle_position(lane: int, y: float, obstacle_size: Vector2) -> Vector2:
 	return Vector2(_lane_x_at_y(lane, y) - obstacle_size.x * 0.5, y - obstacle_size.y * 0.5)
 
 func _depth_t(y: float) -> float:
-	var viewport_height: float = maxf(get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(STAGE_SIZE.y, 720.0)
 	return clampf((y - viewport_height * 0.355) / (viewport_height * 0.565), 0.0, 1.0)
 
 func _perspective_scale(y: float) -> float:
 	return lerpf(0.26, 1.16, _depth_t(y))
 
 func _lane_x_at_y(lane: int, y: float) -> float:
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		viewport_size = Vector2(1280, 720)
 	var t: float = _depth_t(y)
@@ -1359,7 +1417,7 @@ func _lane_x_at_y(lane: int, y: float) -> float:
 			return viewport_size.x * 0.50
 
 func _update_obstacles(delta: float) -> void:
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = STAGE_SIZE
 	for i in range(obstacle_data.size() - 1, -1, -1):
 		var data: Dictionary = obstacle_data[i]
 		var node: Control = data.get("node", null)
@@ -1497,7 +1555,8 @@ func _obstacle_visual_rect_at(data: Dictionary, y: float) -> Rect2:
 	var obstacle_size: Vector2 = base_size * scale_factor
 	var local_position: Vector2 = _obstacle_position(lane, y, obstacle_size)
 	var global_offset: Vector2 = obstacles_layer.global_position if obstacles_layer != null else Vector2.ZERO
-	return Rect2(local_position + global_offset, obstacle_size)
+	var ks: float = _stage_scale()
+	return Rect2(local_position * ks + global_offset, obstacle_size * ks)
 
 func _obstacle_swept_hitbox(data: Dictionary, node: Control, previous_y: float, current_y: float) -> Rect2:
 	var current_rect: Rect2 = _control_hitbox(node, 0.17, 0.17, 0.17)
@@ -1674,7 +1733,7 @@ func _world_speed() -> float:
 	return float(_rules().get("world_speed", 270.0)) + float(current_round) * 10.0
 
 func _lane_x(lane: int) -> float:
-	var viewport_height: float = maxf(get_viewport_rect().size.y, 720.0)
+	var viewport_height: float = maxf(STAGE_SIZE.y, 720.0)
 	return _lane_x_at_y(lane, viewport_height * car_y_ratio)
 
 func _lane_from_x(x: float) -> int:
@@ -1697,7 +1756,7 @@ func _player_car_route_scale() -> float:
 	return car_rect.scale.x if car_rect != null else DLConfig.PLAYER_CAR_NEAR_ROUTE_SCALE
 
 func _car_size() -> Vector2:
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = STAGE_SIZE
 	var scale_factor: float = clampf(minf(viewport_size.x / 1280.0, viewport_size.y / 720.0), 0.76, 1.15)
 	return Vector2(158, 118) * scale_factor
 
@@ -1746,29 +1805,13 @@ func _canvas_item_global_position(node: Node) -> Vector2:
 	else:
 		return Vector2.ZERO
 
-	var viewport_size: Vector2 = get_viewport_rect().size
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		return raw_pos
-
-	# Resolução base de referência do editor (1280x720)
-	const BASE_WIDTH := 1280.0
-	const BASE_HEIGHT := 720.0
-
-	# Fator de escala vertical da tela atual
-	var scale_y: float = viewport_size.y / BASE_HEIGHT
-
-	# Centro X real da tela do dispositivo vs Centro X da resolução de projeto (640px)
-	var current_center_x: float = viewport_size.x * 0.5
-	var base_center_x: float = BASE_WIDTH * 0.5
-
-	# Recalcula a posição X proporcionalmente ao centro da estrada e a altura Y com a escala
-	var adjusted_x: float = current_center_x + (raw_pos.x - base_center_x) * scale_y
-	var adjusted_y: float = raw_pos.y * scale_y
-
-	return Vector2(adjusted_x, adjusted_y)
+	# V0.14.6: os marcadores foram posicionados no editor em 1280x720 e o palco usa exatamente
+	# essas coordenadas. Antes havia um reescalonamento por altura que desalinhava os postes
+	# (e o resto do cenario) fora de 16:9.
+	return raw_pos
 
 func _on_road_layer_draw() -> void:
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		return
 	if state == DLConfig.STATE_ACCELERATION or state == DLConfig.STATE_DRIVE:

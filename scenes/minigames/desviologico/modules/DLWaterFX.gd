@@ -99,7 +99,7 @@ func _on_water_layer_draw() -> void:
 		return
 	if not g._animations_enabled():
 		return
-	var viewport_size: Vector2 = g.get_viewport_rect().size
+	var viewport_size: Vector2 = g.STAGE_SIZE
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		return
 	# V0.13.12.2: Mar Vivo. Em vez de tentar filtrar o background inteiro,
