@@ -379,8 +379,7 @@ func _warm_for_transition(phase_key: String) -> Array:
 	if bg_path != "":
 		list.append(bg_path)
 	for character_id in _novel_character_ids(phase_key):
-		var data: Dictionary = TutorialManager.sprite_set(str(character_id), "v1")
-		var sprite_path: String = str(data.get("path", ""))
+		var sprite_path: String = TutorialManager.resolve_sprite_path(str(character_id), "v1")
 		if sprite_path != "":
 			list.append(sprite_path)
 	if has_node("/root/AudioManager"):

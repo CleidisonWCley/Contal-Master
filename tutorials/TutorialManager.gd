@@ -206,11 +206,55 @@ static func sprite_set(character_id: String, variant: String = "v3") -> Dictiona
 
 
 ## Textura COMPLETA da variante (sem recorte), pronta para um TextureRect.
+## V0.14.7: o caminho passa por resolve_sprite_path() (tolera diferenca de maiuscula/minuscula da pasta no build web).
 static func sprite_texture(character_id: String, variant: String = "v3") -> Texture2D:
-	var data: Dictionary = sprite_set(character_id, variant)
-	if data.is_empty():
+	var path: String = resolve_sprite_path(character_id, variant)
+	if path == "":
 		return null
-	return load(str(data.get("path", ""))) as Texture2D
+	var texture: Texture2D = load(path) as Texture2D
+	if texture == null:
+		push_warning("TutorialManager: nao foi possivel carregar o sprite '%s' (%s): %s" % [character_id, variant, path])
+	return texture
+
+
+## Cache id|variante -> caminho que realmente existe no build.
+static var _sprite_paths: Dictionary = {}
+
+
+## V0.14.7 (hotfix sprites web): devolve o caminho do sprite que EXISTE de verdade no build.
+## Causa do bug: o build web (Linux/PCK) diferencia maiuscula de minuscula e o .pck publicado tinha as pastas
+## "Ariel/", "Cleiton/", "Natalia/" e "Priscilla/", enquanto o codigo pede "ariel/", "cleiton/"... No Windows isso
+## funciona (nao diferencia); na web o load() falha e o personagem some. Tenta, nesta ordem: o caminho padrao
+## (minusculo), a pasta com a 1a letra maiuscula e, para a Priscila, a grafia antiga "Priscilla". Se nada existir,
+## devolve o caminho padrao (o load() acusa o erro no console) e avisa UMA vez.
+static func resolve_sprite_path(character_id: String, variant: String = "v3") -> String:
+	var key: String = "%s|%s" % [character_id, variant]
+	if _sprite_paths.has(key):
+		return str(_sprite_paths[key])
+	var path: String = str(sprite_set(character_id, variant).get("path", ""))
+	if path == "":
+		return ""
+	var file_name: String = path.get_file()
+	var folder_path: String = path.get_base_dir()
+	var folder: String = folder_path.get_file()
+	var parent: String = folder_path.get_base_dir()
+	var candidates: Array[String] = [path, "%s/%s/%s" % [parent, folder.capitalize(), file_name]]
+	if folder == "priscila":
+		candidates.append("%s/Priscilla/%s" % [parent, file_name])
+		candidates.append("%s/Priscila/%s" % [parent, file_name])
+	var chosen: String = path
+	var found: bool = false
+	for candidate: String in candidates:
+		if ResourceLoader.exists(candidate):
+			chosen = candidate
+			found = true
+			break
+	if not found:
+		push_warning("TutorialManager: sprite '%s' (%s) nao existe no build: %s" % [character_id, variant, path])
+	elif chosen != path:
+		push_warning("TutorialManager: sprite '%s' (%s) achado com outra caixa de pasta: %s (padrao: %s). Renomeie a pasta e reexporte." % [character_id, variant, chosen, path])
+	_sprite_paths[key] = chosen
+	return chosen
 
 
 ## Valores reais do jogo injetados nos textos ({correct}, {wrong}, {stage}...): o tutorial nunca fica
