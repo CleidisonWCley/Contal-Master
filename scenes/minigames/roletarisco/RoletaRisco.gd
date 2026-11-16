@@ -652,6 +652,8 @@ func _on_continue_pressed() -> void:
 		return
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
+	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
+	GameManager.report_stage({"tier": "bom" if points_this_stage >= 0 else "ruim", "extra": {"event_name": str(selected_event.get("name", ""))}})
 	GameManager.complete_current_stage(0)
 
 

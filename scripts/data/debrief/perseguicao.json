@@ -1,0 +1,38 @@
+{
+  "schema": "debrief",
+  "version": 1,
+  "notes": "V0.15 - Feedback do anfitriao DEPOIS do minigame. tiers: perfeito (ratio 1,0), otimo (>= 0,80), medio (>= 0,50), fraco (< 0,50); a Roleta usa bom/ruim. Cada faixa tem varias falas e o jogo alterna entre elas (nunca a mesma duas vezes seguidas). 'tips' = dica opcional (2o quadro na campanha). 'jales_next' = fala final do Jales na campanha, apontando a proxima estacao. Limite sugerido: 180 caracteres por fala. Linguagem neutra: o jogador e 'voce' ou 'Novato'.",
+  "minigame_id": "perseguicao",
+  "host": "ariel",
+  "tiers": {
+    "perfeito": [
+      "Rápido. Preciso. Boa marca. Anotei.",
+      "Nenhuma não conformidade escapou e nenhum segundo foi desperdiçado. Está no caderno."
+    ],
+    "otimo": [
+      "Decidiu bem, mas o relógio ganhou algumas. Identifique o problema primeiro.",
+      "Boa leitura. Um ou dois incidentes escaparam no tempo. Respire e ganhe dois segundos.",
+      "Ritmo sólido. Anotei a sua marca. Dá para melhorar."
+    ],
+    "medio": [
+      "Tempo apertado e algumas decisões trocadas. Identifique o problema, depois decida.",
+      "O relógio não espera. Mas a ordem importa: primeiro o que está errado, depois a resposta.",
+      "Meio a meio. Normal. Releia o tipo de não conformidade e volte."
+    ],
+    "fraco": [
+      "O tempo apertou. Normal. Respire e tente de novo.",
+      "Foi difícil acompanhar o relógio. Sem pressa agora: leia, identifique, responda.",
+      "Acontece. Eu também já perdi um prazo uma vez. Uma vez só."
+    ]
+  },
+  "tips": {
+    "otimo": "Dica: leia o problema antes das opções. Os dois segundos que você gasta lendo economizam cinco.",
+    "medio": "Dica: leia o problema antes das opções. Os dois segundos que você gasta lendo economizam cinco.",
+    "fraco": "Dica: não corra para clicar. Leia o problema, identifique o erro e só então escolha."
+  },
+  "jales_next": [
+    "Prazo cumprido! Agora é com a Aline, na Forca Técnica. Prepare o vocabulário: ela não perdoa nenhum termo.",
+    "Ótima corrida. A próxima estação é a Forca Técnica, com a instrutora Aline. Exigente, mas ela torce por você, viu?",
+    "Mais uma concluída! Vem comigo: a Aline te espera na Forca Técnica."
+  ]
+}

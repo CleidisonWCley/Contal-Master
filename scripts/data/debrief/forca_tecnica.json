@@ -1,0 +1,38 @@
+{
+  "schema": "debrief",
+  "version": 1,
+  "notes": "V0.15 - Feedback do anfitriao DEPOIS do minigame. tiers: perfeito (ratio 1,0), otimo (>= 0,80), medio (>= 0,50), fraco (< 0,50); a Roleta usa bom/ruim. Cada faixa tem varias falas e o jogo alterna entre elas (nunca a mesma duas vezes seguidas). 'tips' = dica opcional (2o quadro na campanha). 'jales_next' = fala final do Jales na campanha, apontando a proxima estacao. Limite sugerido: 180 caracteres por fala. Linguagem neutra: o jogador e 'voce' ou 'Novato'.",
+  "minigame_id": "forca_tecnica",
+  "host": "aline",
+  "tiers": {
+    "perfeito": [
+      "Hmpf. Vocabulário afiado. Fico... satisfeita. Não se acostume com o elogio.",
+      "Todos os termos, sem uma letra fora do lugar. Hmpf. Devo admitir que impressiona."
+    ],
+    "otimo": [
+      "Quase tudo exato. Um termo ficou aproximado, e aproximar não basta. Mesmo assim, bom trabalho.",
+      "Hmpf. Bem acima da média. Releia o termo que escapou antes que ele escape de novo.",
+      "O glossário está firme. Falta só a última precisão."
+    ],
+    "medio": [
+      "Alguns termos exatos, outros aproximados. Aproximar não basta. Releia o glossário.",
+      "Termo errado enforca o texto inteiro, lembra? Ainda há margem para mais precisão.",
+      "Metade do glossário está na ponta da língua. A outra metade pede estudo, não sorte."
+    ],
+    "fraco": [
+      "Termo errado enforca o texto inteiro. Estude o glossário e volte. Você é capaz.",
+      "Hmpf. Não foi o melhor dia, mas o glossário não foge. Releia com calma e volte.",
+      "Erro de termo se corrige com repetição. Estude e tente de novo. Eu estarei aqui, infelizmente para o meu sossego."
+    ]
+  },
+  "tips": {
+    "otimo": "Dica: comece pelas vogais; depois deduza pela categoria e pela dica.",
+    "medio": "Dica: comece pelas vogais; depois deduza pela categoria e pela dica.",
+    "fraco": "Dica: comece pelas vogais, depois use a categoria e a dica. Letra errada derruba a integridade."
+  },
+  "jales_next": [
+    "Terminologia em dia! A reta final do primeiro dia é com o Cleiton, no STOP. Vem comigo!",
+    "Sobreviveu à Aline, e isso já é motivo de orgulho. A próxima é o STOP, com o Cleiton. Ele é gentil, mas muito sério.",
+    "Muito bem! Falta só uma estação hoje: o STOP, do Cleiton. Bora?"
+  ]
+}

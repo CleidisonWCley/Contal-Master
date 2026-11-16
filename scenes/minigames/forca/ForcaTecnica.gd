@@ -703,6 +703,8 @@ func _on_finish_continue_pressed() -> void:
 		return
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
+	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
+	GameManager.report_stage({"total": TOTAL_ROUNDS, "correct": success_count, "wrong": failure_count, "extra": {"erros_totais": total_errors_count}})
 	GameManager.complete_current_stage(0)
 
 

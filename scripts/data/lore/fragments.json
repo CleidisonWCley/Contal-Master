@@ -1,0 +1,143 @@
+{
+  "schema": "lore_fragments",
+  "version": 1,
+  "canon": "proposta",
+  "notes": "V0.15 - Mosaico de lore (secao 10 do ContalMaster_Fase2_Design). Cada trecho abre quando a ESTACAO do dono chega ao nivel pedido (1 = concluir; 2 = Prata; 3 = Ouro; ver LoreManager.GOALS) e aparece como novel curta no Modo Livre, 1 trecho por conclusao, alem de ficar no Arquivo da Equipe. 'unlock' (opcional) troca a regra por {\"all_stations_level\": N}. TODOS os textos sao PROPOSTA DE CANON: confirme item por item e edite aqui sem mexer em codigo. Ate 180 caracteres por quadro.",
+  "fragments": [
+    {
+      "id": "tiago_1",
+      "owner": "tiago",
+      "station": "maleta_certa",
+      "level": 1,
+      "title": "Por que a firma joga",
+      "hint": "Conclua a Maleta Certa.",
+      "frames": [
+        "Sabe por que a ContalMaster joga? Porque errar num jogo custa pontos, e não clientes. É o jeito mais barato de aprender.",
+        "Foi o Jales que me explicou isso no meu primeiro dia. Fiquei uma semana repetindo a frase para mim mesmo."
+      ]
+    },
+    {
+      "id": "priscila_2",
+      "owner": "priscila",
+      "station": "show_do_bilhao",
+      "level": 2,
+      "title": "A noite da pizza",
+      "hint": "Chegue à Prata no Show do Bilhão.",
+      "frames": [
+        "Foi numa terça, com uma pizza no meio da mesa. Eu, o Cleiton e a Aline começamos a nos perguntar a norma, só por diversão.",
+        "A pizza esfriou, o quiz ficou. Foi ali que a firma ganhou uma língua comum: a norma. O Show do Bilhão nasceu dessa noite."
+      ]
+    },
+    {
+      "id": "tiago_2",
+      "owner": "tiago",
+      "station": "maleta_certa",
+      "level": 2,
+      "title": "O teste do primeiro dia",
+      "hint": "Chegue à Prata na Maleta Certa.",
+      "frames": [
+        "Todo Novato é testado no primeiro dia pelos veteranos. Não é maldade: é o nosso jeito de dizer 'vem, você já faz parte'.",
+        "Eu passei por isso e, na hora, achei que ia desmaiar. Hoje eu entendo: quem testa quer ver você chegar."
+      ]
+    },
+    {
+      "id": "anderson_2",
+      "owner": "anderson",
+      "station": "batalha_naval",
+      "level": 2,
+      "title": "O furo no casco",
+      "hint": "Chegue à Prata na Batalha Naval.",
+      "frames": [
+        "Meu pai era oficial de navegação. Dizia que o mar perdoa muita coisa, menos um furo no casco que ninguém viu.",
+        "Quando fui para a auditoria, entendi: papéis de trabalho também têm casco. É por isso que eu varro cada coordenada!"
+      ]
+    },
+    {
+      "id": "ariel_2",
+      "owner": "ariel",
+      "station": "perseguicao",
+      "level": 2,
+      "title": "O palete do papel",
+      "hint": "Chegue à Prata na Perseguição.",
+      "frames": [
+        "Uma vez conferi um estoque inteiro. No papel, havia um palete. No chão, não havia.",
+        "O prazo era curto e o erro seria caro. Desde então eu olho antes de assinar. Observo, anoto, decido."
+      ]
+    },
+    {
+      "id": "aline_2",
+      "owner": "aline",
+      "station": "forca_tecnica",
+      "level": 2,
+      "title": "A palavra que anula",
+      "hint": "Chegue à Prata na Forca Técnica.",
+      "frames": [
+        "Minha família é de tabeliães. Em casa, aprendi cedo que uma palavra errada pode anular um ato inteiro.",
+        "Por isso eu insisto no termo exato. Hmpf. Não é frescura: é herança."
+      ]
+    },
+    {
+      "id": "cleiton_2",
+      "owner": "cleiton",
+      "station": "stop",
+      "level": 2,
+      "title": "Cada linha",
+      "hint": "Chegue à Prata no STOP.",
+      "frames": [
+        "Quando cheguei, havia um sênior que lia cada linha dos meus papéis, até as notas de rodapé. Eu achava exagero.",
+        "Hoje sei que revisar é respeito: ler cada linha é dizer 'o seu trabalho importa'. Eu tento fazer o mesmo com você."
+      ]
+    },
+    {
+      "id": "jales_all2",
+      "owner": "jales",
+      "station": "",
+      "level": 2,
+      "title": "A promessa do Jales",
+      "hint": "Leve todas as estações à Prata.",
+      "frames": [
+        "Vou contar por que a ContalMaster existe. Havia um colega júnior numa equipe e, quando ele errou, ninguém o defendeu.",
+        "Prometi que teria uma firma em que errar fosse parte de aprender. É por isso que a gente joga. Obrigado por ficar."
+      ],
+      "unlock": {
+        "all_stations_level": 2
+      }
+    },
+    {
+      "id": "julios_3",
+      "owner": "julios",
+      "station": "roleta_risco",
+      "level": 3,
+      "title": "O almoço",
+      "hint": "Chegue ao Ouro na Roleta de Risco (campanha).",
+      "frames": [
+        "Houve um almoço. Um cliente simpático, um prato caro e um papel na mesa. Eu quase assinei.",
+        "Não assinei. O resto da história fica comigo. E a história do 'S' do meu nome, também. Mistério é método."
+      ]
+    },
+    {
+      "id": "natalia_3",
+      "owner": "natalia",
+      "station": "desvio_logico",
+      "level": 3,
+      "title": "O elevador",
+      "hint": "Chegue ao Ouro no Desvio Lógico.",
+      "frames": [
+        "Já subi num elevador com um colega que sabia de um erro e não disse nada. O silêncio durou três andares.",
+        "O contrato foi embora junto com a confiança. Desde então eu escolho falar, com gentileza, mas falo. Por isso a pista tem bifurcações."
+      ]
+    },
+    {
+      "id": "tiago_3",
+      "owner": "tiago",
+      "station": "maleta_certa",
+      "level": 3,
+      "title": "A maleta vazia",
+      "hint": "Chegue ao Ouro na Maleta Certa.",
+      "frames": [
+        "No meu primeiro dia, o Jales me deu uma maleta. Eu abri e estava vazia. Pensei que fosse pegadinha.",
+        "Ele disse: 'aqui dentro cabe tudo o que você vai aprender'. Guardo a maleta até hoje. Já está bem cheia."
+      ]
+    }
+  ]
+}

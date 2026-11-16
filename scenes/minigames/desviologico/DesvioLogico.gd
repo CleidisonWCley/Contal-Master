@@ -1096,6 +1096,8 @@ func _on_finish_continue_pressed() -> void:
 	engineaudio._stop_engine_audio()
 	engineaudio._clear_desvio_music_audio_profile()
 	_save_desvio_free_mode_record_if_needed()
+	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
+	GameManager.report_stage({"total": DLConfig.TOTAL_ROUNDS, "correct": correct_count})
 	GameManager.complete_current_stage(0)
 
 func _save_desvio_free_mode_record_if_needed() -> void:

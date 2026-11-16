@@ -650,6 +650,8 @@ func _show_finish() -> void:
 func _on_finish_continue_pressed() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
+	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
+	GameManager.report_stage({"total": incidents.size(), "correct": maxi(incidents.size() - damage_count, 0)})
 	GameManager.complete_current_stage(0)
 
 

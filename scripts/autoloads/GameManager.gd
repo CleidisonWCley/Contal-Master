@@ -16,6 +16,11 @@ const FREE_MENU_SCENE := Paths.SCENE_FREE_MENU
 const INTRO_SCENE := Paths.SCENE_CUTSCENE_INTRO
 const STAGE_TRANSITION_SCENE := Paths.SCENE_STAGE_TRANSITION
 const FINAL_SCENE := Paths.SCENE_CUTSCENE_FINAL
+## V0.15: conversa DEPOIS de cada minigame e arquivo da equipe (lore).
+const STAGE_DEBRIEF_SCENE := Paths.SCENE_STAGE_DEBRIEF
+const TEAM_ARCHIVE_SCENE := Paths.SCENE_TEAM_ARCHIVE
+## V0.15: false = volta ao fluxo antigo (minigame -> proxima transicao, sem conversa). Util para testar/comparar.
+const DEBRIEF_ENABLED := true
 
 const PHASES := [
 	{
@@ -97,6 +102,15 @@ var _stage_open: bool = true
 ## Cortina (CanvasLayer) que cobre a tela entre o clique em "Continuar" e a LoadingScreen.
 var _exit_shield: CanvasLayer = null
 
+## V0.15: relatorio da ultima estacao concluida ({"phase_key","mode","difficulty","points","total","correct","wrong","ratio","extra"}).
+## Cada minigame chama report_stage() ANTES de complete_current_stage(); o GameManager completa os campos que faltam.
+var last_stage_report: Dictionary = {}
+var _pending_report: Dictionary = {}
+## V0.15: plano da conversa pos-minigame (montado por DebriefBuilder) lido pela StageDebrief.
+var debrief_plan: Dictionary = {}
+## V0.15: o que fazer quando a conversa termina: "transition" | "final" | "free_menu".
+var _after_debrief_action: String = ""
+
 ## V0.14.3: imagem principal de cada minigame, carregada pela LoadingScreen ANTES da cena (ver SceneLoader).
 const PHASE_WARM := {
 	"show_do_bilhao": [Paths.BG_SHOW_DO_BILHAO],
@@ -145,6 +159,12 @@ func open_achievements() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
 	_change_scene(ACHIEVEMENTS_SCENE)
+
+## V0.15: tela "Arquivo da Equipe" (perfis e trechos de lore ja liberados).
+func open_team_archive() -> void:
+	if has_node("/root/AudioManager"):
+		AudioManager.play_click()
+	_change_scene(TEAM_ARCHIVE_SCENE)
 
 func open_free_menu() -> void:
 	current_mode = GameMode.FREE
@@ -195,6 +215,31 @@ func complete_current_stage(points: int) -> void:
 	await _begin_stage_exit()
 	_finish_stage(points)
 
+## V0.15: o minigame informa o desempenho (acertos/total etc.) logo antes de complete_current_stage().
+## Campos usados (todos opcionais): total, correct, wrong, ratio (0..1), tier ("bom"/"ruim" na Roleta), extra {}.
+func report_stage(report: Dictionary) -> void:
+	_pending_report = report.duplicate(true)
+
+func _build_stage_report(phase_key: String, difficulty: String, stage_points: int) -> Dictionary:
+	var report: Dictionary = _pending_report.duplicate(true)
+	_pending_report = {}
+	report["phase_key"] = phase_key
+	report["mode"] = "campaign" if current_mode == GameMode.CAMPAIGN else "free"
+	report["difficulty"] = difficulty
+	report["points"] = stage_points
+	var total: int = maxi(int(report.get("total", 0)), 0)
+	var correct: int = clampi(int(report.get("correct", 0)), 0, maxi(total, 0))
+	report["total"] = total
+	report["correct"] = correct
+	report["wrong"] = int(report.get("wrong", maxi(total - correct, 0)))
+	if not report.has("ratio"):
+		report["ratio"] = (float(correct) / float(total)) if total > 0 else 0.0
+	report["ratio"] = clampf(float(report.get("ratio", 0.0)), 0.0, 1.0)
+	if not report.has("extra") or not (report["extra"] is Dictionary):
+		report["extra"] = {}
+	last_stage_report = report
+	return report
+
 func _finish_stage(points: int) -> void:
 	var completed_phase_key: String = current_phase_key
 	if points != 0:
@@ -202,30 +247,83 @@ func _finish_stage(points: int) -> void:
 	var score_after_stage: int = ScoreManager.get_score()
 	var stage_points: int = score_after_stage - phase_start_score
 	var difficulty: String = DifficultyManager.get_difficulty()
+	# V0.15: relatorio da estacao + memoria da firma (confianca/lore). Nao altera pontos nem recordes.
+	var report: Dictionary = _build_stage_report(completed_phase_key, difficulty, stage_points)
+	var mode_name: String = str(report.get("mode", "free"))
+	LoreManager.record_stage(report)
 	if current_mode == GameMode.CAMPAIGN:
 		ScoreManager.save_campaign_stage_score(completed_phase_key, difficulty, stage_points)
 		if has_node("/root/AchievementManager"):
 			AchievementManager.record_minigame_completed(completed_phase_key, difficulty)
 		campaign_index += 1
 		if campaign_index < PHASES.size():
-			_open_stage_transition()
+			_after_debrief_action = "transition"
 		else:
 			var campaign_result: Dictionary = ScoreManager.finish_campaign_run(difficulty, score_after_stage)
 			last_campaign_result = campaign_result
 			if has_node("/root/AchievementManager"):
 				AchievementManager.record_campaign_completed(difficulty, score_after_stage)
 				AchievementManager.record_campaign_score_result(campaign_result)
-			current_phase_key = "final"
-			if has_node("/root/AudioManager"):
-				AudioManager.play_music("musica_final")
-			_change_scene(FINAL_SCENE, _warm_for_final())
+			_after_debrief_action = "final"
 	else:
 		var free_result: Dictionary = ScoreManager.save_free_mode_score(completed_phase_key, difficulty, stage_points)
 		if has_node("/root/AchievementManager"):
 			AchievementManager.record_free_mode_completion(completed_phase_key, difficulty, free_result)
 		ScoreManager.reset_score()
-		open_free_menu()
+		_after_debrief_action = "free_menu"
+	_open_debrief(completed_phase_key, mode_name, report)
 	_release_exit_shield_later()
+
+# ---------------------------------------------------------------- V0.15: conversa depois do minigame
+## Abre a StageDebrief (feedback do anfitriao + Jales / lore do modo livre). Sem conteudo, segue direto.
+func _open_debrief(phase_key: String, mode_name: String, report: Dictionary) -> void:
+	var next_key: String = ""
+	if mode_name == "campaign" and campaign_index < PHASES.size():
+		next_key = str(PHASES[campaign_index].get("key", ""))
+	if DEBRIEF_ENABLED:
+		debrief_plan = DebriefBuilder.build(phase_key, mode_name, report, next_key)
+	else:
+		debrief_plan = DebriefBuilder.empty_plan(phase_key, mode_name)
+	if not bool(debrief_plan.get("has_content", false)):
+		after_debrief()
+		return
+	current_phase_key = phase_key
+	_change_scene(STAGE_DEBRIEF_SCENE, _warm_for_debrief(phase_key, debrief_plan))
+
+## A StageDebrief chama isto quando termina (ou o jogador pula). Faz o que o fluxo antigo fazia direto no fim do minigame.
+func after_debrief() -> void:
+	var action: String = _after_debrief_action
+	_after_debrief_action = ""
+	debrief_plan = {}
+	match action:
+		"transition":
+			_open_stage_transition()
+		"final":
+			current_phase_key = "final"
+			if has_node("/root/AudioManager"):
+				AudioManager.play_music("musica_final")
+			_change_scene(FINAL_SCENE, _warm_for_final())
+		"free_menu":
+			open_free_menu()
+		_:
+			go_to_main_menu()
+
+## Recursos pesados do feedback: cenario da fase, sprites "_1" de quem aparece e (se existir) o cenario do interludio.
+func _warm_for_debrief(phase_key: String, plan: Dictionary) -> Array:
+	var list: Array = []
+	var bg_path: String = str(Paths.CUTSCENE_BG_BY_PHASE.get(phase_key, ""))
+	if bg_path != "" and ResourceLoader.exists(bg_path):
+		list.append(bg_path)
+	for character_id in plan.get("characters", []) as Array:
+		var sprite_path: String = TutorialManager.resolve_sprite_path(str(character_id), "v1")
+		if sprite_path != "" and ResourceLoader.exists(sprite_path):
+			list.append(sprite_path)
+	var interlude: Dictionary = plan.get("interlude", {}) as Dictionary
+	if not interlude.is_empty():
+		var interlude_bg: String = Paths.first_existing(Paths.CUTSCENE_BG_INTERLUDE.get(str(interlude.get("background", "")), []) as Array)
+		if interlude_bg != "":
+			list.append(interlude_bg)
+	return list
 
 func is_campaign_mode() -> bool:
 	return current_mode == GameMode.CAMPAIGN
@@ -311,6 +409,7 @@ func _load_current_campaign_stage() -> void:
 
 func _load_phase(phase: Dictionary) -> void:
 	_stage_open = true
+	_pending_report = {}
 	current_phase_key = str(phase.get("key", ""))
 	phase_start_score = ScoreManager.get_score()
 	if has_node("/root/AudioManager"):

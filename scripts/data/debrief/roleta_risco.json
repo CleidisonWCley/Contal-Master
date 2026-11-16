@@ -1,0 +1,28 @@
+{
+  "schema": "debrief",
+  "version": 1,
+  "notes": "V0.15 - Feedback do anfitriao DEPOIS do minigame. tiers: perfeito (ratio 1,0), otimo (>= 0,80), medio (>= 0,50), fraco (< 0,50); a Roleta usa bom/ruim. Cada faixa tem varias falas e o jogo alterna entre elas (nunca a mesma duas vezes seguidas). 'tips' = dica opcional (2o quadro na campanha). 'jales_next' = fala final do Jales na campanha, apontando a proxima estacao. Limite sugerido: 180 caracteres por fala. Linguagem neutra: o jogador e 'voce' ou 'Novato'.",
+  "minigame_id": "roleta_risco",
+  "host": "julios",
+  "tiers": {
+    "bom": [
+      "Sorte hoje. Não se acostume: o risco real não pede licença.",
+      "Caiu o setor bom. Parabéns, ou algo parecido. Anote: foi sorte, não mérito.",
+      "Deu certo. Mas me diga: foi prudência ou foi sorte? Pense nisso antes que a roleta pense por você."
+    ],
+    "ruim": [
+      "Caiu o setor ruim. Agora a parte útil: o que você faria na vida real? Pense nisso.",
+      "O risco bateu à porta e você abriu. Faz parte. O que importa é o que se faz com a próxima.",
+      "Azar, mas foi bom ver a sua reação. O risco que parece pequeno, como um favor ou um almoço, é o que mais derruba a independência."
+    ]
+  },
+  "tips": {
+    "bom": "Dica: um bom resultado não diminui o risco; ele só adia a conversa.",
+    "ruim": "Dica: risco pequeno também precisa de resposta: nomeie, avalie e só depois decida."
+  },
+  "jales_next": [
+    "Pronto, sobreviveu ao Julios! Agora a coisa fica rápida: o Ariel te espera na Perseguição. Vem comigo!",
+    "Rodada bônus concluída. Seguimos para a Perseguição, com o Ariel, nosso analista de campo. Ele fala pouco, mas observa tudo.",
+    "Boa! O relógio vai apertar agora: a próxima é a Perseguição, do Ariel. Bora?"
+  ]
+}

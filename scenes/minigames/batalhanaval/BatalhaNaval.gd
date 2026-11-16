@@ -560,6 +560,8 @@ func _update_threat_counter() -> void:
 func _on_finish_continue_pressed() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
+	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
+	GameManager.report_stage({"total": threat_total, "correct": found_total, "ratio": float(found_total) / float(maxi(found_total + missed_indices.size(), 1)), "extra": {"tiros": found_total + missed_indices.size()}})
 	GameManager.complete_current_stage(0)
 
 

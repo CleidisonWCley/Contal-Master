@@ -15,6 +15,9 @@ const SCENE_FREE_MENU := "res://scenes/menus/MenuMinigames.tscn"
 const SCENE_CUTSCENE_INTRO := "res://scenes/cutscenes/CutsceneIntro.tscn"
 const SCENE_STAGE_TRANSITION := "res://scenes/cutscenes/StageTransition.tscn"
 const SCENE_CUTSCENE_FINAL := "res://scenes/cutscenes/CutsceneFinal.tscn"
+## V0.15: conversa DEPOIS de cada minigame (feedback do anfitriao + Jales) e arquivo da equipe (lore).
+const SCENE_STAGE_DEBRIEF := "res://scenes/cutscenes/StageDebrief.tscn"
+const SCENE_TEAM_ARCHIVE := "res://scenes/menus/TeamArchive.tscn"
 const SCENE_SHOW_DO_BILHAO := "res://scenes/minigames/showdobilhao/ShowDoBilhao.tscn"
 const SCENE_BATALHA_NAVAL := "res://scenes/minigames/batalhanaval/BatalhaNaval.tscn"
 const SCENE_MALETA_CERTA := "res://scenes/minigames/maletacerta/MaletaCerta.tscn"
@@ -50,6 +53,11 @@ const BG_CUT_11_CENA_CREDITOS := CUT_DIR + "11_cena_creditos.png"
 const BG_CUT_12_CORREDOR := CUT_DIR + "012_corredor.png"
 ## V0.13.2: cena estatica da CHEGADA a sala de reuniao (Natalia recebendo o jogador). Usada pela ArrivalScene.
 const BG_CUT_13_ENTRADA_SALA := CUT_DIR + "13_entrada_sala_reuniao.png"
+## V0.15: ESTRADA A NOITE (interludio entre o Desvio Logico e o escritorio). O arquivo AINDA NAO EXISTE: quando voce
+## colocar a imagem em um dos dois caminhos abaixo, a cena passa a usa-la sozinha, sem mexer em codigo.
+## Enquanto nao existir, StageDebrief pinta um gradiente noturno (INTERLUDE_FALLBACK).
+const BG_CUT_14_ESTRADA := "res://assets/background/14_estrada.png"
+const BG_CUT_14_ESTRADA_ALT := CUT_DIR + "14_estrada.png"
 
 ## Background de novel de cada minigame da campanha (chave = key de GameManager.PHASES).
 const CUTSCENE_BG_BY_PHASE := {
@@ -67,6 +75,15 @@ const CUTSCENE_BG_BY_PHASE := {
 const CUTSCENE_BG_INTRO := {
 	"recepcao": BG_CUT_00_RECEPCAO,
 	"escritorio": BG_CUT_00_ESCRITORIO
+}
+
+## V0.15: cenarios dos INTERLUDIOS (cortes curtos entre cenas). Cada id lista os caminhos candidatos, em ordem; vale o
+## primeiro que existir. Se nenhum existir, usa INTERLUDE_FALLBACK (cor de cima, cor de baixo) como fundo.
+const CUTSCENE_BG_INTERLUDE := {
+	"estrada": [BG_CUT_14_ESTRADA, BG_CUT_14_ESTRADA_ALT]
+}
+const INTERLUDE_FALLBACK := {
+	"estrada": [Color(0.020, 0.030, 0.085, 1.0), Color(0.070, 0.050, 0.150, 1.0)]
 }
 
 ## Fechamento: a chave "background" de cada bloco da cutscene final escolhe um destes ids.
@@ -242,6 +259,13 @@ const DIALOGUE_MINIGAMES := {
 	"desvio_logico": "res://scripts/data/dialogues/desvio_logico.json"
 }
 
+# ---- V0.15: FEEDBACK POS-MINIGAME, MEMORIA DA FIRMA E LORE ---------
+const DEBRIEF_DIR := "res://scripts/data/debrief/"
+const LORE_DIR := "res://scripts/data/lore/"
+const LORE_FRAGMENTS := "res://scripts/data/lore/fragments.json"
+const LORE_PROFILES := "res://scripts/data/lore/profiles.json"
+const LORE_SECRET_ENDINGS := "res://scripts/data/lore/secret_endings.json"
+
 # ---- TUTORIAIS DOS MINIGAMES (V0.10) -----------------------------
 const TUTORIALS_DIR := "res://tutorials/"
 const TUTORIAL_OVERLAY_SCENE := "res://tutorials/TutorialOverlay.tscn"
@@ -286,6 +310,8 @@ const SFX_DOOR := "res://assets/sounds/efeitos/porta_abrindo.ogg"
 # ---- SAVES (user://) ----------------------------------------
 const SAVE_SCORES := "user://contal_master_scores.json"
 const SAVE_ACHIEVEMENTS := "user://contal_master_achievements.json"
+## V0.15: confianca por estacao, trechos de lore vistos e finais secretos liberados (arquivo SEPARADO dos recordes).
+const SAVE_LORE := "user://contal_master_lore.json"
 # Nomes ANTIGOS: usados somente por migrate_legacy_saves() para nao perder progresso de testadores.
 # Quando ninguem mais tiver save antigo, apague estas 2 constantes e a funcao abaixo.
 const LEGACY_SAVE_SCORES := "user://party_pascal_scores.json"
@@ -324,3 +350,11 @@ static func _migrate_save(old_path: String, new_path: String) -> void:
 	out.store_string(text)
 	out.close()
 	DirAccess.remove_absolute(old_path)
+
+## V0.15: primeiro caminho da lista que existe no build (ou "" se nenhum). Usado pelos interludios.
+static func first_existing(candidates: Array) -> String:
+	for candidate in candidates:
+		var path: String = str(candidate)
+		if path != "" and ResourceLoader.exists(path):
+			return path
+	return ""

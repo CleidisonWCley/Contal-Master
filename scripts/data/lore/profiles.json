@@ -1,0 +1,101 @@
+{
+  "schema": "lore_profiles",
+  "version": 1,
+  "notes": "V0.15 - 'Quem e' de cada personagem (nivel 1). Aparece como novel curta no Modo Livre na PRIMEIRA vez que o jogador conclui a estacao do personagem, e fica guardado no Arquivo da Equipe. 'station' = minigame que abre o perfil (Jales abre quando 3 estacoes diferentes chegam ao nivel 1). Linguagem neutra; ate 180 caracteres por quadro. Conteudo marcado 'proposta' aguarda confirmacao de canon.",
+  "canon": "proposta",
+  "profiles": [
+    {
+      "id": "priscila",
+      "name": "Priscila",
+      "role": "Líder de checagem normativa",
+      "station": "show_do_bilhao",
+      "frames": [
+        "Sou a Priscila, líder de checagem normativa. Cuido do que não pode falhar: prazos, ciclos e órgãos da NBC PA 11.",
+        "Não gosto de 'acho que'. Gosto de item, parágrafo e prazo. Mas torço por quem aprende, e quem volta aqui sempre aprende."
+      ]
+    },
+    {
+      "id": "anderson",
+      "name": "Anderson",
+      "role": "Estrategista das evidências",
+      "station": "batalha_naval",
+      "frames": [
+        "Anderson na área! Pra mim auditoria é navegação: cada coordenada dos papéis de trabalho pode esconder uma falha.",
+        "Gosto de mapa, de estratégia e de piada ruim. As duas primeiras ajudam no trabalho; a terceira ajuda o humor da equipe!"
+      ]
+    },
+    {
+      "id": "tiago",
+      "name": "Tiago",
+      "role": "O mais novo da equipe, cuida dos pareceres",
+      "station": "maleta_certa",
+      "frames": [
+        "Eu sou o Tiago, o mais novo da equipe. Cuido dos pareceres: saber qual conclusão emitir depois de analisar as evidências.",
+        "Chegar aqui foi um susto, mas me ensinaram rápido. Gosto de explicar o que aprendo, porque assim eu aprendo duas vezes."
+      ]
+    },
+    {
+      "id": "julios",
+      "name": "Julios",
+      "role": "Farejador de riscos",
+      "station": "roleta_risco",
+      "frames": [
+        "Julios. Eu farejo risco antes de ele chegar: conflito de interesse, familiaridade, intimidação. Sinto o cheiro de longe.",
+        "Dizem que sou arrogante. Dizem também que eu estou certo. Uma coisa não anula a outra."
+      ]
+    },
+    {
+      "id": "ariel",
+      "name": "Ariel",
+      "role": "Analista de campo",
+      "station": "perseguicao",
+      "frames": [
+        "Ariel. Analista de campo. Observo, anoto, decido.",
+        "Guardo o placar da firma e um caderno. Nada some do caderno. Nem o seu primeiro dia."
+      ]
+    },
+    {
+      "id": "aline",
+      "name": "Aline",
+      "role": "Instrutora de terminologia",
+      "station": "forca_tecnica",
+      "frames": [
+        "Sou a Aline, instrutora de terminologia. Termo exato é garantia de clareza. Termo aproximado é convite ao erro.",
+        "Dizem que sou exigente. Prefiro 'precisa'. E sim, as minhas opiniões são tão afiadas quanto o meu glossário. Hmpf."
+      ]
+    },
+    {
+      "id": "cleiton",
+      "name": "Cleiton",
+      "role": "Avaliador de papéis de trabalho",
+      "station": "stop",
+      "frames": [
+        "Sou o Cleiton e avalio papéis de trabalho. Sou gentil, mas não brinco em serviço quando o assunto é técnica.",
+        "Aqui me chamam de o estagiário mais antigo da firma. Eu aceito o título, e cuido do meu fermento com o mesmo capricho."
+      ]
+    },
+    {
+      "id": "natalia",
+      "name": "Natalia",
+      "role": "Especialista em raciocínio crítico",
+      "station": "desvio_logico",
+      "frames": [
+        "Sou a Natalia, especialista em raciocínio crítico. Na pista ou na auditoria, o que importa é escolher bem.",
+        "Eu dirijo rápido, mas chego com calma. E se quiser conversar sobre ética, eu sempre tenho tempo."
+      ]
+    },
+    {
+      "id": "jales",
+      "name": "Jales",
+      "role": "Fundador da ContalMaster",
+      "station": "",
+      "unlock": {
+        "stations_level_1": 3
+      },
+      "frames": [
+        "Sou o Jales, fundador da ContalMaster. Cuido para que todo Novato se sinta em casa antes de se sentir testado.",
+        "Gosto de ideias novas, de café frio e de boas equipes. As três andam juntas, e você está ajudando a provar isso."
+      ]
+    }
+  ]
+}
