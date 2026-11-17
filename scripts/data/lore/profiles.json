@@ -4,98 +4,98 @@
   "notes": "V0.15 - 'Quem e' de cada personagem (nivel 1). Aparece como novel curta no Modo Livre na PRIMEIRA vez que o jogador conclui a estacao do personagem, e fica guardado no Arquivo da Equipe. 'station' = minigame que abre o perfil (Jales abre quando 3 estacoes diferentes chegam ao nivel 1). Linguagem neutra; ate 180 caracteres por quadro. Alinhado ao canon de contalmaster_elenco.docx (v2.2).",
   "canon": "contalmaster_elenco v2.2",
   "profiles": [
-    {
-      "id": "priscila",
-      "name": "Priscila",
-      "role": "Líder de Checagem Normativa & Compliance",
-      "station": "show_do_bilhao",
-      "frames": [
-        "Sou a Priscila, líder de checagem normativa. Cresci entre rolos de tecido e aprendi cedo que norma não é burocracia: é o muro que protege.",
+	{
+	  "id": "priscila",
+	  "name": "Priscila",
+	  "role": "Líder de Checagem Normativa & Compliance",
+	  "station": "show_do_bilhao",
+	  "frames": [
+		"Sou a Priscila, líder de checagem normativa. Cresci entre rolos de tecido e aprendi cedo que norma não é burocracia: é o muro que protege.",
         "Não gosto de 'eu acho que'. Gosto de item, prazo e café sem açúcar. Mas torço por quem aprende, e explico duas vezes sem erguer a voz."
-      ]
-    },
-    {
-      "id": "anderson",
-      "name": "Anderson",
-      "role": "Especialista em Estratégia & Mapeamento de Evidências",
-      "station": "batalha_naval",
-      "frames": [
-        "Anderson na área! Sou o estrategista das evidências. Para mim, auditoria é navegação: cada coordenada dos papéis pode esconder uma falha.",
+	  ]
+	},
+	{
+	  "id": "anderson",
+	  "name": "Anderson",
+	  "role": "Especialista em Estratégia & Mapeamento de Evidências",
+	  "station": "batalha_naval",
+	  "frames": [
+		"Anderson na área! Sou o estrategista das evidências. Para mim, auditoria é navegação: cada coordenada dos papéis pode esconder uma falha.",
         "Nos fins de semana eu velejo na Enseada. Mapa, vento e uma piada ruim: essa é a minha receita, tripulante!"
-      ]
-    },
-    {
-      "id": "tiago",
-      "name": "Tiago",
-      "role": "Auditor Assistente / Especialista em Emissão de Pareceres",
-      "station": "maleta_certa",
-      "frames": [
-        "Eu sou o Tiago, auditor assistente e especialista em pareceres. Fui o primeiro da família a me formar, então cada pergunta permitida vale ouro.",
+	  ]
+	},
+	{
+	  "id": "tiago",
+	  "name": "Tiago",
+	  "role": "Auditor Assistente / Especialista em Emissão de Pareceres",
+	  "station": "maleta_certa",
+	  "frames": [
+		"Eu sou o Tiago, auditor assistente e especialista em pareceres. Fui o primeiro da família a me formar, então cada pergunta permitida vale ouro.",
         "Jogo futsal às quintas e guardo um Caderno de Erros: anoto cada erro meu para não esquecer o que aprendi com ele."
-      ]
-    },
-    {
-      "id": "julios",
-      "name": "Julios",
-      "role": "Especialista em Riscos Profissionais & Ética",
-      "station": "roleta_risco",
-      "frames": [
-        "Júlio Sérgio, mas é Julios, com S. Cuido de riscos profissionais e ética. Farejo conflito de interesse, familiaridade e intimidação de longe.",
+	  ]
+	},
+	{
+	  "id": "julios",
+	  "name": "Julios",
+	  "role": "Especialista em Riscos Profissionais & Ética",
+	  "station": "roleta_risco",
+	  "frames": [
+		"Júlio Sérgio, mas é Julios, com S. Cuido de riscos profissionais e ética. Farejo conflito de interesse, familiaridade e intimidação de longe.",
         "Dizem que sou arrogante. Dizem também que eu estou certo. Uma coisa não anula a outra. E sim, eu me importo, mas não conte para ninguém."
-      ]
-    },
-    {
-      "id": "ariel",
-      "name": "Ariel",
-      "role": "Analista de Campo & Inspeção de Inconsistências",
-      "station": "perseguicao",
-      "frames": [
-        "Ariel. Analista de campo. Observo, anoto, decido. Sou o mais novo da equipe e este é o meu primeiro emprego.",
+	  ]
+	},
+	{
+	  "id": "ariel",
+	  "name": "Ariel",
+	  "role": "Analista de Campo & Inspeção de Inconsistências",
+	  "station": "perseguicao",
+	  "frames": [
+		"Ariel. Analista de campo. Observo, anoto, decido. Sou o mais novo da equipe e este é o meu primeiro emprego.",
         "Corro provas de orientação, observo aves e resolvo o cubo mágico em menos de vinte segundos. Detalhe é comigo."
-      ]
-    },
-    {
-      "id": "aline",
-      "name": "Aline",
-      "role": "Professora & Mentora de Rigor Normativo",
-      "station": "forca_tecnica",
-      "frames": [
-        "Sou a Aline, professora e mentora de rigor normativo. Termo exato é garantia de clareza; termo aproximado é convite ao erro.",
+	  ]
+	},
+	{
+	  "id": "aline",
+	  "name": "Aline",
+	  "role": "Professora & Mentora de Rigor Normativo",
+	  "station": "forca_tecnica",
+	  "frames": [
+		"Sou a Aline, professora e mentora de rigor normativo. Termo exato é garantia de clareza; termo aproximado é convite ao erro.",
         "Tenho mestrado, pratico esgrima desde os 12 anos e coleciono dicionários antigos. Sim, sou exigente. Exijo porque acredito. Hmpf."
-      ]
-    },
-    {
-      "id": "cleiton",
-      "name": "Cleiton",
-      "role": "Auditor Sênior & Especialista em Controle Normativo",
-      "station": "stop",
-      "frames": [
-        "Sou o Cleiton, auditor sênior e o primeiro contratado da firma. Gentil, mas muito sério quando o assunto é técnica.",
+	  ]
+	},
+	{
+	  "id": "cleiton",
+	  "name": "Cleiton",
+	  "role": "Auditor Sênior & Especialista em Controle Normativo",
+	  "station": "stop",
+	  "frames": [
+		"Sou o Cleiton, auditor sênior e o primeiro contratado da firma. Gentil, mas muito sério quando o assunto é técnica.",
         "Em casa faço pão de fermentação natural e móveis simples. Paciência é o que mais se aprende, na marcenaria e na auditoria."
-      ]
-    },
-    {
-      "id": "natalia",
-      "name": "Natalia",
-      "role": "Especialista Sênior em Raciocínio Crítico & Análise de Desvios Éticos",
-      "station": "desvio_logico",
-      "frames": [
-        "Sou a Natalia, especialista em raciocínio crítico e desvios éticos. Na pista ou na auditoria, o que importa é escolher bem.",
+	  ]
+	},
+	{
+	  "id": "natalia",
+	  "name": "Natalia",
+	  "role": "Especialista Sênior em Raciocínio Crítico & Análise de Desvios Éticos",
+	  "station": "desvio_logico",
+	  "frames": [
+		"Sou a Natalia, especialista em raciocínio crítico e desvios éticos. Na pista ou na auditoria, o que importa é escolher bem.",
         "Aos domingos eu piloto kart e, quando dá, faço jantar para a equipe. Pode contar comigo, de carro ou de conversa."
-      ]
-    },
-    {
-      "id": "jales",
-      "name": "Jales",
-      "role": "Líder da equipe ContalMaster",
-      "station": "",
-      "unlock": {
-        "stations_level_1": 3
-      },
-      "frames": [
-        "Sou o Jales, fundador da ContalMaster. Cuido para que todo Novato se sinta em casa antes de se sentir testado.",
+	  ]
+	},
+	{
+	  "id": "jales",
+	  "name": "Jales",
+	  "role": "Líder da equipe ContalMaster",
+	  "station": "",
+	  "unlock": {
+		"stations_level_1": 3
+	  },
+	  "frames": [
+		"Sou o Jales, fundador da ContalMaster. Cuido para que todo Novato se sinta em casa antes de se sentir testado.",
         "Faço churrasco de domingo, rego as plantas da recepção e adoro biografia de fundador. Aqui, errar é permitido. Esconder o erro, não."
-      ]
-    }
+	  ]
+	}
   ]
 }

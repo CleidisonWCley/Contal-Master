@@ -194,6 +194,7 @@ func _build_ui() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	main_box.add_child(scroll)
+	TouchScroll.attach(scroll)   # V0.15.6: rolar com o dedo (celular/tablet)
 	_style_scrollbar(scroll)
 
 	# folga interna para o contorno/foco dos cartoes nao ser cortado pelo scroll

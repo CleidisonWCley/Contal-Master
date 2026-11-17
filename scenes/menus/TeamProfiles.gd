@@ -52,6 +52,7 @@ func _build_ui() -> void:
 	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_safe.add_child(_scroll)
+	TouchScroll.attach(_scroll)   # V0.15.6: rolar com o dedo (celular/tablet)
 	var pad: MarginContainer = UiKit.margin(10, 10, 10, 10)
 	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.add_child(pad)
