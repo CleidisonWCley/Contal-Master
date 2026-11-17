@@ -408,6 +408,10 @@ func _prepare_notification_layer() -> void:
 	_notification_layer.layer = 900
 	add_child(_notification_layer)
 
+## V0.15.3: aviso avulso (capitulo aberto etc.) no mesmo quadro das conquistas. Chaves: header, title, description, icon.
+func notify_custom(data: Dictionary) -> void:
+	_queue_notification(data)
+
 func _queue_notification(achievement: Dictionary) -> void:
 	_notification_queue.append(achievement.duplicate(true))
 	if not _notification_active:
@@ -472,7 +476,7 @@ func _show_notification_card(achievement: Dictionary) -> void:
 	row.add_child(text_box)
 
 	var header: Label = Label.new()
-	header.text = "Conquista desbloqueada!"
+	header.text = str(achievement.get("header", "Conquista desbloqueada!"))
 	header.add_theme_font_size_override("font_size", 16)
 	header.add_theme_color_override("font_color", Color(1.0, 0.86, 0.24, 1.0))
 	text_box.add_child(header)

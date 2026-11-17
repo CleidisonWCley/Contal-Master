@@ -14,8 +14,9 @@ class_name DebriefBuilder
 ##
 ##   MODO LIVRE  (conhecer os personagens e juntar lore; sem Jales)
 ##     1. anfitriao comenta o desempenho;
-##     2. UMA novidade de lore, se houver (perfil na 1a conclusao ou trecho liberado, ver LoreManager.next_unseen_item);
-##        sem novidade, a dica pratica (quando o desempenho nao foi perfeito).
+##     2. V0.15.3: se ha ESTRELA de confianca pendente, a CONVERSA (plan["extras"]: cena do personagem com o Jales, narracao
+##        centralizada e cartao de estrela); senao so a dica pratica.
+##        V0.15.4: o cartao de confianca NUNCA aparece sem estrela nova (antes uma faixa de andamento surgia apos todo minigame).
 ##
 ## O resultado e um "plano" (Dictionary) guardado em GameManager.debrief_plan e tocado por StageDebrief:
 ##   {"phase_key", "mode", "host", "frames": [...], "interlude": {...}, "characters": [ids], "has_content": bool}
@@ -37,7 +38,7 @@ static func load_debrief(phase_key: String) -> Dictionary:
 
 
 static func empty_plan(phase_key: String, mode: String) -> Dictionary:
-	return {"phase_key": phase_key, "mode": mode, "host": "", "frames": [], "interlude": {}, "characters": [], "has_content": false}
+	return {"phase_key": phase_key, "mode": mode, "host": "", "frames": [], "interlude": {}, "background": "", "characters": [], "has_content": false}
 
 
 static func build(phase_key: String, mode: String, report: Dictionary, next_phase_key: String = "") -> Dictionary:
@@ -47,6 +48,7 @@ static func build(phase_key: String, mode: String, report: Dictionary, next_phas
 		return plan
 	var host: String = str(data.get("host", "")).to_lower()
 	plan["host"] = host
+	plan["background"] = str(data.get("background", ""))
 	var tier: String = LoreManager.tier_for_report(report)
 	var frames: Array = []
 
@@ -74,29 +76,61 @@ static func build(phase_key: String, mode: String, report: Dictionary, next_phas
 			if next_line != "" and next_phase_key != "":
 				frames.append({"speaker": "jales", "show": ["jales", host], "text": next_line})
 	else:
-		var item: Dictionary = LoreManager.next_unseen_item(phase_key)
-		if not item.is_empty():
-			var owner: String = str(item.get("owner", host)).to_lower()
-			var label: String = "Perfil" if str(item.get("kind", "")) == "profile" else "Lore"
-			var display: String = str(LoreManager.CHARACTER_NAMES.get(owner, owner.capitalize()))
-			var texts: Array = item.get("frames", []) as Array
-			for i in range(texts.size()):
-				var lore_frame: Dictionary = {
-					"speaker": owner,
-					"show": [owner] if owner == host else [host, owner],
-					"name": "%s · %s" % [display, label],
-					"text": str(texts[i])
-				}
-				if i == 0:
-					lore_frame["lore"] = {"kind": str(item.get("kind", "")), "id": str(item.get("id", ""))}
-				frames.append(lore_frame)
-		elif tip != "":
-			frames.append({"speaker": host, "show": [host], "text": tip})
-
+		# V0.15.3: MODO LIVRE = conversa de confianca (a estrela pendente do anfitriao, ou do Julios) + o Jales em todas.
+		var extras: Array = []
+		for talk in LoreManager.plan_talks(phase_key):
+			var built: Dictionary = _talk_sequence(talk as Dictionary)
+			if not built.is_empty():
+				extras.append(built)
+		plan["extras"] = extras
+		if extras.is_empty():
+			if tip != "":
+				frames.append({"speaker": host, "show": [host], "text": tip})
 	plan["frames"] = frames
-	plan["has_content"] = not frames.is_empty()
-	plan["characters"] = _characters_in(frames)
+	plan["has_content"] = not frames.is_empty() or not (plan.get("extras", []) as Array).is_empty()
+	var chars: Array = _characters_in(frames)
+	for extra in plan.get("extras", []) as Array:
+		for id in (extra as Dictionary).get("characters", []) as Array:
+			if not chars.has(id):
+				chars.append(id)
+	plan["characters"] = chars
 	return plan
+
+
+## Quadros de UMA conversa (3 a 4 quadros do personagem + Jales), a narracao centralizada e o cartao de estrela.
+static func _talk_sequence(talk: Dictionary) -> Dictionary:
+	var owner: String = str(talk.get("owner", ""))
+	var level: int = int(talk.get("level", 1))
+	var co: String = str(talk.get("co", ""))
+	var scene: Dictionary = LoreManager.get_trust_scene(owner, level)
+	if scene.is_empty():
+		return {}
+	var has_jales: bool = owner == "jales"
+	for item in scene.get("frames", []) as Array:
+		if str((item as Dictionary).get("s", "")) == "jales":
+			has_jales = true
+	var visible: Array = [owner]
+	if owner == "jales":
+		if co != "" and co != "jales":
+			visible = ["jales", co]
+	elif has_jales:
+		visible = [owner, "jales"]
+	var frames: Array = []
+	for item in scene.get("frames", []) as Array:
+		var line: Dictionary = item as Dictionary
+		var speaker: String = str(line.get("s", owner))
+		frames.append({"speaker": speaker, "show": visible.duplicate(), "text": str(line.get("t", ""))})
+	var display: String = str(LoreManager.CHARACTER_NAMES.get(owner, owner.capitalize()))
+	var narration: Array = [
+		"Depois de uma longa conversa, você conhece %s um pouco melhor.",
+		"A conversa se estende, e %s abre mais da própria história com você.",
+		"Já é noite quando a conversa termina. %s agora trata você como gente da casa."
+	]
+	return {
+		"owner": owner, "level": level, "title": str(scene.get("title", "")), "frames": frames,
+		"talk_frames": [{"speaker": "", "narration": true, "dim": 0.72, "text": str(narration[clampi(level - 1, 0, 2)]) % display}],
+		"characters": visible
+	}
 
 
 static func _tier_lines(data: Dictionary, tier: String) -> Array:

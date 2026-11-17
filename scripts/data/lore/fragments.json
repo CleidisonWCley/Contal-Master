@@ -1,143 +1,706 @@
 {
-  "schema": "lore_fragments",
-  "version": 1,
-  "canon": "proposta",
-  "notes": "V0.15 - Mosaico de lore (secao 10 do ContalMaster_Fase2_Design). Cada trecho abre quando a ESTACAO do dono chega ao nivel pedido (1 = concluir; 2 = Prata; 3 = Ouro; ver LoreManager.GOALS) e aparece como novel curta no Modo Livre, 1 trecho por conclusao, alem de ficar no Arquivo da Equipe. 'unlock' (opcional) troca a regra por {\"all_stations_level\": N}. TODOS os textos sao PROPOSTA DE CANON: confirme item por item e edite aqui sem mexer em codigo. Ate 180 caracteres por quadro.",
-  "fragments": [
-    {
-      "id": "tiago_1",
-      "owner": "tiago",
-      "station": "maleta_certa",
-      "level": 1,
-      "title": "Por que a firma joga",
-      "hint": "Conclua a Maleta Certa.",
-      "frames": [
-        "Sabe por que a ContalMaster joga? Porque errar num jogo custa pontos, e não clientes. É o jeito mais barato de aprender.",
-        "Foi o Jales que me explicou isso no meu primeiro dia. Fiquei uma semana repetindo a frase para mim mesmo."
-      ]
-    },
-    {
-      "id": "priscila_2",
-      "owner": "priscila",
-      "station": "show_do_bilhao",
-      "level": 2,
-      "title": "A noite da pizza",
-      "hint": "Chegue à Prata no Show do Bilhão.",
-      "frames": [
-        "Foi numa terça, com uma pizza no meio da mesa. Eu, o Cleiton e a Aline começamos a nos perguntar a norma, só por diversão.",
-        "A pizza esfriou, o quiz ficou. Foi ali que a firma ganhou uma língua comum: a norma. O Show do Bilhão nasceu dessa noite."
-      ]
-    },
-    {
-      "id": "tiago_2",
-      "owner": "tiago",
-      "station": "maleta_certa",
-      "level": 2,
-      "title": "O teste do primeiro dia",
-      "hint": "Chegue à Prata na Maleta Certa.",
-      "frames": [
-        "Todo Novato é testado no primeiro dia pelos veteranos. Não é maldade: é o nosso jeito de dizer 'vem, você já faz parte'.",
-        "Eu passei por isso e, na hora, achei que ia desmaiar. Hoje eu entendo: quem testa quer ver você chegar."
-      ]
-    },
-    {
-      "id": "anderson_2",
-      "owner": "anderson",
-      "station": "batalha_naval",
-      "level": 2,
-      "title": "O furo no casco",
-      "hint": "Chegue à Prata na Batalha Naval.",
-      "frames": [
-        "Meu pai era oficial de navegação. Dizia que o mar perdoa muita coisa, menos um furo no casco que ninguém viu.",
-        "Quando fui para a auditoria, entendi: papéis de trabalho também têm casco. É por isso que eu varro cada coordenada!"
-      ]
-    },
-    {
-      "id": "ariel_2",
-      "owner": "ariel",
-      "station": "perseguicao",
-      "level": 2,
-      "title": "O palete do papel",
-      "hint": "Chegue à Prata na Perseguição.",
-      "frames": [
-        "Uma vez conferi um estoque inteiro. No papel, havia um palete. No chão, não havia.",
-        "O prazo era curto e o erro seria caro. Desde então eu olho antes de assinar. Observo, anoto, decido."
-      ]
-    },
-    {
-      "id": "aline_2",
-      "owner": "aline",
-      "station": "forca_tecnica",
-      "level": 2,
-      "title": "A palavra que anula",
-      "hint": "Chegue à Prata na Forca Técnica.",
-      "frames": [
-        "Minha família é de tabeliães. Em casa, aprendi cedo que uma palavra errada pode anular um ato inteiro.",
-        "Por isso eu insisto no termo exato. Hmpf. Não é frescura: é herança."
-      ]
-    },
-    {
-      "id": "cleiton_2",
-      "owner": "cleiton",
-      "station": "stop",
-      "level": 2,
-      "title": "Cada linha",
-      "hint": "Chegue à Prata no STOP.",
-      "frames": [
-        "Quando cheguei, havia um sênior que lia cada linha dos meus papéis, até as notas de rodapé. Eu achava exagero.",
-        "Hoje sei que revisar é respeito: ler cada linha é dizer 'o seu trabalho importa'. Eu tento fazer o mesmo com você."
-      ]
-    },
-    {
-      "id": "jales_all2",
-      "owner": "jales",
-      "station": "",
-      "level": 2,
-      "title": "A promessa do Jales",
-      "hint": "Leve todas as estações à Prata.",
-      "frames": [
-        "Vou contar por que a ContalMaster existe. Havia um colega júnior numa equipe e, quando ele errou, ninguém o defendeu.",
-        "Prometi que teria uma firma em que errar fosse parte de aprender. É por isso que a gente joga. Obrigado por ficar."
-      ],
-      "unlock": {
-        "all_stations_level": 2
-      }
-    },
-    {
-      "id": "julios_3",
-      "owner": "julios",
-      "station": "roleta_risco",
-      "level": 3,
-      "title": "O almoço",
-      "hint": "Chegue ao Ouro na Roleta de Risco (campanha).",
-      "frames": [
-        "Houve um almoço. Um cliente simpático, um prato caro e um papel na mesa. Eu quase assinei.",
-        "Não assinei. O resto da história fica comigo. E a história do 'S' do meu nome, também. Mistério é método."
-      ]
-    },
-    {
-      "id": "natalia_3",
-      "owner": "natalia",
-      "station": "desvio_logico",
-      "level": 3,
-      "title": "O elevador",
-      "hint": "Chegue ao Ouro no Desvio Lógico.",
-      "frames": [
-        "Já subi num elevador com um colega que sabia de um erro e não disse nada. O silêncio durou três andares.",
-        "O contrato foi embora junto com a confiança. Desde então eu escolho falar, com gentileza, mas falo. Por isso a pista tem bifurcações."
-      ]
-    },
-    {
-      "id": "tiago_3",
-      "owner": "tiago",
-      "station": "maleta_certa",
-      "level": 3,
-      "title": "A maleta vazia",
-      "hint": "Chegue ao Ouro na Maleta Certa.",
-      "frames": [
-        "No meu primeiro dia, o Jales me deu uma maleta. Eu abri e estava vazia. Pensei que fosse pegadinha.",
-        "Ele disse: 'aqui dentro cabe tudo o que você vai aprender'. Guardo a maleta até hoje. Já está bem cheia."
-      ]
-    }
-  ]
+ "schema": "lore_fragments",
+ "version": 2,
+ "canon": "contalmaster_elenco v2.2",
+ "notes": "V0.15.3 - Conversas de confianca. Cada cena = 1 estrela de um personagem (id '<personagem>_<nivel>'), tocada no MODO LIVRE depois do minigame dele quando os pontos de confianca alcancam o limite (LoreManager.STAR_THRESHOLDS / JALES_THRESHOLDS). 3 a 4 quadros por cena; 's' = quem fala; o ultimo quadro e do dono e convida para a conversa; o Jales participa de todas. Escrito com as palavras do proprio personagem (ver contalmaster_elenco.docx). Ate ~190 caracteres por quadro. O texto 'Apos uma longa conversa...' e o cartao de estrela sao montados pelo DebriefBuilder.",
+ "fragments": [
+  {
+   "id": "jales_1",
+   "owner": "jales",
+   "station": "",
+   "level": 1,
+   "title": "O número 214",
+   "hint": "Converse com Jales no Modo Livre.",
+   "frames": [
+	{
+	 "s": "jales",
+	 "t": "Eu comecei como o número 214 numa fila de assistentes, numa firma enorme. Ninguém sabia o meu nome. Hoje faço questão de saber o de todo mundo."
+	},
+	{
+	 "s": "jales",
+	 "t": "Aqui a gente fala em “nós”. Churrasco de domingo, samambaia na recepção e café coado no fim da tarde. É a nossa cara."
+	},
+	{
+	 "s": "jales",
+	 "t": "Tem uma frase que eu queria ter ouvido naquela época: “pode perguntar”. Então repito sempre. Pode perguntar, Novato. Vamos conversar?"
+	}
+   ]
+  },
+  {
+   "id": "jales_2",
+   "owner": "jales",
+   "station": "",
+   "level": 2,
+   "title": "A promessa",
+   "hint": "Converse com Jales no Modo Livre.",
+   "frames": [
+	{
+	 "s": "jales",
+	 "t": "No meu segundo ano, vi um colega júnior ser exposto diante do cliente por um erro que ninguém tinha ensinado a evitar. Ninguém o defendeu."
+	},
+	{
+	 "s": "jales",
+	 "t": "Ele deixou a profissão meses depois. Ali eu prometi: se um dia tivesse uma firma, errar seria permitido. Esconder o erro, não."
+	},
+	{
+	 "s": "jales",
+	 "t": "Em 2020, aos 27, abri a ContalMaster. Uma sala alugada, duas mesas e essa promessa. O Cleiton foi o primeiro a acreditar."
+	},
+	{
+	 "s": "jales",
+	 "t": "Por isso, quando alguém erra, a minha pergunta é sempre a mesma: o que a gente não ensinou? Vem, senta aqui. Quero ouvir a sua."
+	}
+   ]
+  },
+  {
+   "id": "jales_3",
+   "owner": "jales",
+   "station": "",
+   "level": 3,
+   "title": "A noite do manual",
+   "hint": "Converse com Jales no Modo Livre.",
+   "frames": [
+	{
+	 "s": "jales",
+	 "t": "Na véspera da primeira revisão, em 2023, fiquei até as quatro da manhã relendo o manual com a Priscila. Eu achava que estávamos prontos."
+	},
+	{
+	 "s": "jales",
+	 "t": "O relatório saiu “com deficiências”. Fui o primeiro a assumir a responsabilidade diante da equipe. E abri o plano de ação com a pergunta de sempre."
+	},
+	{
+	 "s": "jales",
+	 "t": "O que eu quero? Ver a firma receber o selo de excelência e, depois, revisar outras firmas com a mesma gentileza que recebemos."
+	},
+	{
+	 "s": "jales",
+	 "t": "O que eu temo? Virar a grande firma de onde saí, onde ninguém sabe o nome de ninguém. Enquanto você estiver aqui, eu fico tranquilo. Fica mais um pouco?"
+	}
+   ]
+  },
+  {
+   "id": "priscila_1",
+   "owner": "priscila",
+   "station": "show_do_bilhao",
+   "level": 1,
+   "title": "Item, prazo e café sem açúcar",
+   "hint": "Converse com Priscila no Modo Livre.",
+   "frames": [
+	{
+	 "s": "priscila",
+	 "t": "Priscila. Checagem normativa. Resumindo: eu cito o item, confiro o prazo e não aceito “eu acho que”."
+	},
+	{
+	 "s": "priscila",
+	 "t": "Cresci entre rolos de tecido, na loja da minha mãe. Costuro, bordo, resolvo palavras cruzadas. De caneta, nunca de lápis."
+	},
+	{
+	 "s": "jales",
+	 "t": "A Priscila diz que é fria. Ela anota o aniversário de cada um num caderninho de bolso. Eu já vi."
+	},
+	{
+	 "s": "priscila",
+	 "t": "Jales. Isso não precisava constar. Anotado. Novato, sente-se. Café sem açúcar? Temos tempo."
+	}
+   ]
+  },
+  {
+   "id": "priscila_2",
+   "owner": "priscila",
+   "station": "show_do_bilhao",
+   "level": 2,
+   "title": "A loja e a multa",
+   "hint": "Converse com Priscila no Modo Livre.",
+   "frames": [
+	{
+	 "s": "priscila",
+	 "t": "Aos 15 anos, vi a loja da minha mãe pagar uma multa pesada. Um terceiro leu mal um prazo fiscal. Quase fechamos."
+	},
+	{
+	 "s": "priscila",
+	 "t": "Aprendi ali: norma não é burocracia. É o muro que protege quem trabalha honestamente."
+	},
+	{
+	 "s": "jales",
+	 "t": "Foi por isso que ela escolheu a checagem. Ali o erro é evitável. Eu confio nela de olhos fechados, e ela confere mesmo assim."
+	},
+	{
+	 "s": "priscila",
+	 "t": "Conferir não é desconfiar. Sente-se, Novato. Eu explico duas vezes."
+	}
+   ]
+  },
+  {
+   "id": "priscila_3",
+   "owner": "priscila",
+   "station": "show_do_bilhao",
+   "level": 3,
+   "title": "Agora todo mundo sabe",
+   "hint": "Converse com Priscila no Modo Livre.",
+   "frames": [
+	{
+	 "s": "priscila",
+	 "t": "2023. O relatório saiu “com deficiências”. Fiquei sozinha na sala até a madrugada, reescrevendo o manual de qualidade."
+	},
+	{
+	 "s": "priscila",
+	 "t": "De manhã, deixei um bilhete em cada mesa: “agora todo mundo sabe”. Foi o jeito que achei de pedir desculpas."
+	},
+	{
+	 "s": "jales",
+	 "t": "Eu li o meu três vezes. Está guardado na gaveta."
+	},
+	{
+	 "s": "priscila",
+	 "t": "Quero que ninguém precise “achar” nada sobre a norma. E temo falhar no dia em que cobrarem de mim o que cobro dos outros. Fica entre nós. Sente-se."
+	}
+   ]
+  },
+  {
+   "id": "anderson_1",
+   "owner": "anderson",
+   "station": "batalha_naval",
+   "level": 1,
+   "title": "Capitão de mesa",
+   "hint": "Converse com Anderson no Modo Livre.",
+   "frames": [
+	{
+	 "s": "anderson",
+	 "t": "Anderson na área! Estrategista de evidências e capitão nas horas vagas. O boné é amuleto: nos dias de revisão eu não saio sem ele!"
+	},
+	{
+	 "s": "anderson",
+	 "t": "Fim de semana é regata na Enseada. Leio vento do jeito que leio balancete: os dois mudam de repente, tripulante!"
+	},
+	{
+	 "s": "jales",
+	 "t": "O Anderson dá apelido para todo mundo. Eu sou o “imediato”. Ainda não descobri o que isso quer dizer."
+	},
+	{
+	 "s": "anderson",
+	 "t": "Quer dizer que você manda, mas quem lê o mapa sou eu! Vem, tripulante, senta aí que eu desenho no quadro!"
+	}
+   ]
+  },
+  {
+   "id": "anderson_2",
+   "owner": "anderson",
+   "station": "batalha_naval",
+   "level": 2,
+   "title": "O furo no casco",
+   "hint": "Converse com Anderson no Modo Livre.",
+   "frames": [
+	{
+	 "s": "anderson",
+	 "t": "Meu pai foi oficial de navegação de cabotagem, em Santos. Dizia que navio não afunda por um rombo, e sim por um furinho que ninguém inspecionou."
+	},
+	{
+	 "s": "anderson",
+	 "t": "Vistoria de casco virou ritual lá em casa: nenhum centímetro sem olhar. Depois descobri que auditoria é a mesma coisa. Haha!"
+	},
+	{
+	 "s": "jales",
+	 "t": "Registro faltando é furo no casco. Foi o Anderson quem me ensinou a olhar a documentação assim."
+	},
+	{
+	 "s": "anderson",
+	 "t": "Por isso eu fecho todo planejamento com a mesma pergunta: o que pode furar o casco? Pensa nisso comigo, tripulante!"
+	}
+   ]
+  },
+  {
+   "id": "anderson_3",
+   "owner": "anderson",
+   "station": "batalha_naval",
+   "level": 3,
+   "title": "A regata que ficou no porto",
+   "hint": "Converse com Anderson no Modo Livre.",
+   "frames": [
+	{
+	 "s": "anderson",
+	 "t": "Em 2024 uma tempestade quase me fez perder uma regata. Eu já estava na marina, vela içada, ansioso."
+	},
+	{
+	 "s": "anderson",
+	 "t": "Voltei ao porto. E sabe? Foi a melhor decisão do dia: não zarpar. Planejar também é saber a hora de ficar."
+	},
+	{
+	 "s": "jales",
+	 "t": "Quase ninguém conhece essa parte do Anderson: o agitado que sabe esperar."
+	},
+	{
+	 "s": "anderson",
+	 "t": "Meu sonho é ver cada trabalho com um mapa claro, do começo ao fim. Meu medo é ficar parado, sem rota. Hoje você está no mapa. Fica, tripulante!"
+	}
+   ]
+  },
+  {
+   "id": "tiago_1",
+   "owner": "tiago",
+   "station": "maleta_certa",
+   "level": 1,
+   "title": "Pode perguntar",
+   "hint": "Converse com Tiago no Modo Livre.",
+   "frames": [
+	{
+	 "s": "tiago",
+	 "t": "Oi! Eu sou o Tiago, auditor assistente. Fui o primeiro da família a me formar, então pergunta é coisa que eu valorizo muito."
+	},
+	{
+	 "s": "tiago",
+	 "t": "Jogo futsal às quintas, de fixo. E guardo um Caderno de Erros: cada erro meu, com a data e a correção em uma frase."
+	},
+	{
+	 "s": "jales",
+	 "t": "O Tiago era o mais novo da casa até o Ariel chegar. Agora é ele quem ensina. E leva isso a sério demais."
+	},
+	{
+	 "s": "tiago",
+	 "t": "Desculpa, me empolguei! Mas pode perguntar o que quiser, de verdade. Obrigado por conversar comigo!"
+	}
+   ]
+  },
+  {
+   "id": "tiago_2",
+   "owner": "tiago",
+   "station": "maleta_certa",
+   "level": 2,
+   "title": "O que a maleta não leva",
+   "hint": "Converse com Tiago no Modo Livre.",
+   "frames": [
+	{
+	 "s": "tiago",
+	 "t": "Na semana em que cheguei, errei um dilema diante de todo mundo. Fiquei esperando a bronca. Acho que nem respirei."
+	},
+	{
+	 "s": "tiago",
+	 "t": "O Jales só disse: “agora você sabe o que a maleta não leva”. Escrevi a frase na primeira página do Caderno de Erros."
+	},
+	{
+	 "s": "jales",
+	 "t": "Quem ensina com vergonha ensina medo. Eu prefiro que a gente aprenda com curiosidade."
+	},
+	{
+	 "s": "tiago",
+	 "t": "Um professor já me humilhou por uma dúvida. Prometi que ninguém ia se sentir pequeno perguntando comigo. Obrigado por me deixar contar!"
+	}
+   ]
+  },
+  {
+   "id": "tiago_3",
+   "owner": "tiago",
+   "station": "maleta_certa",
+   "level": 3,
+   "title": "O post-it",
+   "hint": "Converse com Tiago no Modo Livre.",
+   "frames": [
+	{
+	 "s": "tiago",
+	 "t": "Quando o Ariel chegou, copiei a frase da maleta num post-it e colei na mesa dele. Ele não disse nada. Mas não tirou o post-it."
+	},
+	{
+	 "s": "tiago",
+	 "t": "Foi a primeira vez que alguém aprendeu comigo. Sei que parece pouco, desculpa, mas para mim foi enorme."
+	},
+	{
+	 "s": "jales",
+	 "t": "Pouco, nada. O Tiago passou adiante o que recebeu. É exatamente isso que a gente quer aqui."
+	},
+	{
+	 "s": "tiago",
+	 "t": "Quero passar no exame e ser quem ensina o Primeiro Dia a quem chegar. Meu medo é voltar a ser o aluno de quem riram. Aqui eu não sou. Obrigado!"
+	}
+   ]
+  },
+  {
+   "id": "julios_1",
+   "owner": "julios",
+   "station": "roleta_risco",
+   "level": 1,
+   "title": "Julios, com S",
+   "hint": "Converse com Julios no Modo Livre.",
+   "frames": [
+	{
+	 "s": "julios",
+	 "t": "Ei, gracinha. Passei só para me apresentar direito. Júlio Sérgio, mas é Julios, com S. Não pergunte por quê."
+	},
+	{
+	 "s": "julios",
+	 "t": "Riscos e ética. Farejo conflito de interesse de longe. Pôquer sem dinheiro, vinil pós-punk e escândalos corporativos: meus romances policiais."
+	},
+	{
+	 "s": "jales",
+	 "t": "O Julios acha que é arrogante. E é. Mas confio nele mais do que em qualquer relatório que já li."
+	},
+	{
+	 "s": "julios",
+	 "t": "Isso foi um elogio? Anotado. E não conte para ninguém que eu me importo. Agora senta, a conversa vai ser boa."
+	}
+   ]
+  },
+  {
+   "id": "julios_2",
+   "owner": "julios",
+   "station": "roleta_risco",
+   "level": 2,
+   "title": "O almoço que quase",
+   "hint": "Converse com Julios no Modo Livre.",
+   "frames": [
+	{
+	 "s": "julios",
+	 "t": "Aos 22, assistente numa empresa cujo diretor era amigo da minha família. Me pediram para assinar sem olhar um assunto delicado."
+	},
+	{
+	 "s": "julios",
+	 "t": "Quase assinei. Saí do almoço com o estômago virado e jurei: nunca mais confundir afeto com independência."
+	},
+	{
+	 "s": "jales",
+	 "t": "É por isso que eu confio no julgamento dele quando a pressão aperta."
+	},
+	{
+	 "s": "julios",
+	 "t": "A empresa quebrou dois anos depois. Desconfiar virou método, não maldade. Fica aí, gracinha. A conversa é longa."
+	}
+   ]
+  },
+  {
+   "id": "julios_3",
+   "owner": "julios",
+   "station": "roleta_risco",
+   "level": 3,
+   "title": "Um favor recusado",
+   "hint": "Converse com Julios no Modo Livre.",
+   "frames": [
+	{
+	 "s": "julios",
+	 "t": "2025. Um cliente poderoso tentou resolver uma divergência comigo com um favor, durante um almoço. Aceitei o almoço. Recusei o favor."
+	},
+	{
+	 "s": "julios",
+	 "t": "Documentei tudo e voltei ao escritório sem dizer nada. A Priscila achou a anotação e pregou no mural. Sem comentário."
+	},
+	{
+	 "s": "jales",
+	 "t": "Foi o comentário mais bonito que ela já fez."
+	},
+	{
+	 "s": "julios",
+	 "t": "Quero que alguém me chame de Julios sem perguntar por quê. E temo que a armadura tenha virado o rosto. Você não ouviu isso, gracinha."
+	}
+   ]
+  },
+  {
+   "id": "ariel_1",
+   "owner": "ariel",
+   "station": "perseguicao",
+   "level": 1,
+   "title": "Observo, anoto, decido",
+   "hint": "Converse com Ariel no Modo Livre.",
+   "frames": [
+	{
+	 "s": "ariel",
+	 "t": "Ariel. Analista de campo. Observo, anoto, decido."
+	},
+	{
+	 "s": "ariel",
+	 "t": "Sou o mais novo da equipe. Primeiro emprego. Falo pouco. Não é frieza. É atenção."
+	},
+	{
+	 "s": "jales",
+	 "t": "O Ariel fala pouco e vê muito. Aprendi a confiar nos silêncios dele."
+	},
+	{
+	 "s": "ariel",
+	 "t": "Nos fins de semana subo os morros com binóculo. Observo aves. Cubo mágico: menos de vinte segundos. Quer sentar? Eu escuto."
+	}
+   ]
+  },
+  {
+   "id": "ariel_2",
+   "owner": "ariel",
+   "station": "perseguicao",
+   "level": 2,
+   "title": "Dois segundos e um inventário",
+   "hint": "Converse com Ariel no Modo Livre.",
+   "frames": [
+	{
+	 "s": "ariel",
+	 "t": "Eu era a criança que ganhava o jogo dos sete erros em dois segundos."
+	},
+	{
+	 "s": "ariel",
+	 "t": "Último ano da faculdade. Um item existia no papel e não na prateleira. Ali entendi: papel e mundo diferem. Isso é fato, não opinião."
+	},
+	{
+	 "s": "jales",
+	 "t": "Ele mandou mais de quarenta currículos. Fomos os únicos a responder: “venha conhecer a equipe”."
+	},
+	{
+	 "s": "ariel",
+	 "t": "Foi a melhor resposta que recebi. Fico à vontade com você. Pode sentar."
+	}
+   ]
+  },
+  {
+   "id": "ariel_3",
+   "owner": "ariel",
+   "station": "perseguicao",
+   "level": 3,
+   "title": "Linha 14",
+   "hint": "Converse com Ariel no Modo Livre.",
+   "frames": [
+	{
+	 "s": "ariel",
+	 "t": "Primeira semana. Achei sozinho uma divergência que a equipe tinha deixado passar. Não disse nada."
+	},
+	{
+	 "s": "ariel",
+	 "t": "Deixei um bilhete na mesa do Cleiton. Duas palavras: “linha 14”. Ele leu. Sorriu. Pediu que eu anotasse no caderno do primeiro dia."
+	},
+	{
+	 "s": "jales",
+	 "t": "O caderno está com ele porque eu confio nos números dele. E nas poucas palavras também."
+	},
+	{
+	 "s": "ariel",
+	 "t": "Ali senti que era da casa. Quero provar que mereço o lugar. Temo parecer desinteressado. Não sou. Estou aqui. Fica?"
+	}
+   ]
+  },
+  {
+   "id": "aline_1",
+   "owner": "aline",
+   "station": "forca_tecnica",
+   "level": 1,
+   "title": "Hmpf, professora",
+   "hint": "Converse com Aline no Modo Livre.",
+   "frames": [
+	{
+	 "s": "aline",
+	 "t": "Aline. Professora. Hmpf. Pode chamar de “professora”, todo mundo chama, até os veteranos."
+	},
+	{
+	 "s": "aline",
+	 "t": "Formei aos vinte. Mestrado. Aulas de Auditoria à noite. E cuido da educação continuada desta casa, porque alguém precisa."
+	},
+	{
+	 "s": "jales",
+	 "t": "Ela me chama de “diretor”, com uma ironia que eu escolhi interpretar como carinho."
+	},
+	{
+	 "s": "aline",
+	 "t": "Interprete como quiser. Hmpf. Sente-se direito, Novato. Chá, só se prometer não derramar nos papéis. E não se acostume com a gentileza."
+	}
+   ]
+  },
+  {
+   "id": "aline_2",
+   "owner": "aline",
+   "station": "forca_tecnica",
+   "level": 2,
+   "title": "A palavra que anula",
+   "hint": "Converse com Aline no Modo Livre.",
+   "frames": [
+	{
+	 "s": "aline",
+	 "t": "Sou de Pomerode, descendente de alemães. Precisão, língua e ofício bem feito eram tradição de casa. Meu avô dizia: um documento é uma promessa."
+	},
+	{
+	 "s": "aline",
+	 "t": "Jogávamos forca no papel. Cada palavra errada custava um pedaço do boneco. Um termo errado “enforca” o texto e quem assina."
+	},
+	{
+	 "s": "jales",
+	 "t": "Foi ela quem montou o glossário da firma. E é quem me diz as verdades que ninguém mais diz."
+	},
+	{
+	 "s": "aline",
+	 "t": "Hmpf. Guarde isto: uma palavra trocada muda tudo. Sente-se, a aula é longa."
+	}
+   ]
+  },
+  {
+   "id": "aline_3",
+   "owner": "aline",
+   "station": "forca_tecnica",
+   "level": 3,
+   "title": "A margem da prova",
+   "hint": "Converse com Aline no Modo Livre.",
+   "frames": [
+	{
+	 "s": "aline",
+	 "t": "2024. Devolvi a prova de um aluno e escrevi na margem a única frase gentil da minha carreira: “esta resposta me ensinou algo”."
+	},
+	{
+	 "s": "aline",
+	 "t": "Ele guardou a prova. Eu finjo que não sei. Hmpf."
+	},
+	{
+	 "s": "jales",
+	 "t": "Ela finge. Eu já a vi sorrindo para uma prova velha. Não conte que eu disse."
+	},
+	{
+	 "s": "aline",
+	 "t": "Quero ver uma aluna minha assinar o primeiro relatório. Temo que o rigor me deixe sem ninguém para dividir o chá. Isso não consta. Sente-se."
+	}
+   ]
+  },
+  {
+   "id": "cleiton_1",
+   "owner": "cleiton",
+   "station": "stop",
+   "level": 1,
+   "title": "Gentil por escolha",
+   "hint": "Converse com Cleiton no Modo Livre.",
+   "frames": [
+	{
+	 "s": "cleiton",
+	 "t": "Cleiton. Auditor sênior. Obrigado por vir conversar. Não é todo dia que alguém tira um tempo para isso."
+	},
+	{
+	 "s": "cleiton",
+	 "t": "Cuido da carteira de previdência complementar e do programa interno de qualidade. Em casa, dois filhos e uma bancada de marcenaria."
+	},
+	{
+	 "s": "jales",
+	 "t": "O Cleiton faz uma piada por ano. Todo mundo lembra."
+	},
+	{
+	 "s": "cleiton",
+	 "t": "Essa foi a do ano? Então já gastei. Aos domingos, meus filhos treinam o STOP comigo. Sente-se, Novato."
+	}
+   ]
+  },
+  {
+   "id": "cleiton_2",
+   "owner": "cleiton",
+   "station": "stop",
+   "level": 2,
+   "title": "Notas nas margens",
+   "hint": "Converse com Cleiton no Modo Livre.",
+   "frames": [
+	{
+	 "s": "cleiton",
+	 "t": "No começo da carreira, um sênior leu meus papéis linha por linha e escreveu notas à mão nas margens. Aprendi mais ali do que na faculdade."
+	},
+	{
+	 "s": "cleiton",
+	 "t": "Entendi que revisar é um ato de respeito: o trabalho de alguém importa o bastante para ser lido."
+	},
+	{
+	 "s": "jales",
+	 "t": "O Cleiton revisa cada papel do Tiago com notas à mão. Como fizeram com ele. É assim que uma casa se constrói."
+	},
+	{
+	 "s": "cleiton",
+	 "t": "Hoje pago essa dívida lendo com o mesmo cuidado. Na previdência, o dinheiro é de quem espera a aposentadoria. Fique, conversemos."
+	}
+   ]
+  },
+  {
+   "id": "cleiton_3",
+   "owner": "cleiton",
+   "station": "stop",
+   "level": 3,
+   "title": "O primeiro mês de 2020",
+   "hint": "Converse com Cleiton no Modo Livre.",
+   "frames": [
+	{
+	 "s": "cleiton",
+	 "t": "Em 2020 a firma tinha duas mesas e nenhum cliente. O Jales acreditou antes de qualquer um. Eu acreditei no Jales."
+	},
+	{
+	 "s": "jales",
+	 "t": "Ele foi o primeiro contratado. É o irmão mais velho que eu não tive. Nunca vou esquecer que ele acreditou em nós."
+	},
+	{
+	 "s": "cleiton",
+	 "t": "Há coisas da fundação que ficam entre quem as viveu. Quero ver meus filhos crescerem num mundo em que o trabalho bem feito ainda importa."
+	},
+	{
+	 "s": "cleiton",
+	 "t": "Meu medo é perder a paciência com quem erra e virar o sênior que nunca quis ser. Obrigado por ouvir. Foi uma honra conversar com você."
+	}
+   ]
+  },
+  {
+   "id": "natalia_1",
+   "owner": "natalia",
+   "station": "desvio_logico",
+   "level": 1,
+   "title": "Sorriso antes da fala",
+   "hint": "Converse com Natalia no Modo Livre.",
+   "frames": [
+	{
+	 "s": "natalia",
+	 "t": "Oi! Natalia. Auditora de dia, piloto nos fins de semana. Eu sorrio antes de falar, é mais forte que eu!"
+	},
+	{
+	 "s": "natalia",
+	 "t": "Cuido da ética aqui, mas sermão não é comigo: eu pergunto. E o Bionix, o carro da garagem, sou eu que levo à pista."
+	},
+	{
+	 "s": "jales",
+	 "t": "Por isso confiei a ela a recepção afetiva de quem chega. A Natalia faz todo mundo se sentir escolhido."
+	},
+	{
+	 "s": "natalia",
+	 "t": "Escolhido e responsável! Vem, Novato, me conta: o que você achou da ilha até agora?"
+	}
+   ]
+  },
+  {
+   "id": "natalia_2",
+   "owner": "natalia",
+   "station": "desvio_logico",
+   "level": 2,
+   "title": "O elevador",
+   "hint": "Converse com Natalia no Modo Livre.",
+   "frames": [
+	{
+	 "s": "natalia",
+	 "t": "Ainda trainee, num elevador, ouvi um colega bem-intencionado comentar um detalhe de um cliente. Havia gente ouvindo."
+	},
+	{
+	 "s": "natalia",
+	 "t": "O cliente soube. A firma perdeu o contrato. E eu estava lá, calada. Percebi que o silêncio também é uma decisão."
+	},
+	{
+	 "s": "jales",
+	 "t": "Quando ela chegou, em 2024, me disse que ética se ensina com acolhimento, não com medo. Eu só dei a pista."
+	},
+	{
+	 "s": "natalia",
+	 "t": "Por isso pergunto em vez de dar sermão. Se fosse com você, o que teria feito naquele elevador?"
+	}
+   ]
+  },
+  {
+   "id": "natalia_3",
+   "owner": "natalia",
+   "station": "desvio_logico",
+   "level": 3,
+   "title": "Vamos deixar isso no elevador?",
+   "hint": "Converse com Natalia no Modo Livre.",
+   "frames": [
+	{
+	 "s": "natalia",
+	 "t": "Meu primeiro mês, 2024. A recepcionista de um cliente comentou algo sigiloso no elevador. Eu sorri e disse: “vamos deixar isso aqui no elevador?”."
+	},
+	{
+	 "s": "natalia",
+	 "t": "Foi a primeira vez que usei o silêncio a favor. Ninguém saiu constrangido, e o sigilo ficou onde estava."
+	},
+	{
+	 "s": "jales",
+	 "t": "É a cara dela: firmeza com sorriso. Eu sinto muito orgulho."
+	},
+	{
+	 "s": "natalia",
+	 "t": "Quero fazer da gentileza um método de trabalho reconhecido. Meu medo é parecer fraca. Mas hoje, olha só: estou muito orgulhosa de você!"
+	}
+   ]
+  }
+ ]
 }

@@ -15,7 +15,6 @@ const MINIGAME_CARD_DATA: Array[Dictionary] = [
 ]
 
 var back_button: Button
-var _archive_button: Button  # V0.15: Arquivo da Equipe (lore)
 
 var _safe_area: MarginContainer
 var _main_box: VBoxContainer
@@ -106,13 +105,6 @@ func _build_ui() -> void:
 	back_button = UiKit.back_button()
 	back_button.pressed.connect(_on_back_pressed)
 	back_row.add_child(back_button)
-	# V0.15: o Modo Livre tambem e o lugar de conhecer os personagens e juntar lore.
-	_archive_button = Button.new()
-	_archive_button.name = "ArchiveButton"
-	_archive_button.text = "Arquivo da Equipe"
-	_archive_button.pressed.connect(_on_archive_pressed)
-	ButtonStyles.apply(_archive_button, "ui_ghost", Vector2(222, 52), 18)
-	back_row.add_child(_archive_button)
 
 ## Cartao: [selo] Titulo / descricao / Recorde.
 func _make_card(index: int, data: Dictionary, difficulty: String) -> void:
@@ -205,8 +197,6 @@ func _apply_responsive_layout() -> void:
 		_card_badges[i].custom_minimum_size = Vector2(badge_size, badge_size)
 	_layout_rows(columns, gap)
 	ButtonStyles.apply(back_button, "ui_ghost", Vector2(222, 46 if compact else 52), 18)
-	if _archive_button != null:
-		ButtonStyles.apply(_archive_button, "ui_ghost", Vector2(222, 46 if compact else 52), 18)
 
 ## Distribui os cartoes em linhas de `columns` itens; cada linha e centralizada,
 ## entao a ultima (incompleta) fica centralizada: 4 em cima, 3 embaixo.
@@ -245,10 +235,6 @@ func _on_difficulty_selected(_key: String) -> void:
 func _on_minigame_pressed(index: int) -> void:
 	_click()
 	GameManager.start_free_minigame(index)
-
-func _on_archive_pressed() -> void:
-	_click()
-	GameManager.open_team_archive()
 
 func _on_back_pressed() -> void:
 	_click()

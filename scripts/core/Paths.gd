@@ -18,6 +18,10 @@ const SCENE_CUTSCENE_FINAL := "res://scenes/cutscenes/CutsceneFinal.tscn"
 ## V0.15: conversa DEPOIS de cada minigame (feedback do anfitriao + Jales) e arquivo da equipe (lore).
 const SCENE_STAGE_DEBRIEF := "res://scenes/cutscenes/StageDebrief.tscn"
 const SCENE_TEAM_ARCHIVE := "res://scenes/menus/TeamArchive.tscn"
+const SCENE_ARCHIVE_ENTRY := "res://scenes/menus/ArchiveEntry.tscn"
+## V0.15.2: Arquivos da Equipe virou um hub com duas telas: "Arquivos da Firma" (lore da firma) e "Perfis da Equipe" (os 9 personagens).
+const SCENE_FIRMA_ARCHIVE := "res://scenes/menus/FirmaArchive.tscn"
+const SCENE_TEAM_PROFILES := "res://scenes/menus/TeamProfiles.tscn"
 const SCENE_SHOW_DO_BILHAO := "res://scenes/minigames/showdobilhao/ShowDoBilhao.tscn"
 const SCENE_BATALHA_NAVAL := "res://scenes/minigames/batalhanaval/BatalhaNaval.tscn"
 const SCENE_MALETA_CERTA := "res://scenes/minigames/maletacerta/MaletaCerta.tscn"
@@ -83,7 +87,7 @@ const CUTSCENE_BG_INTERLUDE := {
 	"estrada": [BG_CUT_14_ESTRADA, BG_CUT_14_ESTRADA_ALT]
 }
 const INTERLUDE_FALLBACK := {
-	"estrada": [Color(0.020, 0.030, 0.085, 1.0), Color(0.070, 0.050, 0.150, 1.0)]
+	"estrada": [Color(0.050, 0.075, 0.230, 1.0), Color(0.300, 0.170, 0.420, 1.0)]
 }
 
 ## Fechamento: a chave "background" de cada bloco da cutscene final escolhe um destes ids.
@@ -264,6 +268,8 @@ const DEBRIEF_DIR := "res://scripts/data/debrief/"
 const LORE_DIR := "res://scripts/data/lore/"
 const LORE_FRAGMENTS := "res://scripts/data/lore/fragments.json"
 const LORE_PROFILES := "res://scripts/data/lore/profiles.json"
+const LORE_DOSSIERS := "res://scripts/data/lore/dossiers.json"
+const LORE_FIRMA := "res://scripts/data/lore/firma.json"
 const LORE_SECRET_ENDINGS := "res://scripts/data/lore/secret_endings.json"
 
 # ---- TUTORIAIS DOS MINIGAMES (V0.10) -----------------------------

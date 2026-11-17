@@ -1,5 +1,5 @@
 extends Control
-## Tela "Modo de jogo" (UI/UX v4.3 - cartoes compactos, mais respiro entre eles, hover/foco animado): titulo, seletor de dificuldade e dois cartoes com a moldura em
+## Tela "Modo de jogo" (UI/UX v4.3 - cartoes compactos, mais respiro entre eles, hover/foco animado): titulo, seletor de dificuldade e tres cartoes (Campanha, Livre e Arquivos da Equipe) com a moldura em
 ## degrade do icone de referencia (contorno duplo, cantoneiras e glifo). Sem lista de minigames:
 ## o jogador descobre jogando. A dificuldade pode ser trocada aqui mesmo (mesma opcao das Configuracoes).
 ## Toda a interface e montada por codigo, com as cores de UiPalette.
@@ -7,9 +7,9 @@ extends Control
 const CARD_BREAKPOINT := 820.0   # abaixo disso os cartoes ficam um embaixo do outro
 const CARD_SIZE := Vector2(290, 330)          # desktop (antes 360x430)
 const CARD_SIZE_COMPACT := Vector2(250, 290)  # telas compactas (lado a lado)
-const CARD_HEIGHT_STACKED := 270.0            # um embaixo do outro (celular em pe)
-const CARD_GAP := 72.0           # separacao Campanha | Livre (antes 24)
-const CARD_GAP_COMPACT := 36.0
+const CARD_HEIGHT_STACKED := 246.0            # um embaixo do outro (celular em pe)
+const CARD_GAP := 44.0           # separacao entre os 3 cartoes (V0.15: eram 2, com 72)
+const CARD_GAP_COMPACT := 24.0
 const CARD_GAP_STACKED := 16.0
 const TEXT_GAP := 14.0           # respiro entre a moldura interna e o titulo
 const HOVER_SCALE := 1.045       # zoom do cartao em hover/foco (antes 1.015, quase invisivel)
@@ -22,6 +22,11 @@ const CAMPAIGN_LOOK := {
 	"top": Color("#1E6EFF"), "mid": Color("#7B4DFF"), "bottom": Color("#C524FF"),
 	"glyph_top": Color("#8FD0FF"), "glyph_bottom": Color("#E4B5FF")
 }
+## V0.15: Arquivos da Equipe = ambar -> rosa -> roxo (mesma familia de degrades, cor propria para nao confundir com os outros dois).
+const ARCHIVE_LOOK := {
+	"top": Color("#FFB02E"), "mid": Color("#FF5D8F"), "bottom": Color("#9B3DFF"),
+	"glyph_top": Color("#FFE6B0"), "glyph_bottom": Color("#FFC4E0")
+}
 const FREE_LOOK := {
 	"top": Color("#1FD3D0"), "mid": Color("#3F7BFF"), "bottom": Color("#9B3DFF"),
 	"glyph_top": Color("#9BF3EC"), "glyph_bottom": Color("#C9B2FF")
@@ -29,6 +34,7 @@ const FREE_LOOK := {
 
 var campaign_button: Button
 var free_button: Button
+var archive_button: Button   # V0.15: terceiro modo, "Arquivos da Equipe" (lore e personagens)
 var back_button: Button
 
 var _safe_area: MarginContainer
@@ -40,6 +46,7 @@ var _back_spacer: Control
 var _difficulty_selector: DifficultySelector
 var _campaign_best_label: Label
 var _free_best_label: Label
+var _archive_best_label: Label
 # {"button", "title", "desc", "best", "art", "texts"} de cada cartao (para o layout responsivo)
 var _cards: Array[Dictionary] = []
 
@@ -119,6 +126,9 @@ func _build_ui() -> void:
 	free_button = _make_mode_card(
 		"btnLivre", "gamepad", FREE_LOOK, "MODO LIVRE",
 		"Escolha um minigame direto e bata seu recorde.", false)
+	archive_button = _make_mode_card(
+		"btnArquivos", "archive", ARCHIVE_LOOK, "ARQUIVOS DA EQUIPE",
+		"Conheça a firma, a ilha e as pessoas por trás do jogo.", false)
 
 	# Respiro entre os cartoes e o Voltar: o zoom do hover dos cartoes nao invade o botao.
 	_back_spacer = Control.new()
@@ -133,6 +143,7 @@ func _build_ui() -> void:
 
 	campaign_button.pressed.connect(_on_campaign_pressed)
 	free_button.pressed.connect(_on_free_pressed)
+	archive_button.pressed.connect(_on_archive_pressed)
 	back_button.pressed.connect(_on_back_pressed)
 
 ## Cartao com a moldura em degrade: [moldura + glifo] em cima, titulo / descricao / melhor pontuacao embaixo.
@@ -177,6 +188,8 @@ func _make_mode_card(node_name: String, icon_name: String, look: Dictionary, tit
 	texts.add_child(best_label)
 	if is_campaign:
 		_campaign_best_label = best_label
+	elif node_name == "btnArquivos":
+		_archive_best_label = best_label
 	else:
 		_free_best_label = best_label
 
@@ -207,6 +220,8 @@ func _refresh_stats() -> void:
 		free_best = maxi(free_best, ScoreManager.get_free_mode_best_score(str(key), difficulty))
 	_campaign_best_label.text = "Melhor campanha: %s" % UiKit.format_points(campaign_best)
 	_free_best_label.text = "Melhor recorde: %s" % UiKit.format_points(free_best)
+	var counts: Dictionary = LoreManager.count_items()
+	_archive_best_label.text = "Liberado: %d/%d" % [int(counts.get("unlocked", 0)), int(counts.get("total", 0))]
 
 # ---------------------------------------------------------------- layout
 func _apply_responsive_layout() -> void:
@@ -234,7 +249,8 @@ func _apply_responsive_layout() -> void:
 	_back_spacer.custom_minimum_size = Vector2(0, 12 if compact else 30)
 
 	var usable_width: float = view.x - 2.0 * margin_x - 40.0   # 40 = folga interna do scroll + respiro
-	var card_width: float = clampf((usable_width - (0.0 if stacked else gap)) / (1.0 if stacked else 2.0), 220.0, base_size.x)
+	var card_count: float = float(_cards.size())
+	var card_width: float = clampf((usable_width - (0.0 if stacked else gap * (card_count - 1.0))) / (1.0 if stacked else card_count), 190.0, base_size.x)
 	var card_height: float = CARD_HEIGHT_STACKED if stacked else base_size.y
 	var text_area: float = 132.0 if compact else 140.0
 	var title_px: int = 19 if compact else 22
@@ -302,6 +318,9 @@ func _on_campaign_pressed() -> void:
 func _on_free_pressed() -> void:
 	_click()
 	GameManager.open_free_menu()
+
+func _on_archive_pressed() -> void:
+	GameManager.open_team_archive()   # toca o clique por conta propria
 
 func _on_back_pressed() -> void:
 	_click()

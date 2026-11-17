@@ -166,6 +166,29 @@ func open_team_archive() -> void:
 		AudioManager.play_click()
 	_change_scene(TEAM_ARCHIVE_SCENE)
 
+## V0.15.2: "Arquivos da Firma" (capitulos sobre a ilha, a origem e os valores). Lembra o capitulo aberto ao voltar.
+var firma_selected_chapter: String = ""
+func open_firma_archive() -> void:
+	if has_node("/root/AudioManager"):
+		AudioManager.play_click()
+	_change_scene(Paths.SCENE_FIRMA_ARCHIVE)
+
+## V0.15.2: "Perfis da Equipe" (os 9 personagens). Lembra quem estava selecionado ao voltar da ficha completa.
+var profile_selected_character: String = ""
+func open_team_profiles() -> void:
+	if has_node("/root/AudioManager"):
+		AudioManager.play_click()
+	_change_scene(Paths.SCENE_TEAM_PROFILES)
+
+## V0.15: abre a ficha completa de um personagem ("char:<id>"). A tela ArchiveEntry le archive_entry.
+## V0.15.2: os capitulos da firma agora sao lidos dentro de FirmaArchive; a ficha e so de personagem.
+var archive_entry: String = ""
+func open_archive_entry(entry: String) -> void:
+	archive_entry = entry
+	if has_node("/root/AudioManager"):
+		AudioManager.play_click()
+	_change_scene(Paths.SCENE_ARCHIVE_ENTRY)
+
 func open_free_menu() -> void:
 	current_mode = GameMode.FREE
 	current_phase_key = ""
@@ -261,6 +284,7 @@ func _finish_stage(points: int) -> void:
 		else:
 			var campaign_result: Dictionary = ScoreManager.finish_campaign_run(difficulty, score_after_stage)
 			last_campaign_result = campaign_result
+			LoreManager.record_campaign_completed()   # V0.15.3: o Jales participou da jornada inteira
 			if has_node("/root/AchievementManager"):
 				AchievementManager.record_campaign_completed(difficulty, score_after_stage)
 				AchievementManager.record_campaign_score_result(campaign_result)
@@ -271,6 +295,8 @@ func _finish_stage(points: int) -> void:
 			AchievementManager.record_free_mode_completion(completed_phase_key, difficulty, free_result)
 		ScoreManager.reset_score()
 		_after_debrief_action = "free_menu"
+	# V0.15.3: recordes novos podem abrir capitulos da firma (aviso na tela de conquista).
+	LoreManager.refresh_chapters()
 	_open_debrief(completed_phase_key, mode_name, report)
 	_release_exit_shield_later()
 
@@ -312,7 +338,12 @@ func after_debrief() -> void:
 func _warm_for_debrief(phase_key: String, plan: Dictionary) -> Array:
 	var list: Array = []
 	var bg_path: String = str(Paths.CUTSCENE_BG_BY_PHASE.get(phase_key, ""))
-	if bg_path != "" and ResourceLoader.exists(bg_path):
+	var plan_background: String = str(plan.get("background", ""))
+	if plan_background != "":
+		var plan_bg_path: String = Paths.first_existing(Paths.CUTSCENE_BG_INTERLUDE.get(plan_background, []) as Array)
+		if plan_bg_path != "":
+			list.append(plan_bg_path)
+	elif bg_path != "" and ResourceLoader.exists(bg_path):
 		list.append(bg_path)
 	for character_id in plan.get("characters", []) as Array:
 		var sprite_path: String = TutorialManager.resolve_sprite_path(str(character_id), "v1")

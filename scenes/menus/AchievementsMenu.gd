@@ -45,6 +45,8 @@ var _filter_box: FlowContainer
 var _filter_buttons: Dictionary = {}     # id -> Button
 var _empty_label: Label
 var _filter: String = FILTER_ALL
+var _tab: String = "jogo"            # V0.15.3: "jogo" (conquistas) | "arquivos" (capitulos e confianca dos personagens)
+var _tab_buttons: Dictionary = {}
 var _progress_tween: Tween
 var _intro_done: bool = false
 var _shown_insignia: String = ""
@@ -154,6 +156,19 @@ func _build_ui() -> void:
 	var track_holder := CenterContainer.new()
 	header_box.add_child(track_holder)
 	track_holder.add_child(_build_rank_track())
+
+	# ---- V0.15.3: abas Conquistas | Arquivos da Equipe
+	var tab_flow := HFlowContainer.new()
+	tab_flow.alignment = FlowContainer.ALIGNMENT_CENTER
+	tab_flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tab_flow.add_theme_constant_override("h_separation", 10)
+	main_box.add_child(tab_flow)
+	for tab_id in ["jogo", "arquivos"]:
+		var tab_button := Button.new()
+		tab_button.name = "Tab_%s" % tab_id
+		tab_button.pressed.connect(_on_tab_pressed.bind(tab_id))
+		tab_flow.add_child(tab_button)
+		_tab_buttons[tab_id] = tab_button
 
 	# ---- filtros
 	_filter_box = HFlowContainer.new()
@@ -330,6 +345,11 @@ func _populate_grid() -> void:
 	for child in grid.get_children():
 		grid.remove_child(child)
 		child.queue_free()
+	_refresh_tab_buttons()
+	_filter_box.visible = _tab == "jogo"
+	if _tab == "arquivos":
+		_populate_archive_grid()
+		return
 	var shown: int = 0
 	for item in AchievementManager.get_all_achievements():
 		if not item is Dictionary:
@@ -726,3 +746,98 @@ func _bar_style(bg_color: Color, border_color: Color, border_width: int) -> Styl
 	style.content_margin_top = 0
 	style.content_margin_bottom = 0
 	return style
+
+
+# ---------------------------------------------------------------- V0.15.3: Arquivos da Equipe (capitulos e confianca)
+func _refresh_tab_buttons() -> void:
+	var chapters: Dictionary = LoreManager.count_chapters()
+	var stars: int = 0
+	for character_id in LoreManager.CHARACTER_ORDER:
+		stars += LoreManager.get_stars(str(character_id))
+	var labels: Dictionary = {
+		"jogo": "Conquistas (%d)" % AchievementManager.get_total_count(),
+		"arquivos": "Arquivos da Equipe (%d/%d)" % [int(chapters.get("unlocked", 0)) + stars, int(chapters.get("total", 0)) + LoreManager.CHARACTER_ORDER.size() * 3]
+	}
+	var compact: bool = _is_compact()
+	for tab_id in _tab_buttons.keys():
+		var button: Button = _tab_buttons[tab_id] as Button
+		button.text = str(labels[tab_id])
+		ButtonStyles.apply(button, "ui_toggle_on" if str(tab_id) == _tab else "ui_ghost", Vector2(0, 40 if compact else 46), 15 if compact else 17)
+
+
+func _on_tab_pressed(tab_id: String) -> void:
+	if has_node("/root/AudioManager"):
+		AudioManager.play_click()
+	if tab_id == _tab:
+		return
+	_tab = tab_id
+	_populate_grid()
+	scroll.scroll_vertical = 0
+
+
+func _populate_archive_grid() -> void:
+	_empty_label.visible = false
+	for item in LoreManager.get_chapters():
+		var chapter: Dictionary = item as Dictionary
+		var info: Dictionary = LoreManager.chapter_progress(chapter)
+		var done: bool = bool(info.get("unlocked", false))
+		var target: int = int(info.get("target", 0))
+		grid.add_child(_make_archive_card(null, "Capítulo: %s" % str(chapter.get("title", "")),
+			"Arquivos da Firma. Supere recordes somando %s pontos." % UiKit.format_points(target).replace(" pts", ""),
+			done, {"current": mini(int(info.get("points", 0)), target), "target": maxi(target, 1),
+				"text": "%s / %s" % [UiKit.format_points(int(info.get("points", 0))).replace(" pts", ""), UiKit.format_points(target).replace(" pts", "")]}, ""))
+	for character_id in LoreManager.CHARACTER_ORDER:
+		var id: String = str(character_id)
+		var trust: Dictionary = LoreManager.trust_progress(id)
+		var stars: int = int(trust.get("stars", 0))
+		var name_text: String = str(LoreManager.CHARACTER_NAMES.get(id, id.capitalize()))
+		var title: String = "%s  %s" % [name_text if stars > 0 else "???", ArchiveArt.stars_text(stars)]
+		var description: String = LoreManager.get_level_name(stars) if stars > 0 else "Ainda não nos conhecemos bem."
+		var bar: Dictionary = {}
+		if not bool(trust.get("maxed", false)):
+			var previous: int = int(trust.get("previous", 0))
+			var next_value: int = int(trust.get("next", 1))
+			bar = {"current": clampi(int(trust.get("points", 0)) - previous, 0, next_value - previous), "target": maxi(next_value - previous, 1),
+				"text": "%d / %d pts" % [int(trust.get("points", 0)), next_value]}
+			description += " · próxima: %s" % LoreManager.get_level_name(stars + 1)
+		else:
+			description += " · confiança máxima"
+		grid.add_child(_make_archive_card(id, title, description, stars >= 3, bar, ""))
+	_apply_responsive_layout()
+
+
+## Cartao pequeno: personagem = SO o rosto centralizado (FaceAvatar); capitulo = icone de arquivo.
+func _make_archive_card(character_id: Variant, title: String, description: String, complete: bool, progress: Dictionary, _unused: String) -> PanelContainer:
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.custom_minimum_size = Vector2(300, 120)
+	var border: Color = UiPalette.ACCENT_ACHIEVEMENTS if complete else UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.28)
+	card.add_theme_stylebox_override("panel", UiKit.panel_style(UiPalette.CARD_RAISED if complete else UiPalette.with_alpha(UiPalette.CARD.darkened(0.12), 0.96), border, 17, 2 if complete else 1, 8 if complete else 0))
+	var margin := UiKit.margin(16, 14, 12, 12)
+	card.add_child(margin)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	margin.add_child(row)
+	if character_id is String:
+		var id: String = character_id as String
+		var face: FaceAvatar = FaceAvatar.create(id, 72.0, LoreManager.get_stars(id) < 1)
+		face.backdrop = UiPalette.with_alpha(UiPalette.BG, 0.55)
+		row.add_child(face)
+	else:
+		row.add_child(UiIcons.make_rect("archive" if complete else "lock", 48.0, UiPalette.ACCENT_ACHIEVEMENTS if complete else UiPalette.TEXT_MUTED))
+	var text_box := VBoxContainer.new()
+	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	text_box.add_theme_constant_override("separation", 4)
+	row.add_child(text_box)
+	var title_label: Label = UiKit.label(title, 19, UiPalette.TEXT_ON_DARK if complete or character_id is String else UiPalette.TEXT_MUTED)
+	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text_box.add_child(title_label)
+	var desc_label: Label = UiKit.label(description, 14, UiPalette.TEXT_MUTED)
+	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text_box.add_child(desc_label)
+	if not progress.is_empty() and not (complete and not (character_id is String)):
+		text_box.add_child(_make_mini_progress(progress))
+	elif complete:
+		text_box.add_child(UiKit.label("Liberado", 13, UiPalette.ACCENT_ACHIEVEMENTS))
+	return card

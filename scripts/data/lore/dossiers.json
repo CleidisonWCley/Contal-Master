@@ -1,0 +1,924 @@
+{
+ "schema": "lore_dossiers",
+ "version": 1,
+ "notes": "V0.15 - Fichas dos 9 personagens, extraidas de contalmaster_elenco.docx (v2.2, 15/11/2026): dados pessoais (SEM medidas do corpo; so altura), personalidade, hobbies, gostos, forcas, motivacao/origem, momento marcante, ilha e relacoes. Edite aqui sem mexer em codigo. Quais abas abrem em cada nivel de confianca: LoreManager.DOSSIER_TABS.",
+ "characters": [
+  {
+   "id": "jales",
+   "name": "Jales",
+   "role": "Líder da equipe ContalMaster",
+   "minigame": "A Jornada ContalMaster (o jogo-mãe) · Abertura e encerramento · Todos os Selos de Qualidade · Dias 1 e 2",
+   "info": [
+    [
+     "Nome completo",
+     "Jales Ferreira Monteiro"
+    ],
+    [
+     "Idade e nascimento",
+     "33 anos · 14/03/1993 · Peixes"
+    ],
+    [
+     "Altura",
+     "1,80 m"
+    ],
+    [
+     "Naturalidade",
+     "Belo Horizonte (MG)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis; pós-graduação em Auditoria e Controladoria; responsável técnico da firma (registrado como auditor independente)"
+    ],
+    [
+     "Na firma",
+     "Fundador (2020)"
+    ],
+    [
+     "Traços",
+     "Acolhedor, Orgulhoso da equipe, Guia"
+    ],
+    [
+     "Como demonstra afeto",
+     "Apresenta cada especialista com um elogio sincero e fecha a jornada agradecendo."
+    ]
+   ],
+   "personality": [
+    "Jales é o coração da firma. Sorri com o rosto inteiro, gesticula com a mão aberta (como no sprite, convidando o jogador a entrar) e trata a ContalMaster como uma família de verdade. A gentileza não é ingenuidade: ele cobra rigor porque sabe quanto custa um erro que ninguém explicou.",
+    "Fala em \"nós\" e raramente em \"eu\". Quando alguém erra, a primeira pergunta dele é \"o que a gente não te ensinou?\". Decora o aniversário de todo mundo, até o dos pais da equipe. Aos 33, sabe que é jovem para liderar uma firma de auditoria e compensa com escuta. No dia da revisão, é o último a sair da sala."
+   ],
+   "hobbies": [
+    "Churrasco de domingo. Reúne a equipe e as famílias num quintal do Alto Jardim. É onde observa quem está cansado, sem precisar perguntar.",
+    "Plantas de escritório. Mantém samambaias e uma jiboia na recepção. Gosta do que cresce devagar e pede constância.",
+    "Biografias de fundadores. Prefere histórias de quem construiu algo do zero e quase perdeu tudo no caminho."
+   ],
+   "likes": [
+    "Apresentar a equipe a quem chega",
+    "Reunir todo mundo na sala de reunião",
+    "Café coado no fim da tarde",
+    "Ver um novato acertar depois de errar"
+   ],
+   "dislikes": [
+    "Erro escondido por vergonha",
+    "Reunião em que só uma pessoa fala",
+    "Ser o centro dos elogios",
+    "Papel de trabalho sem nome de responsável"
+   ],
+   "strengths": [
+    "Empatia e leitura de pessoas",
+    "Visão de cultura e de longo prazo",
+    "Fazer cada especialista brilhar",
+    "Autoridade sem ser autoritário"
+   ],
+   "weaknesses": [
+    "Dificuldade de dizer não à equipe",
+    "Carrega a pressão da firma sozinho",
+    "Adia conversas duras por carinho",
+    "Cresce mais rápido do que consegue estruturar"
+   ],
+   "motivation": [
+    "Jales começou numa grande firma, onde era \"o número 214 da fila de assistentes\". No segundo ano, um colega júnior foi exposto diante do cliente por um erro de papel de trabalho que nunca lhe tinham ensinado a evitar. Ninguém o treinou, ninguém o defendeu e ele saiu da profissão meses depois.",
+    "A promessa nasceu ali: se um dia tivesse uma firma, errar seria permitido e esconder o erro, não. Para ele, revisar um relatório é cuidar de quem vai lê-lo e de quem o escreveu. É também por isso que a norma de revisão pelos pares o toca tanto: ser revisado é aceitar ser visto por alguém de fora, sem esconder nada. Depois de revisada, quer uma firma capaz de revisar os outros com a mesma gentileza."
+   ],
+   "island": [
+    "Mora no Alto Jardim, num sobrado com quintal. Chega cedo ao Edifício Mirante para regar as plantas da recepção antes de todo mundo."
+   ],
+   "moment": "Na noite anterior à primeira revisão, em 2023, ficou até as quatro da manhã relendo o manual com a Priscila. Quando o relatório saiu \"com deficiências\", foi o primeiro a assumir a responsabilidade diante da equipe e abriu o plano de ação com a pergunta de sempre: \"o que a gente não ensinou?\".",
+   "wants": "Ver a firma receber o selo de excelência e, depois, revisar outras firmas com gentileza.",
+   "fears": "Virar a grande firma de onde saiu, em que ninguém sabe o nome de ninguém.",
+   "relations": [
+    [
+     "Priscila",
+     "Sua sócia de confiança. Ele sonha, ela confere a conta."
+    ],
+    [
+     "Cleiton",
+     "O primeiro a acreditar na ideia. É o irmão mais velho que o Jales não teve."
+    ],
+    [
+     "Tiago",
+     "Deu a ele a maleta do primeiro dia e vê no mais novo a própria promessa."
+    ],
+    [
+     "Natalia",
+     "Delegou a ela a recepção afetiva do Novato no fim da jornada."
+    ]
+   ]
+  },
+  {
+   "id": "priscila",
+   "name": "Priscila",
+   "role": "Líder de Checagem Normativa & Compliance",
+   "minigame": "Show do Bilhão · Estação 1 · Selo da Norma · Dia 1",
+   "info": [
+    [
+     "Nome completo",
+     "Priscila Andrade Nascimento"
+    ],
+    [
+     "Idade e nascimento",
+     "28 anos · 02/09/1998 · Virgem"
+    ],
+    [
+     "Altura",
+     "1,75 m"
+    ],
+    [
+     "Naturalidade",
+     "Salvador (BA)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis; aprovada no exame de qualificação técnica para auditores independentes; especialização em Compliance e Governança"
+    ],
+    [
+     "Na firma",
+     "2021 (líder de checagem desde 2024)"
+    ],
+    [
+     "Traços",
+     "Rigorosa, Analítica, Perfeccionista, Incentivadora"
+    ],
+    [
+     "Como demonstra afeto",
+     "Rigorosa, mas torce por cada um."
+    ]
+   ],
+   "personality": [
+    "Priscila ajusta os óculos redondos antes de dizer algo importante. Fala pouco, em frases fechadas, e cita o item da norma de cabeça. O cartão com o \"?\" é a marca registrada: nunca faz uma pergunta que não saiba responder. A moeda dourada que aparece no sprite novo é o prêmio simbólico do Show do Bilhão.",
+    "Por trás do rigor há uma torcedora fiel. Quando o Novato acerta, ela anota; quando erra, explica o porquê duas vezes, sem elevar a voz. Foi ela quem reescreveu o manual de qualidade da firma depois da primeira revisão, e leva cada deficiência apontada como assunto pessoal."
+   ],
+   "hobbies": [
+    "Quiz de bar (pub quiz). Capitã de um time imbatível na Vila das Redes. Odeia perder por uma palavra mal lida.",
+    "Costura e customização. Herdou da mãe o gosto por tecidos. Amarra camisas e borda detalhes nas próprias roupas, como o nó da camisa ferrugem.",
+    "Palavras cruzadas temáticas. Resolve de caneta, nunca de lápis."
+   ],
+   "likes": [
+    "Citar o item exato da norma",
+    "Check-lists bem fechados",
+    "Quando o time entrega antes do prazo",
+    "Café sem açúcar e silêncio às 7h"
+   ],
+   "dislikes": [
+    "\"Eu acho que\" sem evidência",
+    "Prazo contado de cabeça",
+    "Reunião sem pauta escrita",
+    "Improviso em assunto normativo"
+   ],
+   "strengths": [
+    "Memória normativa e atenção ao detalhe",
+    "Método e consistência",
+    "Justa: cobra igual de todos",
+    "Explica sem humilhar"
+   ],
+   "weaknesses": [
+    "Perfeccionismo que atrasa entregas",
+    "Dificuldade de delegar a revisão final",
+    "Parece fria à primeira vista",
+    "Leva erro de equipe para o lado pessoal"
+   ],
+   "motivation": [
+    "Priscila cresceu no comércio da mãe, uma pequena loja de tecidos. Aos 15 anos viu a loja pagar uma multa pesada por um prazo fiscal mal lido por um terceiro, e a família quase fechou as portas. Aprendeu cedo que norma não é burocracia: é o muro que protege quem trabalha honestamente.",
+    "Escolheu a checagem normativa porque ali o erro é evitável. Na primeira revisão da firma, em 2023, o relatório \"com deficiências\" apontou lacunas no manual de qualidade. Ela passou meses reescrevendo cada política, e desde então defende que a norma vem antes da opinião. Para ela, vale a regra do sistema de qualidade: o que está escrito precisa ser formal e conhecido por todas as pessoas da casa."
+   ],
+   "island": [
+    "Mora na Vila das Redes, num apartamento sobre uma padaria. Corre pela orla da Enseada às 6h, e guarda um caderno de bolso com os itens da norma."
+   ],
+   "moment": "Ao ler o relatório \"com deficiências\", em 2023, ficou sozinha na sala até a madrugada reescrevendo o manual de qualidade. De manhã, deixou um bilhete em cada mesa: \"agora todo mundo sabe\".",
+   "wants": "Que ninguém na firma precise mais \"achar\" alguma coisa sobre a norma.",
+   "fears": "Que a perfeição que cobra dos outros seja cobrada dela no dia em que falhar.",
+   "relations": [
+    [
+     "Jales",
+     "Sócia e contrapeso: ele inspira, ela confere."
+    ],
+    [
+     "Julios",
+     "Faíscas constantes: ele provoca, ela responde citando o item da norma."
+    ],
+    [
+     "Aline",
+     "Rivalidade respeitosa entre as duas guardiãs do rigor; disputam quem é \"a mais exata\"."
+    ],
+    [
+     "Tiago",
+     "Tem carinho discreto pelo mais novo; relê os pareceres dele e deixa bilhetes."
+    ]
+   ]
+  },
+  {
+   "id": "anderson",
+   "name": "Anderson",
+   "role": "Especialista em Estratégia & Mapeamento de Evidências",
+   "minigame": "Batalha Naval · Estação 2 · Selo da Evidência · Dia 1",
+   "info": [
+    [
+     "Nome completo",
+     "Anderson Luiz Marinho"
+    ],
+    [
+     "Idade e nascimento",
+     "28 anos · 25/06/1998 · Câncer"
+    ],
+    [
+     "Altura",
+     "1,83 m"
+    ],
+    [
+     "Naturalidade",
+     "Santos (SP)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis; aprovado no exame de qualificação técnica para auditores independentes; curso de Gestão de Equipes e Carteira de Clientes"
+    ],
+    [
+     "Na firma",
+     "2022"
+    ],
+    [
+     "Traços",
+     "Entusiasta, Agitado, Estrategista, Bem-humorado"
+    ],
+    [
+     "Como demonstra afeto",
+     "Brinca e anima; chama o Novato de \"tripulante\"."
+    ]
+   ],
+   "personality": [
+    "Anderson não anda: navega. Tem energia sobrando, fala rápido, ri alto e transforma tudo em metáfora náutica. Para ele, auditoria é mapa: quem não varre cada coordenada deixa a falha afundar o projeto.",
+    "A fantasia de marinheiro é escolha dele, não do código de vestimenta: usa o boné de capitão nos dias de revisão como amuleto. Debaixo da brincadeira existe um estrategista de verdade, que planeja a alocação das equipes e escolhe quais trabalhos concluídos entram na amostra do programa anual de verificação de qualidade."
+   ],
+   "hobbies": [
+    "Regatas e vela. Compete aos fins de semana, saindo da marina da Enseada. Lê vento como lê balancete.",
+    "Jogos de estratégia. Xadrez rápido, tabuleiros de guerra e RPG, onde sempre faz o navegador.",
+    "Maquetes de navios. Constrói modelos à mão, com paciência surpreendente para quem não para quieto."
+   ],
+   "likes": [
+    "Mapas, tabuleiros e quadros brancos",
+    "Apelidos para todo mundo",
+    "Maré boa e vento a favor",
+    "Descobrir a falha que ninguém viu"
+   ],
+   "dislikes": [
+    "Amostra \"por conveniência\"",
+    "Reunião sem desenho no quadro",
+    "Ficar parado esperando aprovação",
+    "Documentação mal indexada"
+   ],
+   "strengths": [
+    "Visão estratégica e de cobertura",
+    "Humor que desarma tensão",
+    "Rapidez para montar um plano",
+    "Entusiasmo contagiante"
+   ],
+   "weaknesses": [
+    "Agitação e pouca paciência",
+    "Se empolga e pula conferências",
+    "Metáfora demais quando a hora é de objetividade",
+    "Foge de tarefas repetitivas"
+   ],
+   "motivation": [
+    "O pai de Anderson foi oficial de navegação de cabotagem em Santos. Ensinou ao menino que um navio não afunda por um grande rombo, e sim por um pequeno furo que ninguém inspecionou. A vistoria de casco virou ritual de infância: nenhum centímetro sem olhar.",
+    "Na contabilidade, Anderson reconheceu o mesmo princípio na documentação dos trabalhos: um registro faltando é um furo no casco. Cuida da capacidade da firma, comparando as horas disponíveis da equipe com as horas contratadas, como quem confere o calado de um navio. Entrou na revisão porque queria uma profissão em que a curiosidade inquieta fosse virtude."
+   ],
+   "island": [
+    "Mora num apartamento com varanda para a marina, na Enseada do Farol. Chama o veleiro de Vistoria."
+   ],
+   "moment": "Num fim de semana de 2024, uma tempestade na Enseada quase o fez perder uma regata. Voltou ao porto e disse que a melhor decisão do dia foi não zarpar. Desde então encerra cada planejamento com uma pergunta: \"o que pode furar o casco?\".",
+   "wants": "Ver cada trabalho da firma com um mapa claro, do começo ao fim.",
+   "fears": "Ficar parado, sem rota.",
+   "relations": [
+    [
+     "Ariel",
+     "Dupla de campo e mapa: Anderson desenha, Ariel confirma no terreno."
+    ],
+    [
+     "Tiago",
+     "Adotou o mais novo como \"grumete\"; empresta-lhe livros de estratégia."
+    ],
+    [
+     "Priscila",
+     "Ela corrige as metáforas dele; ele rebate que a norma também tem mapa."
+    ],
+    [
+     "Natalia",
+     "Parceiros de fim de semana na Enseada: ele navega, ela pilota."
+    ]
+   ]
+  },
+  {
+   "id": "tiago",
+   "name": "Tiago",
+   "role": "Auditor Assistente / Especialista em Emissão de Pareceres",
+   "minigame": "Maleta Certa · Estação 3 · Selo do Parecer · Dia 1",
+   "info": [
+    [
+     "Nome completo",
+     "Tiago Henrique Bastos"
+    ],
+    [
+     "Idade e nascimento",
+     "26 anos · 08/05/2000 · Touro"
+    ],
+    [
+     "Altura",
+     "1,72 m"
+    ],
+    [
+     "Naturalidade",
+     "Campinas (SP)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis (universidade pública, primeiro da família a se formar); um ano num pequeno escritório contábil antes da firma; estudando para o exame de qualificação técnica"
+    ],
+    [
+     "Na firma",
+     "2025 (foi o mais novo da casa até a chegada do Ariel)"
+    ],
+    [
+     "Traços",
+     "Entusiasta, Didático, Prestativo, Motivado"
+    ],
+    [
+     "Como demonstra afeto",
+     "Aprende junto e agradece o tempo todo."
+    ]
+   ],
+   "personality": [
+    "Tiago é a pessoa que ainda lembra bem como é o primeiro dia: foi o penúltimo a passar pelo ritual, em 2025. Carrega a pasta como quem carrega um prêmio, usa o crachá sempre visível e anota tudo num caderno. Explica com a paciência de quem aprendeu há pouco e sabe que a dúvida de ontem é a dele hoje. Até a chegada do Ariel, era ele quem guardava o caderno do primeiro dia.",
+    "Agora tem alguém a quem ensinar: o Ariel é o seu primeiro \"novato\", e ele leva isso a sério demais. Estuda à noite para o exame de qualificação técnica e leva as questões antigas na mochila."
+   ],
+   "hobbies": [
+    "Jogos cooperativos de tabuleiro. Prefere os que se ganha ou perde junto. Odeia jogos de eliminação.",
+    "Futsal às quintas. Joga de fixo, o que organiza o time, nunca o que faz o gol.",
+    "Caderno de Erros. Anota os próprios erros por data, com a \"correção em uma frase\". É a base didática do que ensina."
+   ],
+   "likes": [
+    "Explicar com exemplos do dia a dia",
+    "Agradecer em voz alta",
+    "Quando alguém diz \"agora entendi\"",
+    "Pasta organizada e post-its coloridos"
+   ],
+   "dislikes": [
+    "Ser tratado como \"o estagiário\"",
+    "Professor que ridiculariza dúvida",
+    "Parecer sem justificativa",
+    "Chegar atrasado por qualquer motivo"
+   ],
+   "strengths": [
+    "Didática e empatia com quem aprende",
+    "Disciplina de estudo",
+    "Receptividade a feedback",
+    "Boa escrita técnica"
+   ],
+   "weaknesses": [
+    "Insegurança diante de veteranos",
+    "Pede desculpa demais",
+    "Dificuldade de dizer \"não sei\" sem ansiedade",
+    "Aceita mais tarefas do que aguenta"
+   ],
+   "motivation": [
+    "Tiago é o primeiro da família a ter diploma. Estudou à noite, deu aula de reforço para pagar o curso e teve um professor que o humilhou em sala por uma dúvida. Prometeu que, se um dia ensinasse alguém, jamais faria alguém se sentir pequeno por perguntar. No pequeno escritório contábil onde trabalhou antes, ninguém explicava os porquês; na ContalMaster, a primeira coisa que ouviu foi \"pode perguntar\".",
+    "Escolheu pareceres porque ali o raciocínio vira conclusão: depois de olhar as evidências, é preciso dizer algo que alguém vai ler e assinar. Para ele, o relatório do auditor é a arte de transformar um monte de papéis numa frase honesta, e a diferença entre as opiniões possíveis é a diferença entre uma firma tranquila e uma firma exposta. Gosta de lembrar que a revisão de informações trimestrais termina numa conclusão com asseguração limitada, e não numa opinião: cada relatório diz até onde o auditor pode ir."
+   ],
+   "island": [
+    "Mora num quarto alugado no Alto Jardim e vai ao trabalho de ônibus elétrico pela Travessia. Estuda nos cafés da Vila das Redes."
+   ],
+   "moment": "Na semana em que chegou, em 2025, errou um dilema diante de todos. Em vez de ser corrigido, ouviu do Jales: \"agora você sabe o que a maleta não leva\". Guardou a frase na primeira página do Caderno de Erros. Quando o Ariel chegou, copiou a mesma frase num post-it e colou na mesa dele.",
+   "wants": "Passar no exame de qualificação e se tornar quem ensina o primeiro dia a quem chega.",
+   "fears": "Voltar a ser o aluno de quem riram por perguntar.",
+   "relations": [
+    [
+     "Jales",
+     "Mentor e figura paterna profissional; deu-lhe a maleta."
+    ],
+    [
+     "Ariel",
+     "O mais novo da casa e o primeiro \"novato\" do Tiago. Ele tenta ensinar; o Ariel responde com poucas palavras, e os dois se entendem."
+    ],
+    [
+     "Aline",
+     "Ela o corrige e ele agradece. Está aprendendo a responder sem encolher os ombros."
+    ],
+    [
+     "Priscila",
+     "Ela relê seus pareceres e deixa bilhetes; ele guarda todos."
+    ],
+    [
+     "Julios",
+     "Primeiro alvo das provocações e o primeiro a ver o Julios sem a pose."
+    ]
+   ]
+  },
+  {
+   "id": "julios",
+   "name": "Julios",
+   "role": "Especialista em Riscos Profissionais & Ética",
+   "minigame": "Roleta de Risco · Estação 4 (bônus) · Sem selo (rodada bônus) · Dia 1",
+   "info": [
+    [
+     "Nome completo",
+     "Júlio Sérgio Vasconcelos (insiste em \"Julios, com S\")"
+    ],
+    [
+     "Idade e nascimento",
+     "26 anos · 31/10/2000 · Escorpião"
+    ],
+    [
+     "Altura",
+     "1,85 m"
+    ],
+    [
+     "Naturalidade",
+     "Curitiba (PR)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis; habilitação para atuar em seguradoras; especialização em Gestão de Riscos e Fraudes"
+    ],
+    [
+     "Na firma",
+     "2023"
+    ],
+    [
+     "Traços",
+     "Arrogante, Sarcástico, Provocador, Peculiar"
+    ],
+    [
+     "Como demonstra afeto",
+     "Provoca, mas admite que se importa (\"não conte pra ninguém\")."
+    ]
+   ],
+   "personality": [
+    "Julios é o mais alto da equipe e o único que se veste de preto sempre. Cabelo branco desgrenhado, piercing no lábio, meio sorriso de quem já sabe como a história acaba. Chama o Novato de \"gracinha\", duvida em voz alta de tudo e nunca é grosseiro de graça: a provocação é método.",
+    "A peculiaridade é o nome: o cartão diz Júlio, mas ele exige o \"S\". Ninguém sabe se é piada ou ferida. É o técnico da carteira de seguros da firma e a pessoa da casa habilitada para atuar em seguradoras quando a firma revisa ou é revisada. A desconfiança dele não poupa nem a própria equipe."
+   ],
+   "hobbies": [
+    "Pôquer amador (sem dinheiro). Joga por fichas de plástico, só para ler as pessoas. Diz que é treino de desconfiança.",
+    "Coleção de vinis pós-punk. Cerca-se de sons sombrios em volume mínimo para trabalhar.",
+    "Estudos de fraudes históricas. Lê casos de escândalos corporativos como romances policiais."
+   ],
+   "likes": [
+    "Pegar alguém em contradição",
+    "Preto, silêncio e café forte",
+    "Ver o Novato reagir sob provocação",
+    "Histórias de quase-desastre"
+   ],
+   "dislikes": [
+    "Falsa modéstia",
+    "Quem concorda só por educação",
+    "Ser chamado de \"Júlio\"",
+    "Elogio em público"
+   ],
+   "strengths": [
+    "Faro para risco e conflito de interesse",
+    "Pensamento adversarial",
+    "Coragem de dizer o que ninguém diz",
+    "Memória de casos"
+   ],
+   "weaknesses": [
+    "Arrogância que afasta",
+    "Usa o sarcasmo como armadura",
+    "Dificuldade de pedir ajuda",
+    "Desconfia de gentileza"
+   ],
+   "motivation": [
+    "Aos 22 anos, como assistente na auditoria de uma empresa cujo diretor era amigo da família, Júlio foi pressionado a assinar sem olhar um assunto delicado. Quase assinou. Saiu do almoço sentindo o estômago virar e jurou que nunca mais confundiria afeto com independência. A empresa quebrou dois anos depois.",
+    "Reinventou-se como \"Julios\": mais alto, mais frio, mais duro. Escolheu riscos profissionais porque a ameaça mais perigosa nasce dentro da pessoa: interesse próprio, familiaridade, intimidação. A solvência de uma seguradora, o rigor das provisões técnicas e o relacionamento com um cliente poderoso são, para ele, o terreno onde a independência é testada todo dia. Avaliar a carteira de clientes, a integridade de quem os administra e o risco de associação é a rotina dele."
+   ],
+   "island": [
+    "Mora num apartamento minimalista no Centro-Torre, de onde vê a Torre Farol. Os vinis ficam num quarto sem janela, \"para não envelhecerem\"."
+   ],
+   "moment": "Em 2025, um cliente poderoso tentou resolver uma divergência com um favor, durante um almoço. Julios aceitou o almoço, recusou o favor e documentou tudo. Voltou ao escritório sem dizer nada. A Priscila encontrou a anotação e a pregou no mural, sem comentário.",
+   "wants": "Que alguém o chame de \"Julios\" sem perguntar por quê.",
+   "fears": "Que a armadura tenha virado o rosto.",
+   "relations": [
+    [
+     "Priscila",
+     "Duelo de farpas e normas; no fundo, um respeito mútuo gigante."
+    ],
+    [
+     "Aline",
+     "Rivais de sarcasmo; ela tem a mesma arma e treino melhor."
+    ],
+    [
+     "Tiago",
+     "Pega mais leve do que admite e já o defendeu numa reunião sem avisar ninguém."
+    ],
+    [
+     "Jales",
+     "A única pessoa a quem não responde com farpa."
+    ]
+   ]
+  },
+  {
+   "id": "ariel",
+   "name": "Ariel",
+   "role": "Analista de Campo & Inspeção de Inconsistências",
+   "minigame": "Perseguição · Estação 5 · Selo do Prazo · Dia 1",
+   "info": [
+    [
+     "Nome completo",
+     "Ariel Nogueira Pires"
+    ],
+    [
+     "Idade e nascimento",
+     "22 anos · 08/10/2004 · Libra"
+    ],
+    [
+     "Altura",
+     "1,66 m"
+    ],
+    [
+     "Naturalidade",
+     "Porto Alegre (RS)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis (formou-se no fim de 2025); curso de extensão em inventário e observação física; ainda não prestou o exame de qualificação técnica"
+    ],
+    [
+     "Na firma",
+     "2026 (o mais novo da equipe; primeiro emprego)"
+    ],
+    [
+     "Traços",
+     "Observador, Calmo sob pressão, Direto, Ágil"
+    ],
+    [
+     "Como demonstra afeto",
+     "Poucas palavras, respeito direto."
+    ]
+   ],
+   "personality": [
+    "Ariel é o mais novo da casa e o mais calado. Recém-formado, este é o primeiro emprego dele. Cabelo verde-menta, olhos semicerrados num sorriso calmo, polegar para cima quando acha que o Novato mandou bem. Ao contrário dos outros, não explica o óbvio: aponta o que não bate. A prancheta com o sinal de alerta é a ferramenta dele.",
+    "Quem o vê pensa que é frieza; é atenção. Observar é o jeito dele de aprender. Na reunião final é ele quem anuncia o placar: o caderno do primeiro dia fica com a pessoa mais nova da casa, e hoje é dele. Ninguém sabe se anota tudo porque é organizado ou porque é o jeito de dizer \"estou de olho, mas do seu lado\"."
+   ],
+   "hobbies": [
+    "Corrida de aventura e orientação. Mapa, bússola e trilha nos morros da ilha. Gosta de achar o caminho mais curto sem pressa.",
+    "Observação de aves. Passa horas parado esperando um pássaro. Aprendeu paciência ali.",
+    "Cubo mágico. Resolve em menos de 20 segundos; prefere o tempo do cubo ao do relógio."
+   ],
+   "likes": [
+    "Achar a divergência escondida",
+    "Trilhas e silêncio",
+    "Frases curtas",
+    "Placar claro e sem enfeite"
+   ],
+   "dislikes": [
+    "Relatório de 40 páginas sem resumo",
+    "Gritaria em prazo apertado",
+    "Perder tempo com rodeios",
+    "Elogio longo"
+   ],
+   "strengths": [
+    "Calma diante de prazo",
+    "Olhar para inconsistência",
+    "Olhar sem os vícios da casa",
+    "Clareza e síntese"
+   ],
+   "weaknesses": [
+    "Comunicação seca demais",
+    "Guarda o que sente",
+    "Ainda inseguro diante dos veteranos",
+    "Subestima o impacto de uma frase curta"
+   ],
+   "motivation": [
+    "Ariel era a criança que ganhava o jogo dos sete erros em dois segundos. No último ano da faculdade, num trabalho prático de inventário na loja da cooperativa estudantil, notou um item que existia nos registros mas não na prateleira. Aquele momento mudou tudo: a diferença entre o papel e o mundo era um fato, não uma opinião.",
+    "Mandou mais de quarenta currículos ao se formar. A ContalMaster foi a única que respondeu com \"venha conhecer a equipe\". Ficou com o trabalho de campo porque é onde o relatório encontra a realidade. Para ele, revisão de relatórios começa quando se levantam os olhos do papel, e cada prazo estourado é uma falha que o relógio mostra antes de qualquer revisor. No programa de qualidade da firma, é ele quem inspeciona trabalhos já concluídos, o monitoramento que mostra se o sistema funciona de verdade."
+   ],
+   "island": [
+    "Divide um apartamento pequeno na Vila das Redes com um colega de faculdade, para dividir o aluguel. Nos fins de semana, sobe os morros da ilha com binóculos para ver aves."
+   ],
+   "moment": "Na primeira semana, em 2026, achou sozinho uma divergência que a equipe tinha deixado passar e não disse nada: deixou um bilhete na mesa do Cleiton com duas palavras, \"linha 14\". O Cleiton leu, sorriu e pediu que ele anotasse no caderno do primeiro dia. Foi a primeira vez que o Ariel sentiu que era da casa.",
+   "wants": "Provar que merece o lugar e, um dia, passar o caderno a quem chegar depois dele.",
+   "fears": "Que as poucas palavras o façam parecer desinteressado.",
+   "relations": [
+    [
+     "Tiago",
+     "O primeiro mentor dele. Tiago explica demais, Ariel responde de menos, e funciona."
+    ],
+    [
+     "Anderson",
+     "Parceiros de campo: um desenha o mapa, o outro valida no terreno."
+    ],
+    [
+     "Cleiton",
+     "Silêncio compartilhado: entendem-se sem frases. Foi quem leu o bilhete \"linha 14\"."
+    ],
+    [
+     "Natalia",
+     "A única que consegue arrancar-lhe uma risada alta, e sabe disso."
+    ],
+    [
+     "Jales",
+     "Confia a ele o caderno e o placar, uma forma de dizer \"confio nos seus números\"."
+    ]
+   ]
+  },
+  {
+   "id": "aline",
+   "name": "Aline",
+   "role": "Professora & Mentora de Rigor Normativo",
+   "minigame": "Forca Técnica · Estação 6 · Selo da Terminologia · Dia 1",
+   "info": [
+    [
+     "Nome completo",
+     "Aline Mendonça Kruger"
+    ],
+    [
+     "Idade e nascimento",
+     "27 anos · 10/01/1999 · Capricórnio"
+    ],
+    [
+     "Altura",
+     "1,62 m"
+    ],
+    [
+     "Naturalidade",
+     "Pomerode (SC), cidade de forte herança alemã"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis (formou-se aos 20); mestrado em Contabilidade; docente de Auditoria e de curso preparatório para o exame de qualificação técnica; responsável pela educação continuada da firma"
+    ],
+    [
+     "Na firma",
+     "2022"
+    ],
+    [
+     "Traços",
+     "Perfeccionista, Aristocrática, Sarcástica, Exigente"
+    ],
+    [
+     "Como demonstra afeto",
+     "Exigente porque acredita no potencial."
+    ]
+   ],
+   "personality": [
+    "Aline é a mais baixa do elenco e a que ocupa mais espaço na sala. Postura de aristocrata, régua de madeira na mão, sorriso que pode ser elogio ou sentença. Cabelo loiro dourado e olhos verdes, herança da família de descendência alemã. Prodígio precoce, é chamada de \"professora\" por todos, até pelos veteranos.",
+    "O sarcasmo é uma forma de cuidado: ela só se dá ao trabalho de corrigir quem acha que vale a pena. Quando diz \"não se acostume com o elogio\", é o mais perto que chega de dizer \"estou orgulhosa\". O \"Hmpf\" é o selo pessoal dela."
+   ],
+   "hobbies": [
+    "Esgrima. Pratica florete desde os 12 anos. A régua na mão é o florete dela.",
+    "Dicionários antigos. Coleciona edições raras em português e em alemão. Diz que \"língua é jurisprudência\".",
+    "Chá da tarde com palavras cruzadas. Ritual solitário. Ninguém pode interromper."
+   ],
+   "likes": [
+    "Acentuação e concordância corretas",
+    "Provar que sabe mais",
+    "Chá e silêncio",
+    "Ver um aluno virar a resposta no último segundo"
+   ],
+   "dislikes": [
+    "Termo errado em relatório",
+    "Gíria técnica inventada",
+    "Atraso sem aviso",
+    "Elogio fácil"
+   ],
+   "strengths": [
+    "Domínio de terminologia",
+    "Didática exigente e justa",
+    "Memória e rigor",
+    "Presença de palco"
+   ],
+   "weaknesses": [
+    "Perfeccionismo paralisante",
+    "Dificuldade de elogiar",
+    "Solitária",
+    "Corrige até em conversa social"
+   ],
+   "motivation": [
+    "Aline vem de uma família de descendência alemã em Pomerode, onde precisão, língua e ofício bem feito eram tradição de casa. Aprendeu desde pequena com o avô que uma palavra trocada muda o sentido de tudo, e que um documento é uma promessa. Entrou na contabilidade como quem entra num cartório: para proteger o texto, e portanto as pessoas.",
+    "Tornou-se professora porque descobriu que o rigor ensinado cria gente forte. Na revisão de relatórios, lê o texto como quem lê uma sentença: nenhuma palavra solta. Um aluno que ela reprovou voltou um semestre depois para agradecer. Ela diz que não lembra. Lembra. É dela também a educação continuada anual da firma, exigida de quem atua como auditor independente, e a atualização do vocabulário da casa quando a profissão renomeia as coisas, como quando \"parecer\" virou \"relatório de auditoria\" e \"ressalva\" virou \"modificação\"."
+   ],
+   "island": [
+    "Mora num apartamento com estantes até o teto, no Centro-Torre. Dá aulas à noite numa faculdade perto da Vila das Redes."
+   ],
+   "moment": "Num semestre de 2024, ao devolver a prova de um aluno, escreveu na margem a única frase gentil que já escreveu: \"esta resposta me ensinou algo\". O aluno guardou a prova. Ela finge não saber.",
+   "wants": "Ver uma aluna sua assinar o primeiro relatório.",
+   "fears": "Que o rigor a deixe sem ninguém com quem dividir o chá.",
+   "relations": [
+    [
+     "Priscila",
+     "Rivalidade de exatidão, que as duas dizem não existir."
+    ],
+    [
+     "Julios",
+     "Duelo de sarcasmo; ela vence, mas o respeita."
+    ],
+    [
+     "Tiago",
+     "Corrige com firmeza e depois o defende diante dos outros."
+    ],
+    [
+     "Jales",
+     "Chama-o de \"diretor\" com ironia carinhosa; é quem lhe diz verdades que ninguém diz."
+    ]
+   ]
+  },
+  {
+   "id": "cleiton",
+   "name": "Cleiton",
+   "role": "Auditor Sênior & Especialista em Controle Normativo",
+   "minigame": "STOP · Estação 7 · Selo do Controle · Dia 1 (noite)",
+   "info": [
+    [
+     "Nome completo",
+     "Cleiton Barbosa Lima"
+    ],
+    [
+     "Idade e nascimento",
+     "36 anos · 27/12/1989 · Capricórnio"
+    ],
+    [
+     "Altura",
+     "1,77 m"
+    ],
+    [
+     "Naturalidade",
+     "Fortaleza (CE)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis; habilitação para atuar em entidades de previdência complementar; especialização em Controle de Qualidade em Firmas de Auditoria"
+    ],
+    [
+     "Na firma",
+     "2020 (primeiro contratado)"
+    ],
+    [
+     "Traços",
+     "Gentil, Muito sério, Pragmático, Focado"
+    ],
+    [
+     "Como demonstra afeto",
+     "Gentileza séria, honra o trabalho do outro."
+    ]
+   ],
+   "personality": [
+    "Cleiton tem sorriso de pai de família, mãos nos bolsos e uma seriedade que não pede licença. É o auditor sênior: aquele em quem a equipe confia quando o assunto é \"como se faz, de verdade\". É o técnico da carteira de previdência complementar da firma e conduz, uma vez por ano, o programa interno de verificação de qualidade.",
+    "Gentil por escolha, sério por ofício. Fala baixo, agradece o trabalho dos outros pelo nome e raramente faz piada. Se faz, é uma só, e todos lembram."
+   ],
+   "hobbies": [
+    "Marcenaria. Faz móveis simples com medidas exatas. \"Madeira não aceita aproximação.\"",
+    "Pão de fermentação natural. Mantém o fermento vivo desde 2020. Chama-o de \"o estagiário mais antigo\".",
+    "Jogo de STOP em viagem. Tradição de estrada com os dois filhos."
+   ],
+   "likes": [
+    "Cada coisa em seu lugar",
+    "Cozinhar para a família",
+    "Revisar papel com calma",
+    "Quando o outro faz o trabalho direito"
+   ],
+   "dislikes": [
+    "Hesitação por falta de preparo",
+    "Atalho que ignora controle",
+    "Barulho em hora de foco",
+    "Pressa sem método"
+   ],
+   "strengths": [
+    "Foco e consistência",
+    "Conhecimento de controles",
+    "Honra o trabalho do outro",
+    "Confiabilidade"
+   ],
+   "weaknesses": [
+    "Seriedade excessiva",
+    "Resistência a mudanças de método",
+    "Dificuldade de mostrar vulnerabilidade",
+    "Trabalha além do horário"
+   ],
+   "motivation": [
+    "No início da carreira, os papéis de trabalho de Cleiton foram revisados por um sênior que lia tudo, linha por linha, e escrevia notas à mão nas margens. Aquelas notas o ensinaram mais que a faculdade. Ele entendeu que revisar é um ato de respeito: significa que o trabalho de alguém importa o bastante para ser lido.",
+    "Hoje, como sênior, paga essa dívida lendo o trabalho dos outros com o mesmo cuidado. Controle normativo, para ele, é a forma concreta de dizer \"você não está sozinho\". Na carteira de previdência, onde o dinheiro é de quem espera a aposentadoria, esse cuidado tem peso redobrado. Todo ano ele seleciona uma amostra de trabalhos concluídos e confere o que a norma pede: registro no conselho regional, recrutamento, treinamento, contratação, horas disponíveis contra horas contratadas, independência e instalações. Cada falha vira um plano de ação, com acompanhamento até o fim."
+   ],
+   "island": [
+    "Mora num sobrado no Alto Jardim com a família e uma bancada de marcenaria na garagem. Aos domingos, os filhos treinam o STOP com ele."
+   ],
+   "moment": "Em 2020, com a firma recém-aberta e sem clientes, pagou do próprio bolso o primeiro mês de aluguel da sala. Nunca contou ao Jales. O Jales sabe, e nunca contou a ele que sabe.",
+   "wants": "Ver os filhos crescerem num mundo em que o trabalho bem feito ainda importa.",
+   "fears": "Perder a paciência com quem erra e virar o tipo de sênior que ele nunca quis ser.",
+   "relations": [
+    [
+     "Jales",
+     "O primeiro contratado. Sabe de coisas da fundação que ninguém mais sabe."
+    ],
+    [
+     "Ariel",
+     "Entendem-se sem falar; trabalham lado a lado em silêncio."
+    ],
+    [
+     "Natalia",
+     "Ela o faz rir; ele a protege do excesso de trabalho."
+    ],
+    [
+     "Tiago",
+     "Revisa cada papel do mais novo com notas à mão, como fizeram com ele."
+    ]
+   ]
+  },
+  {
+   "id": "natalia",
+   "name": "Natalia",
+   "role": "Especialista Sênior em Raciocínio Crítico & Análise de Desvios Éticos",
+   "minigame": "Desvio Lógico · Estação 8 (Dia 2) · Selo da Ética · Dia 2 (manhã)",
+   "info": [
+    [
+     "Nome completo",
+     "Natalia Duarte Rocha"
+    ],
+    [
+     "Idade e nascimento",
+     "25 anos · 03/08/2001 · Leão"
+    ],
+    [
+     "Altura",
+     "1,68 m"
+    ],
+    [
+     "Naturalidade",
+     "São Paulo (SP)"
+    ],
+    [
+     "Formação e habilitação",
+     "Ciências Contábeis; aprovada no exame de qualificação técnica para auditores independentes; especialização em Ética e Governança (em curso)"
+    ],
+    [
+     "Na firma",
+     "2024"
+    ],
+    [
+     "Traços",
+     "Extremamente carismática, Acolhedora, Sorridente, Gentil, Encantadora"
+    ],
+    [
+     "Como demonstra afeto",
+     "Acolhe, acompanha e se orgulha."
+    ]
+   ],
+   "personality": [
+    "Natalia ilumina a sala. Sorri antes de falar e fala como quem convida. É a pessoa que conduz o Novato até a sala de reunião, e quem diz \"estou muito orgulhosa de você\" sem soar condescendente. Tem dois figurinos: o de auditora (blazer, crachá e mocassim) no escritório, e o de piloto (boné para trás, jaqueta de corrida e bandeira quadriculada) nos fins de semana e na garagem do Desvio Lógico.",
+    "Por trás do sorriso há uma ética firme. Ela não dá sermão: faz perguntas. O Novato sai da conversa sentindo-se escolhido, e responsável."
+   ],
+   "hobbies": [
+    "Kart e track days. Pilota aos domingos no autódromo amador da Enseada. Gosta da pista porque cada curva é uma escolha.",
+    "Viagens de carro. Roteiros longos com playlist e paradas improvisadas. Adora a Travessia ao amanhecer.",
+    "Receber gente em casa. Faz jantares para a equipe. Todos saem com um pote para levar."
+   ],
+   "likes": [
+    "Acolher quem chega",
+    "Acelerar com segurança",
+    "Gente que escolhe bem sob pressão",
+    "Fechar o dia agradecendo"
+   ],
+   "dislikes": [
+    "Quebra de confidencialidade",
+    "Fofoca disfarçada de preocupação",
+    "Gente que corta caminho por esperteza",
+    "Dizer \"não\" a quem precisa"
+   ],
+   "strengths": [
+    "Carisma e escuta",
+    "Raciocínio crítico",
+    "Ética prática",
+    "Condução de pessoas"
+   ],
+   "weaknesses": [
+    "Evita conflitos",
+    "Absorve a carga emocional dos outros",
+    "Sorri quando está cansada",
+    "Dificuldade de delegar o acolhimento"
+   ],
+   "motivation": [
+    "Natalia viveu uma cena que nunca esqueceu: num elevador, ainda trainee, ouviu um colega bem-intencionado comentar um detalhe de um cliente. Havia gente ouvindo. O cliente soube e a firma perdeu o contrato. Ela estava lá e ficou calada. Percebeu que ética é feita de pequenas decisões do dia, e que o silêncio também é uma.",
+    "Decidiu dedicar-se a ensinar reflexos éticos com acolhimento, não com medo. Revisão de relatórios, para ela, é o lugar onde a confidencialidade e a verdade se encontram: a própria norma de revisão pelos pares exige sigilo de quem participa, e o sigilo é um dos cinco princípios éticos e de qualidade que a firma ensina."
+   ],
+   "island": [
+    "Mora num apartamento alto com vista para a Travessia, no Centro-Torre. O carro do Desvio Lógico, o Bionix, fica na garagem da firma, e é ela quem o leva à pista."
+   ],
+   "moment": "No primeiro mês, em 2024, a recepcionista de um cliente comentou algo sigiloso no elevador. Natalia sorriu e disse: \"vamos deixar isso aqui no elevador?\". Foi a primeira vez que usou o silêncio a favor, e não contra.",
+   "wants": "Fazer da gentileza um método de trabalho reconhecido.",
+   "fears": "Que a gentileza a faça parecer fraca.",
+   "relations": [
+    [
+     "Jales",
+     "Confia-lhe a recepção afetiva do Novato; é a anfitriã do encerramento."
+    ],
+    [
+     "Cleiton",
+     "Ele a protege do excesso de trabalho; ela o faz rir."
+    ],
+    [
+     "Anderson",
+     "Parceiros de fim de semana na Enseada: ele navega, ela pilota."
+    ],
+    [
+     "Ariel",
+     "Única que lhe arranca uma risada alta."
+    ]
+   ]
+  }
+ ]
+}

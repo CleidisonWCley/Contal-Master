@@ -34,3 +34,21 @@ Nível 1 = concluir; 2 = Prata (bom desempenho em Normal/Difícil **ou** 3 concl
 - **Textos antigos** (limpeza de linguagem neutra, "revisor", Malfoid: V0.14.5 do docx) NÃO foram tocados; os textos novos já são neutros.
 - Finais secretos: só liberam em dados (`LoreManager.get_unlocked_secret_endings()`); falta produzir as cenas.
 - Testado em Godot 4.5 headless (lógica, feedback até o interlúdio, Arquivo e menu livre). Falta passada visual no editor e na exportação Web.
+
+---
+# V0.15.1 - Arquivos da Equipe como 3º modo + fichas dos personagens + estrada no Desvio Lógico
+
+## Mudanças
+1. **Desvio Lógico**: TODO o feedback depois do minigame (Natalia, corte da reunião e narração) acontece no cenário da **estrada à noite** (`14_estrada.png`), a ponte para os créditos. Sem a imagem, gradiente noturno de reserva. Vale na campanha e no Modo Livre. Configurável em `scripts/data/debrief/desvio_logico.json > background`.
+2. **Arquivos da Equipe virou o 3º modo** em "Modo de jogo" (cartão próprio, ícone `icon_archive.svg`, degradê âmbar → rosa → roxo). O botão escondido do Modo Livre foi removido (`MenuMinigames.gd` voltou ao original).
+   Motivo: descoberta (é onde o jogador já escolhe o que fazer), layout próprio e rolável no celular, e a lore deixa de depender de um menu de minigames.
+3. **Hub** (`TeamArchive`): "A Firma" (6 capítulos: ilha, como nasceu, por que jogar, Primeiro Dia, valores, revisão) + "A Equipe" em grade **3 x 3**.
+4. **Ficha** (`ArchiveEntry`) ao tocar num personagem: nome, cargo, confiança e abas **Perfil** (nome completo, idade e nascimento, altura, naturalidade, formação, traços, hobbies), **Gostos e forças**, **Origem e motivação**, **Relações**, **Momento marcante**, **Lembranças** (trechos de lore já ouvidos no Modo Livre). **Sem medidas do corpo.**
+5. Conteúdo vindo de `contalmaster_elenco.docx` (v2.2): `scripts/data/lore/dossiers.json` e `firma.json`. Perfis e trechos de lore dos novels do Modo Livre foram **realinhados ao canon** do documento (ex.: Cleiton é auditor sênior, não "estagiário"; Natalia/Ariel/Aline/Julios/Anderson com as origens do doc).
+
+## Trava por progresso (a calibrar)
+Abas: Perfil e Gostos = nível 1 · Origem e Relações = nível 2 · Momento marcante = nível 3. Nível do Jales: 3 estações concluídas / 5 na Prata / 8 na Prata (`LoreManager.JALES_LEVEL_RULES`). Capítulos da firma abrem por estações concluídas (`firma.json > min_stations`).
+
+## Novos arquivos
+`scenes/menus/ArchiveEntry.(gd|tscn)`, `assets/icons/ui/icon_archive.svg(.import)`, `scripts/data/lore/{dossiers,firma}.json`.
+Alterados: `ModeSelect.gd`, `TeamArchive.gd`, `LoreManager.gd`, `GameManager.gd`, `Paths.gd`, `StageDebrief.gd`, `DebriefBuilder.gd`, `profiles.json`, `fragments.json`, `secret_endings.json`, `desvio_logico.json`.

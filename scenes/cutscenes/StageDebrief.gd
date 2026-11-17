@@ -10,6 +10,7 @@ extends Control
 ## (mesmo motor das transicoes: cenario da fase desfocado, sprites "_1", caixa de dialogo embaixo).
 ## "Pular" (ou Esc) encerra a conversa inteira e segue o fluxo normal. Ao fim chama GameManager.after_debrief().
 ##
+## Desvio Logico: o cenario de TODO o feedback e a estrada a noite (JSON "background"), ponte para os creditos.
 ## INTERLUDIO: o cenario vem de Paths.CUTSCENE_BG_INTERLUDE[id]. Se NENHUM arquivo existir (hoje: 14_estrada.png), a cena
 ## pinta um gradiente noturno (Paths.INTERLUDE_FALLBACK[id]). Basta colocar a imagem em assets/background/14_estrada.png
 ## (ou assets/background/cutcines/14_estrada.png) para ela entrar sozinha, sem mexer em codigo.
@@ -39,7 +40,7 @@ var _skip_all: bool = false
 func _ready() -> void:
 	plan = GameManager.debrief_plan
 	phase_key = str(plan.get("phase_key", ""))
-	if (plan.get("frames", []) as Array).is_empty():
+	if (plan.get("frames", []) as Array).is_empty() and (plan.get("extras", []) as Array).is_empty():
 		call_deferred("_finish")
 		return
 	_build_scene()
@@ -89,6 +90,8 @@ func _build_scene() -> void:
 	background_image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background_image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var bg_path: String = str(Paths.CUTSCENE_BG_BY_PHASE.get(phase_key, ""))
+	if str(plan.get("background", "")) != "":
+		bg_path = ""   # cenario proprio (ex.: estrada), aplicado logo abaixo
 	if bg_path != "" and ResourceLoader.exists(bg_path):
 		var texture: Resource = load(bg_path)
 		if texture is Texture2D:
@@ -105,6 +108,9 @@ func _build_scene() -> void:
 	blur_layer = NovelBlur.create(1.0)
 	blur_layer.name = "DebriefBlur"
 	add_child(blur_layer)
+	# V0.15: Desvio Logico -> TODO o feedback acontece na estrada a noite (ponte para os creditos), sem desfoque.
+	if str(plan.get("background", "")) != "":
+		_show_interlude_background(str(plan.get("background", "")))
 
 	novel = NovelStage.new()
 	novel.z_index = 30
@@ -129,12 +135,49 @@ func _run() -> void:
 	await get_tree().create_timer(0.3).timeout
 	if not is_inside_tree():
 		return
-	var completed: bool = await novel.play_frames(frames)
+	var completed: bool = true
+	if not frames.is_empty():
+		completed = await novel.play_frames(frames)
+		if not completed:
+			_skip_all = true
 	if not is_inside_tree() or _finished:
 		return
 	if completed and not _skip_all:
 		await _play_interlude()
+	await _play_extras()
 	_finish()
+
+
+## V0.15.3 - Conversas de confianca do Modo Livre: o personagem conta a propria historia (3 a 4 quadros, com o Jales),
+## a narracao centralizada e o cartao de estrela. A estrela e entregue quando a conversa COMECA: pular nao faz perder.
+## V0.15.5: o cartao agora e um aviso compacto no canto (3,5 s, sem clique). V0.15.4: o cartao so aparece quando a estrela foi MESMO entregue; sem estrela nova nao aparece nada alem do feedback normal.
+func _play_extras() -> void:
+	var extras: Array = plan.get("extras", []) as Array
+	for item in extras:
+		if not is_inside_tree() or _finished:
+			return
+		var extra: Dictionary = item as Dictionary
+		var talk_owner: String = str(extra.get("owner", ""))
+		var level: int = int(extra.get("level", 1))
+		var result: Dictionary = LoreManager.begin_talk(talk_owner, level)
+		if not bool(result.get("granted", false)):
+			continue
+		var card_shown: bool = false
+		if not _skip_all:
+			var ok: bool = await novel.play_frames(extra.get("frames", []) as Array)
+			if ok and is_inside_tree():
+				# V0.15.5: o aviso compacto aparece junto da fala final ("voce conhece X um pouco melhor"), no canto,
+				# e some sozinho em ~3,5 s. Nao pausa o fluxo nem pede "continuar".
+				TrustCard.star(self, talk_owner, level)
+				card_shown = true
+				ok = await novel.play_frames(extra.get("talk_frames", []) as Array)
+			if not ok:
+				_skip_all = true
+		if not is_inside_tree():
+			return
+		if not card_shown:
+			# Quem pulou a conversa ainda ve o aviso da estrela (ja entregue), sem travar o fluxo.
+			TrustCard.star(self, talk_owner, level)
 
 
 ## Marca perfil/trecho de lore como visto quando o quadro COMECA (quem pula antes dele nao perde a novidade).
@@ -157,13 +200,15 @@ func _play_interlude() -> void:
 	var frames: Array = interlude.get("frames", []) as Array
 	if interlude.is_empty() or frames.is_empty():
 		return
-	await _fade_to(1.0, INTERLUDE_FADE_SECONDS)
-	if not is_inside_tree():
-		return
-	_show_interlude_background(str(interlude.get("background", "")))
-	await _fade_to(0.0, INTERLUDE_FADE_SECONDS)
-	if not is_inside_tree():
-		return
+	# Cenario ja e o do interludio (ex.: Desvio Logico): segue na mesma estrada, sem escurecer.
+	if str(interlude.get("background", "")) != str(plan.get("background", "")):
+		await _fade_to(1.0, INTERLUDE_FADE_SECONDS)
+		if not is_inside_tree():
+			return
+		_show_interlude_background(str(interlude.get("background", "")))
+		await _fade_to(0.0, INTERLUDE_FADE_SECONDS)
+		if not is_inside_tree():
+			return
 	await novel.play_frames(frames)
 
 
@@ -177,10 +222,12 @@ func _show_interlude_background(interlude_id: String) -> void:
 		var texture: Resource = load(path)
 		if texture is Texture2D:
 			background_image.texture = texture as Texture2D
+			background_image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 			background_shade.color = Color(0.0, 0.0, 0.0, 0.18)
 			return
 		push_warning("StageDebrief: '%s' existe mas nao e uma imagem; usando a cor de reserva." % path)
 	background_image.texture = _fallback_texture(interlude_id)
+	background_image.stretch_mode = TextureRect.STRETCH_SCALE   # o gradiente estica; "cover" so mostraria uma faixa
 	background_shade.color = Color(0.0, 0.0, 0.0, 0.0)
 
 

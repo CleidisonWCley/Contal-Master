@@ -1,0 +1,115 @@
+{
+ "schema": "lore_firma",
+ "version": 1,
+ "notes": "V0.15 - Capitulos de 'A Firma' (Arquivos da Equipe), de contalmaster_elenco.docx secoes 2, 3.2, 3.3, 3.5, 3.6 e 3.7. 'min_stations' = quantas estacoes precisam estar no nivel 1 (concluidas) para o capitulo abrir. | V0.15.3: capitulos abrem por PONTOS DE RECORDE (min_points = soma dos recordes de campanha + modo livre em qualquer dificuldade; LoreManager.archive_points). Ajuste os numeros aqui.",
+ "chapters": [
+  {
+   "id": "ilha",
+   "title": "A Ilha Faroleira",
+   "paragraphs": [
+    "Faroleira é uma cidade-ilha fictícia no litoral de Santa Catarina, um polo de tecnologia e serviços. A ilha é uma metrópole tropical e moderna: torres de vidro, avenidas arborizadas, luz dourada ao entardecer e o mar sempre à vista. O ponto mais alto do skyline é a Torre Farol, uma torre de observação que serve de bússola visual para a cidade inteira. Na enseada, um farol antigo ainda funciona como símbolo do lugar.",
+    "Ao continente, a ilha se liga pela Travessia: uma estrada reta e longa sobre o mar, de onde se vê o skyline se aproximando. É a estrada do Desvio Lógico, e quem chega de fora a atravessa pela primeira vez como um rito de entrada.",
+    "A tecnologia é a de um presente avançado: telas grandes, carros com piloto automático, painéis luminosos. Os moradores se chamam faroleiros, e a maior parte deles veio de outros estados.",
+    "Quase todos vieram de outros estados. A ilha é um lugar de recomeço, o que reforça a ideia de equipe como \"família escolhida\"."
+   ],
+   "list": [],
+   "min_points": 150
+  },
+  {
+   "id": "nasceu",
+   "title": "Como nasceu a firma",
+   "paragraphs": [
+    "Jales começou a carreira numa grande firma, como o \"número 214\" de uma fila de assistentes. No segundo ano, viu um colega júnior ser exposto diante do cliente por um erro de papel de trabalho que ninguém tinha lhe ensinado a evitar. Ninguém o defendeu, e ele deixou a profissão meses depois.",
+    "Jales prometeu a si mesmo que, se algum dia tivesse uma firma, errar seria permitido e esconder o erro, não. Em 2020, aos 27 anos, deixou a grande firma e abriu a ContalMaster na ilha, atraído pelos incentivos para empresas de serviços. O Cleiton, auditor experiente e sério, foi o primeiro contratado e o primeiro a acreditar na ideia. Nos primeiros meses, a firma não tinha clientes, só uma sala alugada, duas mesas e a promessa."
+   ],
+   "list": [],
+   "min_points": 500
+  },
+  {
+   "id": "jogo",
+   "title": "Por que treinar com um jogo",
+   "paragraphs": [
+    "Entre as firmas da ilha, treinar pessoal com jogos ainda é uma ideia incomum, e a ContalMaster foi a primeira a apostar nela. Os motivos, dentro do mundo:"
+   ],
+   "list": [
+    "Erro seguro. No jogo, errar custa pontos, não clientes. Dúvida exposta é dúvida corrigida.",
+    "Pressão que prepara. O exame de qualificação técnica dos auditores cobra muitas questões em tempo limitado, e a revisão pelos pares também. Jogar com relógio, risco e escolha treina esse reflexo.",
+    "Aplicar, não só decorar. A equipe percebeu que quem estudava só pelos livros recitava a norma, mas hesitava em aplicá-la. Cada minigame obriga a usar o conceito.",
+    "Teste de seleção e medida de qualidade. O sistema de qualidade de uma firma prevê formalizar contratação, treinamento e promoção, com testes na seleção de pessoal, e pede que se meça o efeito do programa de qualidade. O Primeiro Dia é esse teste, e o placar é a medida: mostra onde a pessoa está forte e onde precisa de apoio, sem aprovação ou reprovação.",
+    "Treinar o olhar de quem revisa. Todos os cenários do jogo são de conduta de revisão: impedimentos, escolha do revisor, independência, sigilo, plano de ação.",
+    "Linguagem comum. Cada veterano precisa organizar o que sabe para criar a sua estação. Quem cria, aprende de novo."
+   ],
+   "min_points": 1400
+  },
+  {
+   "id": "primeiro_dia",
+   "title": "O Primeiro Dia",
+   "paragraphs": [
+    "Todo membro novo passa por um jogo no primeiro dia, aplicado pelos veteranos. A regra vem de uma ideia técnica: numa auditoria inicial, o auditor não pode confiar nos saldos de abertura e precisa reunir evidências sobre eles. A equipe faz o mesmo com cada pessoa nova: não presume o que ela sabe, mede. O jogo é a verificação dos \"saldos de abertura\" do conhecimento.",
+    "Normalmente o Primeiro Dia dura um dia. Desta vez, com a revisão a 48 horas, o circuito foi esticado para dois dias e ganhou uma segunda missão: preparar a firma. O olhar novo do Novato é o mais próximo do olhar de quem revisa, que também não conhece os vícios da casa."
+   ],
+   "list": [],
+   "min_points": 2800
+  },
+  {
+   "id": "valores",
+   "title": "Os valores da casa",
+   "paragraphs": [],
+   "pairs": [
+    [
+     "Rigor com carinho",
+     "Quem cobra, cobra por acreditar. Ninguém humilha."
+    ],
+    [
+     "O erro é dado",
+     "Todo erro vira explicação e aprendizado, nunca culpa."
+    ],
+    [
+     "Honestidade e integridade",
+     "Dizer o que é, mesmo quando custa."
+    ],
+    [
+     "Objetividade",
+     "Julgar pelos fatos, não por afeto."
+    ],
+    [
+     "Competência e zelo profissionais",
+     "Fazer bem feito e manter-se em dia (educação continuada)."
+    ],
+    [
+     "Sigilo",
+     "O que é do cliente fica com o cliente, no elevador, na rua e na mesa do almoço."
+    ],
+    [
+     "Comportamento profissional",
+     "Agir como quem representa a profissão em qualquer sala."
+    ],
+    [
+     "Independência",
+     "Nenhum favor, afeto ou pressão compra uma conclusão."
+    ],
+    [
+     "Documentar para quem vem depois",
+     "O que se faz fica registrado de modo formal e é conhecido por toda a equipe."
+    ],
+    [
+     "Qualidade se mede",
+     "Quem investe em qualidade precisa saber o que ganhou com ela. O placar do Primeiro Dia faz essa medida."
+    ]
+   ],
+   "list": [],
+   "min_points": 5000
+  },
+  {
+   "id": "revisao",
+   "title": "A revisão de agora",
+   "paragraphs": [
+    "Na primeira revisão da ContalMaster, em 2023, o relatório saiu \"com deficiências\": o manual de qualidade da firma não descrevia alguns procedimentos exigidos, e a documentação de alguns trabalhos não estava à altura do que o sistema de qualidade prevê. Nada que impedisse a firma de seguir, mas era um aviso.",
+    "A carta de recomendações foi respondida com um plano de ação. Entre as medidas: a Priscila reescreveu o manual de qualidade e o Jales formalizou o Primeiro Dia, que já existia desde 2022, como política de treinamento do sistema de qualidade da firma. Agora, em 2026, vem a nova revisão, daqui a dois dias, às 9h. Se o resultado sair adequado, a ContalMaster conquista o que a equipe chama de selo de excelência.",
+    "Passada a primeira revisão, a ContalMaster pôde enfim atuar como Revisora de outras firmas. O Jales quer essa via aberta, e por isso o Primeiro Dia treina o Novato para os dois lados da mesa: o de quem é revisado e o de quem revisa."
+   ],
+   "list": [],
+   "min_points": 8000
+  }
+ ]
+}
