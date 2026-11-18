@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="ContalMaster"
-config/version="0.15.5"
+config/version="0.15.6"
 run/main_scene="res://scenes/loading/LoadingScreen.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 boot_splash/bg_color=Color(0.0627451, 0.043137256, 0.12156863, 1)
@@ -32,6 +32,7 @@ DifficultyManager="*res://scripts/autoloads/DifficultyManager.gd"
 GameManager="*res://scripts/autoloads/GameManager.gd"
 AchievementManager="*res://scripts/autoloads/AchievementManager.gd"
 LoreManager="*res://scripts/autoloads/LoreManager.gd"
+TouchScroll="*res://scripts/autoloads/TouchScroll.gd"
 
 [display]
 
@@ -39,6 +40,7 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/handheld/orientation=6
 
 [rendering]
 

@@ -325,10 +325,15 @@ func _on_music_volume_changed(value: float) -> void:
 	SettingsManager.set_music_volume(value)
 	_update_volume_labels()
 
+var _last_preview_msec: int = 0
+
 func _on_sfx_volume_changed(value: float) -> void:
 	SettingsManager.set_sfx_volume(value)
 	_update_volume_labels()
-	if has_node("/root/AudioManager"):
+	# V0.15.6: previa do volume no maximo ~5x por segundo (antes: um clique a cada tique do slider).
+	var now_msec: int = Time.get_ticks_msec()
+	if has_node("/root/AudioManager") and now_msec - _last_preview_msec >= 200:
+		_last_preview_msec = now_msec
 		AudioManager.play_sfx("click")
 
 func _on_difficulty_pressed(key: String) -> void:

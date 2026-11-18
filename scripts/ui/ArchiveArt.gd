@@ -45,8 +45,25 @@ static func minigame_icon(character_id: String) -> String:
 	return "flag" if station == "" else UiIcons.for_minigame(station)
 
 
+## V0.15.6: texto sem simbolos (a fonte da build web nao tem ★/☆). Para MOSTRAR estrelas use make_stars().
 static func stars_text(level: int) -> String:
-	return "★".repeat(level) + "☆".repeat(3 - level)
+	return "%d/3" % clampi(level, 0, 3)
+
+
+## Estrelas desenhadas (StarsRow): funcionam em qualquer navegador.
+static func make_stars(level: int, size_px: float = 16.0, color: Color = UiPalette.DIFF_NORMAL, centered: bool = false) -> StarsRow:
+	return StarsRow.make(level, size_px, 3, color, centered)
+
+
+## Linha "Confianca: [estrelas] Nome do nivel" para fichas.
+static func make_trust_line(level: int, level_name: String, font_px: int = 15) -> HBoxContainer:
+	var line: HBoxContainer = HBoxContainer.new()
+	line.add_theme_constant_override("separation", 8)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.add_child(UiKit.label("Confiança:", font_px, UiPalette.DIFF_NORMAL))
+	line.add_child(make_stars(level, float(font_px) + 3.0))
+	line.add_child(UiKit.label(level_name, font_px, UiPalette.DIFF_NORMAL))
+	return line
 
 
 ## Faixa com o cenario do minigame do personagem. Quem ainda nao foi conhecido aparece bem escurecido.

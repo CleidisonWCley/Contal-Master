@@ -571,7 +571,7 @@ func _layout_decision_answers() -> void:
 			widest = maxf(widest, font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x)
 	# Cresce pros lados com o texto; limitado a ~46% da tela cada (depois disso quebra linha).
 	var max_w: float = maxf(120.0, vp.x * 0.46)
-	var want: float = minf(maxf(widest + 64.0, minf(300.0, max_w)), max_w)
+	var want: float = minf(maxf(widest + 108.0, minf(300.0, max_w)), max_w)
 	for button in [option_a_button, option_b_button]:
 		var b: Button = button as Button
 		b.custom_minimum_size = Vector2(want, 92.0)
@@ -972,8 +972,11 @@ func _enter_decision_phase() -> void:
 	decision_layer.visible = true
 	var q: Dictionary = _current_question()
 	var opts: Dictionary = q.get("opcoes", {})
-	option_a_button.text = "ROTA A ←\n%s" % str(opts.get("A", "Alternativa A"))
-	option_b_button.text = "ROTA B →\n%s" % str(opts.get("B", "Alternativa B"))
+	# V0.15.6: setas como ICONES (a fonte da web nao desenha ← →); o texto fica so com ASCII.
+	option_a_button.text = "ROTA A\n%s" % str(opts.get("A", "Alternativa A"))
+	option_b_button.text = "ROTA B\n%s" % str(opts.get("B", "Alternativa B"))
+	_apply_choice_arrow(option_a_button, false)
+	_apply_choice_arrow(option_b_button, true)
 	status_label.text = "Escolha a rota: clique à esquerda para A ou à direita para B."
 	question_label.text = str(q.get("pergunta", "Escolha o melhor caminho técnico."))
 	_set_car_sprite("reto")
@@ -2057,6 +2060,18 @@ func _integrity_color() -> Color:
 	if integrity >= 35.0:
 		return Color(1.0, 0.82, 0.22)
 	return Color(1.0, 0.30, 0.24)
+
+func _apply_choice_arrow(button: Button, points_right: bool) -> void:
+	if button == null:
+		return
+	button.icon = UiIcons.texture_flipped("back") if points_right else UiIcons.texture("back")
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT if points_right else HORIZONTAL_ALIGNMENT_LEFT
+	button.expand_icon = false
+	button.add_theme_constant_override("icon_max_width", 30)
+	button.add_theme_constant_override("h_separation", 12)
+	for color_name in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color"]:
+		button.add_theme_color_override(color_name, Color(0.0, 0.95, 1.0))
+
 
 func _make_choice_button(label: String) -> Button:
 	var button := Button.new()

@@ -309,7 +309,7 @@ func _build_scene() -> void:
 	timer_box.add_child(timer_progress)
 
 	var hint_label := Label.new()
-	hint_label.text = "Decida rápido antes do tempo acabar. Atalhos: 1/A/← para a primeira opção, 2/B/→ para a segunda."
+	hint_label.text = "Decida rápido antes do tempo acabar. Atalhos: 1, A ou seta esquerda para a primeira opção; 2, B ou seta direita para a segunda."
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint_label.add_theme_font_size_override("font_size", 17)

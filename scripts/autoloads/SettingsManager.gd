@@ -18,6 +18,12 @@ var settings: Dictionary = DEFAULT_SETTINGS.duplicate(true)
 ## V0.14.3: instante (ms) do ultimo pedido de tela cheia feito pelo jogador (ver sync_fullscreen_state).
 var _fs_request_msec: int = -100000
 
+## V0.15.6: gravar em disco a CADA tique do slider de volume (user:// vira IndexedDB na web) travava a pagina e, junto,
+## o audio. Agora a gravacao e adiada: so acontece ~0,6 s depois da ULTIMA mudanca (ou ao sair/esconder a aba).
+const SAVE_DELAY_SECONDS: float = 0.6
+var _save_dirty: bool = false
+var _save_timer: Timer = null
+
 func _ready() -> void:
 	load_settings()
 	if OS.has_feature("web"):
@@ -47,6 +53,7 @@ func load_settings() -> void:
 		push_warning("settings.json inválido. As configurações padrão foram carregadas.")
 
 func save_settings() -> void:
+	_save_dirty = false
 	var file: FileAccess = FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if file == null:
 		push_warning("Não foi possível salvar settings.json.")
@@ -54,12 +61,36 @@ func save_settings() -> void:
 	file.store_string(JSON.stringify(settings, "	"))
 
 func set_setting(key: String, value: Variant) -> void:
+	if key != "fullscreen" and settings.has(key) and typeof(settings[key]) == typeof(value) and settings[key] == value:
+		return   # nada mudou: sem gravacao e sem sinal (evita trabalho a cada tique do slider)
 	settings[key] = value
 	if key == "fullscreen":
 		_fs_request_msec = Time.get_ticks_msec()
 		apply_window_settings()
-	save_settings()
+	_schedule_save()
 	settings_changed.emit(settings)
+
+
+func _schedule_save() -> void:
+	_save_dirty = true
+	if _save_timer == null:
+		_save_timer = Timer.new()
+		_save_timer.one_shot = true
+		_save_timer.process_mode = Node.PROCESS_MODE_ALWAYS
+		_save_timer.timeout.connect(flush_pending_save)
+		add_child(_save_timer)
+	_save_timer.start(SAVE_DELAY_SECONDS)
+
+
+## Grava agora se houver mudanca pendente (chamado ao esconder a aba, fechar o jogo ou sair).
+func flush_pending_save() -> void:
+	if _save_dirty:
+		save_settings()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		flush_pending_save()
 
 func get_setting(key: String, fallback: Variant = null) -> Variant:
 	return settings.get(key, fallback)

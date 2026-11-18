@@ -420,10 +420,15 @@ func _on_music_changed(value: float) -> void:
 	SettingsManager.set_music_volume(value)
 	_update_volume_labels()
 
+var _last_preview_msec: int = 0
+
 func _on_sfx_changed(value: float) -> void:
 	SettingsManager.set_sfx_volume(value)
 	_update_volume_labels()
-	_click()
+	var now_msec: int = Time.get_ticks_msec()
+	if now_msec - _last_preview_msec >= 200:   # V0.15.6: previa limitada (nao um clique por tique do slider)
+		_last_preview_msec = now_msec
+		_click()
 
 func _on_animations_pressed() -> void:
 	_click()

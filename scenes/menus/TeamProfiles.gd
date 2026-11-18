@@ -52,7 +52,6 @@ func _build_ui() -> void:
 	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_safe.add_child(_scroll)
-	TouchScroll.attach(_scroll)   # V0.15.6: rolar com o dedo (celular/tablet)
 	var pad: MarginContainer = UiKit.margin(10, 10, 10, 10)
 	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.add_child(pad)
@@ -142,7 +141,7 @@ func _make_tile(character_id: String) -> void:
 	var shown_name: String = str(LoreManager.CHARACTER_NAMES.get(character_id, character_id.capitalize()))
 	var name_label: Label = UiKit.label(shown_name if level >= 1 else "???", 16, UiPalette.TEXT_ON_DARK, HORIZONTAL_ALIGNMENT_CENTER)
 	column.add_child(name_label)
-	var stars: Label = UiKit.label(ArchiveArt.stars_text(level), 13, UiPalette.DIFF_NORMAL, HORIZONTAL_ALIGNMENT_CENTER)
+	var stars: StarsRow = ArchiveArt.make_stars(level, 14.0, UiPalette.DIFF_NORMAL, true)
 	column.add_child(stars)
 	UiKit.ignore_mouse(column)
 	_tiles[character_id] = {"button": button, "portrait": portrait, "name": name_label, "stars": stars}
@@ -190,7 +189,7 @@ func _refresh_preview() -> void:
 	var role: Label = UiKit.label(str(dossier.get("role", "")) if level >= 1 else "Ainda não nos conhecemos bem.", 15, UiPalette.TEXT_MUTED)
 	role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(role)
-	column.add_child(UiKit.label("Confiança: %s  %s" % [ArchiveArt.stars_text(level), LoreManager.get_level_name(level)], 15, UiPalette.DIFF_NORMAL))
+	column.add_child(ArchiveArt.make_trust_line(level, LoreManager.get_level_name(level)))
 
 	# Minigame / estacao do personagem
 	var station_row: HBoxContainer = HBoxContainer.new()
@@ -274,7 +273,10 @@ func _apply_layout() -> void:
 		(entry["button"] as Button).custom_minimum_size = Vector2(cell, cell + (40.0 if small else 46.0))
 		(entry["portrait"] as FaceAvatar).custom_minimum_size = Vector2(cell - 14.0, cell - 14.0)
 		(entry["name"] as Label).add_theme_font_size_override("font_size", 13 if small else 16)
-		(entry["stars"] as Label).add_theme_font_size_override("font_size", 11 if small else 13)
+		var star_row: StarsRow = entry["stars"] as StarsRow
+		star_row.star_size = 11.0 if small else 14.0
+		star_row.custom_minimum_size = star_row._content_size()
+		star_row.queue_redraw()
 	ButtonStyles.apply(_back_button, "ui_ghost", Vector2(222, 46 if compact else 52), 18)
 
 

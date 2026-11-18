@@ -48,7 +48,6 @@ func _build() -> void:
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_safe.add_child(scroll)
-	TouchScroll.attach(scroll)   # V0.15.6: rolar com o dedo (celular/tablet)
 	var pad: MarginContainer = UiKit.margin(10, 10, 10, 10)
 	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(pad)
@@ -127,7 +126,7 @@ func _character_header() -> Control:
 	var role: Label = UiKit.label(str(dossier.get("role", "")) if level >= 1 else "Ainda não nos conhecemos bem.", 15, UiPalette.TEXT_MUTED)
 	role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(role)
-	column.add_child(UiKit.label("Confiança: %s  %s" % ["★".repeat(level) + "☆".repeat(3 - level), LoreManager.get_level_name(level)], 15, UiPalette.DIFF_NORMAL))
+	column.add_child(ArchiveArt.make_trust_line(level, LoreManager.get_level_name(level)))
 	wrapper.add_child(row)
 	return wrapper
 

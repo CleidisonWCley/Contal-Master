@@ -194,7 +194,6 @@ func _build_ui() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	main_box.add_child(scroll)
-	TouchScroll.attach(scroll)   # V0.15.6: rolar com o dedo (celular/tablet)
 	_style_scrollbar(scroll)
 
 	# folga interna para o contorno/foco dos cartoes nao ser cortado pelo scroll
@@ -792,7 +791,7 @@ func _populate_archive_grid() -> void:
 		var trust: Dictionary = LoreManager.trust_progress(id)
 		var stars: int = int(trust.get("stars", 0))
 		var name_text: String = str(LoreManager.CHARACTER_NAMES.get(id, id.capitalize()))
-		var title: String = "%s  %s" % [name_text if stars > 0 else "???", ArchiveArt.stars_text(stars)]
+		var title: String = name_text if stars > 0 else "???"
 		var description: String = LoreManager.get_level_name(stars) if stars > 0 else "Ainda não nos conhecemos bem."
 		var bar: Dictionary = {}
 		if not bool(trust.get("maxed", false)):
@@ -833,7 +832,15 @@ func _make_archive_card(character_id: Variant, title: String, description: Strin
 	row.add_child(text_box)
 	var title_label: Label = UiKit.label(title, 19, UiPalette.TEXT_ON_DARK if complete or character_id is String else UiPalette.TEXT_MUTED)
 	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text_box.add_child(title_label)
+	if character_id is String:
+		# V0.15.6: nome + estrelas desenhadas (a fonte da web nao tem ★).
+		var title_row: HBoxContainer = HBoxContainer.new()
+		title_row.add_theme_constant_override("separation", 10)
+		title_row.add_child(title_label)
+		title_row.add_child(ArchiveArt.make_stars(LoreManager.get_stars(character_id as String), 16.0))
+		text_box.add_child(title_row)
+	else:
+		text_box.add_child(title_label)
 	var desc_label: Label = UiKit.label(description, 14, UiPalette.TEXT_MUTED)
 	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text_box.add_child(desc_label)

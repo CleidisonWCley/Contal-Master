@@ -70,7 +70,6 @@ func _build_ui() -> void:
 	_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_safe.add_child(_scroll)
-	TouchScroll.attach(_scroll)   # V0.15.6: rolar com o dedo (celular/tablet)
 	var pad: MarginContainer = UiKit.margin(10, 10, 10, 10)
 	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.add_child(pad)
@@ -210,7 +209,7 @@ func _refresh_reader() -> void:
 	_reader_box.add_child(nav)
 	var previous: Button = Button.new()
 	previous.name = "PreviousChapter"
-	previous.text = "‹  Anterior"
+	previous.text = "<  Anterior"
 	previous.disabled = index <= 0
 	previous.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	ButtonStyles.apply(previous, "ui_ghost", Vector2(0, 46), 16)
@@ -218,7 +217,7 @@ func _refresh_reader() -> void:
 	nav.add_child(previous)
 	var next: Button = Button.new()
 	next.name = "NextChapter"
-	next.text = "Próximo  ›"
+	next.text = "Próximo  >"
 	next.disabled = index >= ids.size() - 1
 	next.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	ButtonStyles.apply(next, "ui_secondary", Vector2(0, 46), 16)

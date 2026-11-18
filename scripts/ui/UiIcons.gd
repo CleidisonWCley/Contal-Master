@@ -28,6 +28,27 @@ static func texture(icon_name: String) -> Texture2D:
 static func for_minigame(minigame_key: String) -> String:
 	return str(MINIGAME_ICONS.get(minigame_key, "star"))
 
+static var _flipped_cache: Dictionary = {}
+
+## V0.15.6: icone espelhado na horizontal (ex.: seta para a direita = "back" espelhado). Substitui os simbolos ←/→,
+## que a fonte da build web nao desenha.
+static func texture_flipped(icon_name: String) -> Texture2D:
+	if _flipped_cache.has(icon_name):
+		return _flipped_cache[icon_name] as Texture2D
+	var base: Texture2D = texture(icon_name)
+	if base == null:
+		return null
+	var image: Image = base.get_image()
+	if image == null:
+		return base
+	if image.is_compressed():
+		image.decompress()
+	image.flip_x()
+	var flipped: ImageTexture = ImageTexture.create_from_image(image)
+	_flipped_cache[icon_name] = flipped
+	return flipped
+
+
 ## TextureRect pronto para uso em layouts (tamanho fixo, cor via modulate).
 static func make_rect(icon_name: String, size_px: float, tint: Color = Color.WHITE) -> TextureRect:
 	var rect := TextureRect.new()

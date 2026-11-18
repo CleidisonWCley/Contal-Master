@@ -95,8 +95,10 @@ func _ready() -> void:
 	else:
 		col.add_child(_ignore(UiKit.label("Confiança", 13, UiPalette.TEXT_MUTED)))
 		col.add_child(_ignore(UiKit.label(name_text, 17, UiPalette.TEXT_ON_DARK)))
-	col.add_child(_ignore(UiKit.label(ArchiveArt.stars_text(_stars), 20, UiPalette.DIFF_NORMAL)))
+	col.add_child(_ignore(ArchiveArt.make_stars(_stars, 20.0)))
 
+	if _mode == "star" and has_node("/root/AudioManager"):
+		AudioManager.play_sfx("conquista")   # V0.15.6: mesmo som das conquistas de capitulo, agora tambem nas estrelas
 	_play_lifetime()
 
 

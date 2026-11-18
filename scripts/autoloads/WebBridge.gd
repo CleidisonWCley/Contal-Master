@@ -42,6 +42,8 @@ var _debug_timer: float = 0.0
 var _last_scene_path: String = ""
 var _saved_max_fps: int = 0
 var _cb_display: JavaScriptObject
+var _cb_orientation: JavaScriptObject
+var _portrait: bool = false
 var _hidden: bool = false
 var _refit_timer: float = -1.0
 var _perf_time: float = 0.0
@@ -89,8 +91,9 @@ func request_exit() -> void:
 
 func _persist() -> void:
 	# Os autoloads gravam a cada mudanca; aqui so garantimos o que e mais barato regravar.
+	# V0.15.6: as configuracoes agora sao gravadas com atraso (debounce); aqui forcamos a gravacao pendente.
 	if has_node("/root/SettingsManager"):
-		SettingsManager.save_settings()
+		SettingsManager.flush_pending_save()
 
 func _show_exit_overlay() -> void:
 	var js: String = """
@@ -122,7 +125,9 @@ func _install_web_hooks() -> void:
 	_cb_pagehide = JavaScriptBridge.create_callback(_on_js_pagehide)
 	_cb_back = JavaScriptBridge.create_callback(_on_js_back)
 	_cb_display = JavaScriptBridge.create_callback(_on_js_display)
+	_cb_orientation = JavaScriptBridge.create_callback(_on_js_orientation)
 	var window: JavaScriptObject = JavaScriptBridge.get_interface("window")
+	window.__cm_onOrientation = _cb_orientation
 	window.__cm_onVisibility = _cb_visibility
 	window.__cm_onPageHide = _cb_pagehide
 	window.__cm_onBack = _cb_back
@@ -142,12 +147,18 @@ func _install_web_hooks() -> void:
 """
 	JavaScriptBridge.eval(js, true)
 	_install_display_hooks()
+	# V0.15.6: o shell pode ter detectado "tela em pe" ANTES do jogo instalar o gancho: aplica o estado atual.
+	var already_portrait: Variant = JavaScriptBridge.eval("!!window.cmPortrait", true)
+	if bool(already_portrait):
+		_on_js_orientation([true])
 
 func _on_js_visibility(args: Array) -> void:
 	var hidden: bool = args.size() > 0 and bool(args[0])
 	_hidden = hidden
 	if has_node("/root/AudioManager"):
-		AudioManager.set_suspended(hidden)
+		AudioManager.set_suspended(hidden or _portrait)
+	if hidden:
+		_persist()
 	if hidden:
 		# V0.14.3: aba escondida/app em segundo plano durante um minigame -> abre o pause. Ao voltar, o jogo esta
 		# parado (o navegador congela os quadros escondidos e o tempo "pulava" para tras do jogador).
@@ -155,6 +166,22 @@ func _on_js_visibility(args: Array) -> void:
 	else:
 		_perf_reset()
 		_refit_timer = REFIT_DELAY
+
+## V0.15.6: o jogo so e jogavel DEITADO. O shell cobre a tela com "Gire o aparelho" quando esta em pe; aqui o jogo
+## pausa o minigame e silencia a musica enquanto isso, e retoma ao voltar para horizontal.
+func _on_js_orientation(args: Array) -> void:
+	var portrait: bool = args.size() > 0 and bool(args[0])
+	if portrait == _portrait:
+		return
+	_portrait = portrait
+	if has_node("/root/AudioManager"):
+		AudioManager.set_suspended(portrait or _hidden)
+	if portrait:
+		_auto_pause_current_minigame()
+	else:
+		_perf_reset()
+		_refit_timer = REFIT_DELAY
+
 
 func _on_js_pagehide(_args: Array) -> void:
 	_persist()

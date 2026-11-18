@@ -1,3 +1,7 @@
+> **SUBSTITUÍDO na V0.15.6.1.** Esta solução (`class_name TouchScroll` + `TouchScroll.attach(...)`) foi trocada pelo autoload
+> `scripts/autoloads/TouchScroll.gd` (patch de otimização web), que trata toda `ScrollContainer` sozinho. Os dois nomes colidiam
+> ("hides an autoload singleton"). Veja `V0_15_6_1_HOTFIX_TOUCHSCROLL_DUPLICADO.md`. O texto abaixo fica só como histórico.
+
 # V0.15.6 — Rolagem por toque (celular / tablet)
 
 Copie por cima do projeto mantendo as pastas. **Uma classe nova (`TouchScroll`)**: abra o projeto no Godot uma vez

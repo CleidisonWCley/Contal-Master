@@ -64,6 +64,14 @@ var _last_music_db: float = 999.0
 var _tempo_target: float = 1.0
 var _tempo_speed: float = 0.0  # variacao de pitch_scale por segundo
 
+## V0.15.6: efeitos aquecidos no inicio (o 1o clique/conquista nao carrega arquivo na hora), anti-rajada por efeito e
+## cache das ultimas musicas (voltar a uma musica recente nao le/decodifica o arquivo de novo = sem engasgo na troca).
+const SFX_MIN_GAP_MSEC := 35
+const MUSIC_CACHE_SIZE := 3
+var _sfx_last_msec: Dictionary = {}
+var _music_cache: Dictionary = {}
+var _music_cache_order: Array[String] = []
+
 func _ready() -> void:
 	music_player = AudioStreamPlayer.new()
 	music_player.name = "MusicPlayer"
@@ -82,6 +90,19 @@ func _ready() -> void:
 	_apply_volumes()
 	if has_node("/root/SettingsManager"):
 		SettingsManager.settings_changed.connect(_on_settings_changed)
+	_prewarm_sfx.call_deferred()
+
+
+## Carrega os efeitos curtos, um por quadro, logo apos o jogo abrir (fora de qualquer momento de jogo).
+func _prewarm_sfx() -> void:
+	for key in SFX.keys():
+		if not is_inside_tree():
+			return
+		if not _sfx_cache.has(key):
+			var stream: AudioStream = load(SFX[key]) as AudioStream
+			if stream != null:
+				_sfx_cache[key] = stream
+		await get_tree().process_frame
 
 func _process(delta: float) -> void:
 	_update_tempo(delta)
@@ -134,11 +155,14 @@ func play_music(key: String, force_restart: bool = false) -> void:
 	_wants_music = true
 	if current_music_key == key and music_player.playing and not force_restart:
 		return
-	var stream_resource: Resource = load(MUSIC[key])
-	if stream_resource == null or not stream_resource is AudioStream:
-		push_warning("Arquivo de música inválido: %s" % MUSIC[key])
-		return
-	var stream: AudioStream = stream_resource as AudioStream
+	var stream: AudioStream = _music_cache.get(key, null) as AudioStream
+	if stream == null:
+		var stream_resource: Resource = load(MUSIC[key])
+		if stream_resource == null or not stream_resource is AudioStream:
+			push_warning("Arquivo de música inválido: %s" % MUSIC[key])
+			return
+		stream = stream_resource as AudioStream
+		_remember_music(key, stream)
 	_enable_music_loop(stream)
 	current_music_key = key
 	_watchdog_restarts = 0
@@ -150,6 +174,16 @@ func play_music(key: String, force_restart: bool = false) -> void:
 		set_music_tempo(1.0, 0.0)
 	apply_desvio_music_profile(key == "desvio_logico")
 	music_player.play()
+
+func _remember_music(key: String, stream: AudioStream) -> void:
+	_music_cache[key] = stream
+	_music_cache_order.erase(key)
+	_music_cache_order.append(key)
+	while _music_cache_order.size() > MUSIC_CACHE_SIZE:
+		var oldest: String = _music_cache_order.pop_front()
+		if oldest != current_music_key:
+			_music_cache.erase(oldest)
+
 
 func _enable_music_loop(stream: AudioStream) -> void:
 	if stream is AudioStreamOggVorbis:
@@ -226,6 +260,10 @@ func play_sfx(key: String) -> void:
 	if not SFX.has(key):
 		push_warning("Efeito sonoro não mapeado: %s" % key)
 		return
+	var now_msec: int = Time.get_ticks_msec()
+	if now_msec - int(_sfx_last_msec.get(key, -1000)) < SFX_MIN_GAP_MSEC:
+		return   # rajada do mesmo efeito (duplo clique/evento duplicado): um so soa
+	_sfx_last_msec[key] = now_msec
 	var stream: AudioStream = _sfx_cache.get(key, null) as AudioStream
 	if stream == null:
 		stream = load(SFX[key]) as AudioStream
