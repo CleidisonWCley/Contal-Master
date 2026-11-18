@@ -81,7 +81,7 @@ func _build() -> void:
 			button.icon = UiIcons.texture("lock")
 			button.expand_icon = true
 			button.add_theme_constant_override("icon_max_width", 18)
-		button.pressed.connect(_select_tab.bind(str(info.get("id", ""))))
+		button.pressed.connect(_on_tab_pressed.bind(str(info.get("id", ""))))
 		_tab_flow.add_child(button)
 		_tab_buttons[str(info.get("id", ""))] = {"button": button, "locked": bool(info.get("locked", false))}
 
@@ -132,6 +132,14 @@ func _character_header() -> Control:
 
 
 # ---------------------------------------------------------------- abas
+
+## V0.15.6.2 - Clique nas abas da ficha (Perfil / Gostos / Origem...) volta a tocar o som de clique.
+## Antes as abas chamavam _select_tab direto e ficavam mudas (so o botao Voltar e a abertura da ficha tocavam).
+func _on_tab_pressed(tab_id: String) -> void:
+	if has_node("/root/AudioManager"):
+		AudioManager.play_click()
+	_select_tab(tab_id)
+
 
 func _select_tab(tab_id: String) -> void:
 	_current_tab = tab_id

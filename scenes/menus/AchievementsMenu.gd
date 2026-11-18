@@ -831,15 +831,25 @@ func _make_archive_card(character_id: Variant, title: String, description: Strin
 	text_box.add_theme_constant_override("separation", 4)
 	row.add_child(text_box)
 	var title_label: Label = UiKit.label(title, 19, UiPalette.TEXT_ON_DARK if complete or character_id is String else UiPalette.TEXT_MUTED)
-	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if character_id is String:
 		# V0.15.6: nome + estrelas desenhadas (a fonte da web nao tem ★).
+		# V0.15.6.2 (correcao): o nome NAO pode ter autowrap dentro da HBox. Um Label com autowrap tem largura minima
+		# de ~1 caractere; como as estrelas (StarsRow) tem largura fixa, a HBox espremia o nome ate "N/a/t/a/l/i/a"
+		# (uma letra por linha). Agora o nome ocupa o espaco que sobra (EXPAND_FILL), sem quebra de linha, e usa
+		# reticencias se realmente nao couber; as estrelas ficam fixas a direita.
+		title_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		title_label.clip_text = true
+		title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		title_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var title_row: HBoxContainer = HBoxContainer.new()
+		title_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		title_row.add_theme_constant_override("separation", 10)
 		title_row.add_child(title_label)
 		title_row.add_child(ArchiveArt.make_stars(LoreManager.get_stars(character_id as String), 16.0))
 		text_box.add_child(title_row)
 	else:
+		title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		text_box.add_child(title_label)
 	var desc_label: Label = UiKit.label(description, 14, UiPalette.TEXT_MUTED)
 	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
