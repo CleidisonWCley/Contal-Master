@@ -307,14 +307,16 @@ func _build_route_progress_hud() -> void:
 func _build_score_hud() -> void:
 	score_hud = Control.new()
 	score_hud.name = "ScoreHUD"
-	score_hud.anchor_left = 0.018
-	score_hud.anchor_top = 0.024
-	score_hud.anchor_right = 0.018
-	score_hud.anchor_bottom = 0.024
-	score_hud.offset_left = 0.0
-	score_hud.offset_top = 0.0
-	score_hud.offset_right = 205.0
-	score_hud.offset_bottom = 42.0
+	# V0.16.0: o botao global "Tela cheia" (FullscreenOverlay, layer 100) ocupa o canto superior esquerdo ate y = 60.
+	# O score agora fica ABAIXO dele, alinhado a mesma margem esquerda (22 px).
+	score_hud.anchor_left = 0.0
+	score_hud.anchor_top = 0.0
+	score_hud.anchor_right = 0.0
+	score_hud.anchor_bottom = 0.0
+	score_hud.offset_left = 22.0
+	score_hud.offset_top = 62.0
+	score_hud.offset_right = 22.0 + 205.0
+	score_hud.offset_bottom = 62.0 + 42.0
 	score_hud.z_index = 38
 	score_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	score_hud.draw.connect(_on_score_hud_draw)

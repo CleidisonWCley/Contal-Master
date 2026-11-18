@@ -325,6 +325,13 @@ func _make_header() -> Control:
 	title_box.alignment = BoxContainer.ALIGNMENT_BEGIN
 	row.add_child(title_box)
 
+	# V0.16.0: o botao global "Tela cheia" fica no canto superior esquerdo; o titulo comeca a direita dele.
+	var fullscreen_gap := Control.new()
+	fullscreen_gap.name = "FullscreenButtonGap"
+	fullscreen_gap.custom_minimum_size = Vector2(190, 0)
+	fullscreen_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_box.add_child(fullscreen_gap)
+
 	title_icon = TextureRect.new()
 	title_icon.name = "TitleIcon"
 	title_icon.texture = load(Paths.ICON_UI_TROPHY)

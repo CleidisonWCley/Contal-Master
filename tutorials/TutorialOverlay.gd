@@ -28,6 +28,7 @@ const LAYER_INDEX := 95  # acima do MinigamePause (90)
 const TYPE_CHARS_PER_SECOND := 72.0
 const SPOT_PADDING := 10.0
 const NARROW_WIDTH := 760.0
+const TOP_LEFT_RESERVED := 62.0  # V0.16.0: faixa do botao global "Tela cheia" (FullscreenOverlay, layer 100) no canto superior esquerdo
 ## Enquadramento: o retrato e dimensionado pelo DESENHO VISIVEL do sprite "_3" (TutorialManager.BUST_FRAMES), nao pelo canvas
 ## inteiro. A altura visivel (cabeca ate o corte da cintura) e a do cartao + estes "transbordos"; depois entram a altura
 ## real do personagem (CharacterHeights.bust_scale) e o ajuste "fit" de cada um.
@@ -425,7 +426,10 @@ func _style_buttons(compact: bool) -> void:
 
 func _target_card_y(view: Vector2, card_h: float) -> float:
 	var bottom_gap: float = 14.0 if ScreenTools.is_compact(self) else 24.0
+	# V0.16.0: o botao global "Tela cheia" (FullscreenOverlay) ocupa o canto superior esquerdo ate y = 60. O cartao no topo
+	# nunca sobe acima disso, senao o botao cobre o nome do personagem (Natalia, Cleiton, Anderson...).
 	var top_gap: float = view.y * 0.105 if mode == Mode.COACH else (14.0 if ScreenTools.is_compact(self) else 22.0)
+	top_gap = maxf(top_gap, TOP_LEFT_RESERVED)
 	if _current_step.has("card_y"):
 		return view.y * clampf(float(_current_step["card_y"]), 0.0, 0.9)
 	return view.y - card_h - bottom_gap if _card_at_bottom else top_gap
