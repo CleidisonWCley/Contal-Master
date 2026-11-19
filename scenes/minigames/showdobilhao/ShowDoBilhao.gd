@@ -251,7 +251,7 @@ func _build_scene() -> void:
 	title_label.name = "TitleLabel"
 	title_label.text = "SHOW DO BILHÃO"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 54)
+	FontScale.set_size(title_label, 54)
 	title_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
 	title_label.add_theme_constant_override("shadow_offset_x", 3)
@@ -268,7 +268,7 @@ func _build_scene() -> void:
 	status_row.add_theme_constant_override("separation", 14)
 	main_box.add_child(status_row)
 
-	question_counter_label = _create_chip_label("PERGUNTA 1/6", 18, Color(1.0, 0.82, 0.0), Color(0.05, 0.05, 0.05))
+	question_counter_label = _create_chip_label("PERGUNTA 1/%d" % SettingsManager.get_current_questions_count(), 18, Color(1.0, 0.82, 0.0), Color(0.05, 0.05, 0.05))
 	status_row.add_child(question_counter_label)
 
 	score_label = _create_chip_label("Pontuação: 0", 18, Color(0.05, 0.1, 0.18, 0.92), Color(1, 1, 1))
@@ -298,7 +298,7 @@ func _build_scene() -> void:
 	question_text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	question_text_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	question_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	question_text_label.add_theme_font_size_override("font_size", 28)
+	FontScale.set_size(question_text_label, 28)
 	question_text_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	question_margin.add_child(question_text_label)
 
@@ -327,7 +327,7 @@ func _create_chip_label(text_value: String, font_size: int, bg_color: Color, tex
 	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(210, 38)
-	label.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_stylebox_override("normal", _make_panel_style(bg_color, Color(1, 1, 1, 0.16), 12, 1))
 	return label
@@ -371,14 +371,14 @@ func _build_feedback_layer() -> void:
 
 	feedback_title_label = Label.new()
 	feedback_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	feedback_title_label.add_theme_font_size_override("font_size", 46)
+	FontScale.set_size(feedback_title_label, 46)
 	box.add_child(feedback_title_label)
 
 	feedback_body_label = Label.new()
 	feedback_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	feedback_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	feedback_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_body_label.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	box.add_child(feedback_body_label)
 	_create_feedback_continue_button(box)
@@ -388,7 +388,7 @@ func _create_feedback_continue_button(parent: VBoxContainer) -> void:
 	feedback_continue_button.text = "Continuar"
 	feedback_continue_button.custom_minimum_size = Vector2(260, 48)
 	feedback_continue_button.focus_mode = Control.FOCUS_ALL
-	feedback_continue_button.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(feedback_continue_button, 20)
 	feedback_continue_button.add_theme_stylebox_override("normal", _make_button_style(Color(0.06, 0.16, 0.24, 0.96), Color(0.34, 0.90, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("hover", _make_button_style(Color(0.10, 0.28, 0.38, 0.98), Color(0.70, 1.0, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("pressed", _make_button_style(Color(0.03, 0.10, 0.16, 1.0), Color(0.34, 0.90, 1.0), 2))
@@ -439,20 +439,20 @@ func _build_finish_layer() -> void:
 	var title := Label.new()
 	title.text = "Fim do Show!"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 48)
+	FontScale.set_size(title, 48)
 	title.add_theme_color_override("font_color", Color(1.0, 0.82, 0.0))
 	box.add_child(title)
 
 	finish_score_label = Label.new()
 	finish_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	finish_score_label.add_theme_font_size_override("font_size", 26)
+	FontScale.set_size(finish_score_label, 26)
 	finish_score_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	box.add_child(finish_score_label)
 
 	var continue_button := Button.new()
 	continue_button.text = "Continuar"
 	continue_button.custom_minimum_size = Vector2(260, 58)
-	continue_button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(continue_button, 22)
 	continue_button.pressed.connect(_on_finish_continue_pressed)
 	box.add_child(continue_button)
 
@@ -464,7 +464,7 @@ func _connect_score_signal() -> void:
 func _prepare_questions() -> void:
 	var rules := DifficultyManager.get_rules()
 	var question_type := str(rules.get("pergunta_tipo", "normal"))
-	var raw_questions: Array = DynamicQuestionBank.pick_rounds("show_do_bilhao", question_type, 6)
+	var raw_questions: Array = DynamicQuestionBank.pick_rounds("show_do_bilhao", question_type, SettingsManager.get_current_questions_count())
 	if raw_questions.is_empty():
 		raw_questions = ALL_QUESTIONS.get(question_type, ALL_QUESTIONS["normal"]).duplicate(true)
 		raw_questions.shuffle()
@@ -477,7 +477,14 @@ func _prepare_questions() -> void:
 		var correct_key := str(raw_question["resposta"])
 		var correct_text := str(raw_question["opcoes"][correct_key])
 		var correct_reason := str(raw_question["motivos"].get(correct_key, raw_question.get("explanation", "Resposta correta.")))
+		# V0.16.2: motivo de cada alternativa errada, guardado pelo TEXTO (as opcoes sao embaralhadas na tela).
+		var reasons_by_text: Dictionary = {}
+		for letter in raw_question["opcoes"].keys():
+			if str(letter) != correct_key:
+				reasons_by_text[str(raw_question["opcoes"][letter])] = str(raw_question["motivos"].get(letter, ""))
 		questions.append({
+			"motivos_texto": reasons_by_text,
+			"pratica": str(raw_question.get("pratica", "")),
 			"pergunta": str(raw_question["pergunta"]),
 			"opcoes_embaralhadas": option_values,
 			"texto_correto": correct_text,
@@ -516,7 +523,7 @@ func _load_question(index: int) -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.clip_text = true
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.add_theme_font_size_override("font_size", 22)
+		FontScale.set_size(button, 22)
 		button.add_theme_stylebox_override("normal", _make_button_style(Color(0.08, 0.1, 0.22, 0.86), Color(0.45, 0.45, 0.65)))
 		button.add_theme_stylebox_override("hover", _make_button_style(Color(1.0, 0.82, 0.0, 0.24), Color(1.0, 0.9, 0.25), 3))
 		button.add_theme_stylebox_override("pressed", _make_button_style(Color(1.0, 0.82, 0.0, 0.33), Color(1.0, 1.0, 1.0), 3))
@@ -582,10 +589,13 @@ func _show_feedback(is_correct: bool, selected_text: String, correct_text: Strin
 	feedback_title_label.text = "RESPOSTA CORRETA!" if is_correct else "RESPOSTA INCORRETA"
 	feedback_title_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.45) if is_correct else Color(1.0, 0.25, 0.25))
 	var explanation: String = _clean_feedback_explanation(correct_text, correct_reason)
+	var current_question: Dictionary = questions[current_question_index]
+	var practice: String = FeedbackText.practice_line(str(current_question.get("pratica", "")))
 	if is_correct:
-		feedback_body_label.text = "Você marcou: %s\n\n%s\nPontuação adquirida: +%s" % [correct_text, explanation, awarded_points]
+		feedback_body_label.text = "Você marcou: %s\n\n%s%s\nPontuação adquirida: +%s" % [correct_text, explanation, practice, awarded_points]
 	else:
-		feedback_body_label.text = "Você escolheu: %s\nEssa opção não responde corretamente ao conceito pedido.\n\nResposta correta: %s\n%s\nPontuação perdida: %s" % [selected_text, correct_text, explanation, wrong_points]
+		var why_not: String = FeedbackText.why_not_line(FeedbackText.reason_for_text(current_question.get("motivos_texto", {}), selected_text), "Essa opção não responde corretamente ao conceito pedido.")
+		feedback_body_label.text = "Você escolheu: %s\n%s\n\nResposta correta: %s\n%s%s\nPontuação perdida: %s" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
 	await _wait_for_feedback_continue()
 
@@ -633,6 +643,7 @@ func _create_money_particles() -> void:
 	for i in range(WebLite.scaled_count(MONEY_PARTICLE_COUNT)):
 		var label := Label.new()
 		label.text = "$"
+		FontScale.skip(label)
 		label.add_theme_font_size_override("font_size", randi_range(24, 54))
 		label.add_theme_color_override("font_color", [Color(1.0, 0.84, 0.0, 0.42), Color(0.0, 1.0, 0.35, 0.32), Color(0.6, 0.9, 1.0, 0.28)].pick_random())
 		label.position = Vector2(randf_range(0, viewport_size.x), randf_range(0, viewport_size.y))
@@ -668,6 +679,7 @@ func _spawn_coin_burst(center: Vector2) -> void:
 		var label := Label.new()
 		label.text = "$"
 		label.position = center
+		FontScale.skip(label)
 		label.add_theme_font_size_override("font_size", randi_range(22, 38))
 		label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE

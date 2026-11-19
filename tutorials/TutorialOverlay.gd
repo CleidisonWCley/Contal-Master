@@ -284,7 +284,7 @@ func _build_ui() -> void:
 	box.add_child(header)
 
 	_name_label = Label.new()
-	_name_label.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(_name_label, 20)
 	_name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	header.add_child(_name_label)
@@ -303,7 +303,7 @@ func _build_ui() -> void:
 	box.add_child(footer)
 
 	_counter_label = Label.new()
-	_counter_label.add_theme_font_size_override("font_size", 15)
+	FontScale.set_size(_counter_label, 15)
 	_counter_label.add_theme_color_override("font_color", UiPalette.TEXT_MUTED)
 	_counter_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_counter_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -385,8 +385,8 @@ func _layout(place: bool = true) -> void:
 	var label_margin_left: float = 22.0 if (coach or not has_partner) else reserve_left + 14.0
 	_text_label.custom_minimum_size = Vector2(maxf(card_w - 6.0 - label_margin_left - (reserve_right + 14.0), 120.0), 0.0)
 	_card.clip_contents = true
-	_text_label.add_theme_font_size_override("font_size", text_size)
-	_name_label.add_theme_font_size_override("font_size", 18 if compact else 20)
+	FontScale.set_size(_text_label, text_size)
+	FontScale.set_size(_name_label, 18 if compact else 20)
 	_style_buttons(compact)
 	# V0.11.1: a altura do cartao ACOMPANHA o texto (antes o cartao crescia e o retrato ficava preso na altura antiga).
 	var card_h: float = _refit_card(view, card_w, base_card_h, text_size, compact, label_margin_left, reserve_right + 14.0)

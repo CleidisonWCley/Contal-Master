@@ -162,7 +162,7 @@ func _build_scene() -> void:
 	title_label.name = "TitleLabel"
 	title_label.text = "Batalha Naval"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 40)
+	FontScale.set_size(title_label, 40)
 	title_label.add_theme_color_override("font_color", Color(0.90, 0.96, 1.0))
 	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.88))
 	title_label.add_theme_constant_override("shadow_offset_x", 3)
@@ -213,7 +213,7 @@ func _build_scene() -> void:
 	info_label.text = "Encontre os riscos escondidos. Fácil tem mais ameaças; Difícil tem menos margem."
 	info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	info_label.add_theme_font_size_override("font_size", 15)
+	FontScale.set_size(info_label, 15)
 	info_label.add_theme_color_override("font_color", Color(0.86, 0.93, 1.0, 0.96))
 	main_box.add_child(info_label)
 
@@ -240,7 +240,7 @@ func _create_chip_label(text_value: String, font_size: int, bg_color: Color, tex
 	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(230, 38)
-	label.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_stylebox_override("normal", _make_panel_style(bg_color, Color(1, 1, 1, 0.18), 12, 1))
 	return label
@@ -295,7 +295,7 @@ func _build_grid_buttons() -> void:
 		cell_button.size_flags_vertical = Control.SIZE_FILL
 		cell_button.clip_text = true
 		cell_button.text_overrun_behavior = TextServer.OVERRUN_TRIM_CHAR
-		cell_button.add_theme_font_size_override("font_size", 20)
+		FontScale.set_size(cell_button, 20)
 		cell_button.add_theme_stylebox_override("normal", _make_cell_style(Color(0.06, 0.26, 0.60, 0.94), Color(0.68, 0.90, 1.0), 2))
 		cell_button.add_theme_stylebox_override("hover", _make_cell_style(Color(0.18, 0.46, 0.86, 1.0), Color(1.0, 1.0, 1.0), 3))
 		cell_button.add_theme_stylebox_override("pressed", _make_cell_style(Color(0.08, 0.18, 0.44, 1.0), Color(1.0, 1.0, 1.0), 3))
@@ -326,7 +326,7 @@ func _apply_board_metrics() -> void:
 	var grid_h: float = cell.y * GRID_SIZE + BOARD_GAP * (GRID_SIZE - 1)
 	board_panel.custom_minimum_size = Vector2(grid_w + BOARD_PADDING * 2 + 6, grid_h + BOARD_PADDING * 2 + 6)
 	for cell_button in cell_buttons:
-		cell_button.add_theme_font_size_override("font_size", 22 if cell.y >= 72.0 else 18)
+		FontScale.set_size(cell_button, 22 if cell.y >= 72.0 else 18)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
@@ -337,7 +337,7 @@ func _create_feedback_continue_button(parent: VBoxContainer) -> void:
 	feedback_continue_button.text = "Continuar"
 	feedback_continue_button.custom_minimum_size = Vector2(260, 48)
 	feedback_continue_button.focus_mode = Control.FOCUS_ALL
-	feedback_continue_button.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(feedback_continue_button, 20)
 	feedback_continue_button.add_theme_stylebox_override("normal", _make_button_style(Color(0.04, 0.14, 0.24, 0.96), Color(0.36, 0.80, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("hover", _make_button_style(Color(0.08, 0.24, 0.36, 0.98), Color(0.72, 1.0, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("pressed", _make_button_style(Color(0.02, 0.08, 0.16, 1.0), Color(0.36, 0.80, 1.0), 2))
@@ -397,7 +397,7 @@ func _set_cell_as_threat(cell_button: Button) -> void:
 	cell_button.expand_icon = false
 	cell_button.add_theme_constant_override("icon_max_width", 20)
 	cell_button.add_theme_constant_override("h_separation", 4)
-	cell_button.add_theme_font_size_override("font_size", 18)
+	FontScale.set_size(cell_button, 18)
 	cell_button.add_theme_color_override("icon_disabled_color", Color(1.0, 0.96, 0.86))
 	cell_button.add_theme_stylebox_override("disabled", _make_cell_style(Color(0.58, 0.05, 0.05, 0.98), Color(1.0, 0.68, 0.32), 3))
 	cell_button.add_theme_color_override("font_disabled_color", Color(1.0, 0.96, 0.86))
@@ -477,14 +477,14 @@ func _build_feedback_layer() -> void:
 
 	feedback_title_label = Label.new()
 	feedback_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	feedback_title_label.add_theme_font_size_override("font_size", 42)
+	FontScale.set_size(feedback_title_label, 42)
 	box.add_child(feedback_title_label)
 
 	feedback_body_label = Label.new()
 	feedback_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	feedback_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	feedback_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_body_label.add_theme_font_size_override("font_size", 23)
+	FontScale.set_size(feedback_body_label, 23)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.93, 0.97, 1.0))
 	box.add_child(feedback_body_label)
 	_create_feedback_continue_button(box)
@@ -526,21 +526,21 @@ func _build_finish_layer() -> void:
 	var title: Label = Label.new()
 	title.text = "Ambiente Seguro!"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 44)
+	FontScale.set_size(title, 44)
 	title.add_theme_color_override("font_color", Color(0.58, 0.88, 1.0))
 	box.add_child(title)
 
 	finish_score_label = Label.new()
 	finish_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	finish_score_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	finish_score_label.add_theme_font_size_override("font_size", 25)
+	FontScale.set_size(finish_score_label, 25)
 	finish_score_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	box.add_child(finish_score_label)
 
 	var continue_button: Button = Button.new()
 	continue_button.text = "Continuar"
 	continue_button.custom_minimum_size = Vector2(260, 58)
-	continue_button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(continue_button, 22)
 	continue_button.pressed.connect(_on_finish_continue_pressed)
 	box.add_child(continue_button)
 

@@ -8,7 +8,7 @@ const DIFFICULTIES := {
 		"perda_pontos": 25,
 		"tempo_pergunta": 90.0,
 		"perseguicao_tempo": 5.0,
-		"naval_qtd": 14,
+		"naval_qtd": 16,
 		"questoes_por_partida": 6,
 		"pergunta_tipo": "facil",
 		"bonus_acerto": 0,
@@ -19,7 +19,7 @@ const DIFFICULTIES := {
 		"perda_pontos": 55,
 		"tempo_pergunta": 75.0,
 		"perseguicao_tempo": 4.0,
-		"naval_qtd": 10,
+		"naval_qtd": 12,
 		"questoes_por_partida": 6,
 		"pergunta_tipo": "normal",
 		"bonus_acerto": 0,
@@ -30,7 +30,7 @@ const DIFFICULTIES := {
 		"perda_pontos": 90,
 		"tempo_pergunta": 60.0,
 		"perseguicao_tempo": 3.0,
-		"naval_qtd": 6,
+		"naval_qtd": 8,
 		"questoes_por_partida": 6,
 		"pergunta_tipo": "dificil",
 		"bonus_acerto": 0,
@@ -134,7 +134,7 @@ func apply_difficulty_chip(label: Label, value: String = "", font_size: int = -1
 	var border_color: Color = palette.get("border", Color(1.0, 0.84, 0.05, 1.0)) as Color
 	var text_color: Color = palette.get("text", Color(1.0, 1.0, 1.0, 1.0)) as Color
 	if font_size > 0:
-		label.add_theme_font_size_override("font_size", font_size)
+		FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.76))
 	label.add_theme_constant_override("shadow_offset_x", 1)
@@ -185,10 +185,12 @@ func get_score_profile(minigame_key: String, value: String = "") -> Dictionary:
 	return {"correct": 100, "wrong": -40}
 
 func get_correct_points(minigame_key: String, value: String = "") -> int:
-	return int(get_score_profile(minigame_key, value).get("correct", 100))
+	var base: int = int(get_score_profile(minigame_key, value).get("correct", 100))
+	return roundi(float(base) * SettingsManager.question_score_scale(minigame_key))   # V0.16.1
 
 func get_wrong_points(minigame_key: String, value: String = "") -> int:
-	return int(get_score_profile(minigame_key, value).get("wrong", -40))
+	var base: int = int(get_score_profile(minigame_key, value).get("wrong", -40))
+	return roundi(float(base) * SettingsManager.question_score_scale(minigame_key))   # V0.16.1
 
 func get_time_multiplier(elapsed_seconds: float) -> float:
 	if elapsed_seconds <= TIME_FAST_LIMIT:

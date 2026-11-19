@@ -69,6 +69,9 @@ func _apply_compact() -> void:
 	_prefix_label.visible = not _compact
 	var button_size: Vector2 = Vector2(96, 58) if _compact else Vector2(136, 46)
 	var font: int = maxi(font_px - 2, 13) if _compact else font_px
+	# V0.16.3: o conteudo do botao (pontos + nome) e filho, entao o botao precisa crescer junto com a fonte.
+	var grow: float = maxf(FontScale.get_factor(), 1.0)
+	button_size = Vector2(button_size.x * grow * 1.05, button_size.y * grow)
 	for key in KEYS:
 		var key_name: String = str(key)
 		(_buttons[key_name] as Button).custom_minimum_size = button_size
@@ -76,7 +79,7 @@ func _apply_compact() -> void:
 		var box: BoxContainer = parts["box"] as BoxContainer
 		box.vertical = _compact
 		box.add_theme_constant_override("separation", 2 if _compact else 8)
-		(parts["label"] as Label).add_theme_font_size_override("font_size", font)
+		FontScale.set_size((parts["label"] as Label), font)
 
 ## Selecionado = preenchido na cor da dificuldade (texto escuro). Os demais = so contorno.
 func refresh() -> void:

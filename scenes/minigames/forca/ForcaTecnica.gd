@@ -4,7 +4,8 @@ var pause_menu: MinigamePause
 const DynamicQuestionBank := preload("res://scripts/core/question_bank.gd")
 
 const BACKGROUND_PATH := Paths.BG_FORCA
-const TOTAL_ROUNDS := 6
+## V0.16.1: quantidade de rodadas vem das Configuracoes (campanha x modo livre).
+var total_rounds: int = SettingsManager.get_current_questions_count()
 const ERRORS_BY_DIFFICULTY := {"facil": 14, "normal": 10, "dificil": 6}
 const SOLVE_BASE_POINTS := 100
 const INTEGRITY_BONUS_CAP := 60
@@ -466,18 +467,18 @@ func _apply_responsive_layout() -> void:
 	if main_box != null:
 		main_box.add_theme_constant_override("separation", 10 if compact else 16)
 	if title_label != null:
-		title_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 42, 30))
+		FontScale.set_size(title_label, ScreenTools.responsive_font(self, 42, 30))
 	for label in [round_label, score_label, difficulty_label]:
 		if label is Label:
-			(label as Label).add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 15, 12))
+			FontScale.set_size((label as Label), ScreenTools.responsive_font(self, 15, 12))
 			(label as Label).custom_minimum_size = ScreenTools.responsive_size(self, Vector2(210, 34), Vector2(118, 30))
 	if area_label != null:
-		area_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 22, 16))
+		FontScale.set_size(area_label, ScreenTools.responsive_font(self, 22, 16))
 	if hint_label != null:
-		hint_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 19, 14))
+		FontScale.set_size(hint_label, ScreenTools.responsive_font(self, 19, 14))
 		hint_label.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(720, 58), Vector2(330, 52))
 	if word_label != null:
-		word_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 43, 27))
+		FontScale.set_size(word_label, ScreenTools.responsive_font(self, 43, 27))
 		word_label.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(720, 86), Vector2(330, 70))
 	if keyboard_grid != null:
 		keyboard_grid.columns = 9 if ScreenTools.is_narrow(self) else 13
@@ -487,15 +488,15 @@ func _apply_responsive_layout() -> void:
 	if integrity_bar != null:
 		integrity_bar.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(300, 34), Vector2(180, 28))
 	if integrity_label != null:
-		integrity_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 28, 20))
+		FontScale.set_size(integrity_label, ScreenTools.responsive_font(self, 28, 20))
 	if error_label != null:
-		error_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 18, 14))
+		FontScale.set_size(error_label, ScreenTools.responsive_font(self, 18, 14))
 	if terminal_label != null:
-		terminal_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 17, 13))
+		FontScale.set_size(terminal_label, ScreenTools.responsive_font(self, 17, 13))
 		terminal_label.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(310, 166), Vector2(180, 110))
 	var system_title_node: Label = get_node_or_null("SafeArea/MainLayout/ContentRow/SystemPanel/MarginContainer/VBoxContainer/Label")
 	if system_title_node != null:
-		system_title_node.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 19, 14))
+		FontScale.set_size(system_title_node, ScreenTools.responsive_font(self, 19, 14))
 	var system_panel: PanelContainer = get_node_or_null("SafeArea/MainLayout/ContentRow/SystemPanel")
 	if system_panel != null:
 		system_panel.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(350, 430), Vector2(210, 300))
@@ -543,13 +544,13 @@ func _prepare_questions() -> void:
 	_configure_difficulty()
 	questions.clear()
 	var question_type: String = str(DifficultyManager.get_rules().get("pergunta_tipo", "normal"))
-	questions = DynamicQuestionBank.pick_rounds("forca_tecnica", question_type, TOTAL_ROUNDS)
+	questions = DynamicQuestionBank.pick_rounds("forca_tecnica", question_type, total_rounds)
 	if questions.is_empty():
 		var all_words: Array = WORD_BANK.duplicate(true)
 		all_words.shuffle()
 		var used_areas: Array[String] = []
 		for item in all_words:
-			if questions.size() >= TOTAL_ROUNDS:
+			if questions.size() >= total_rounds:
 				break
 			if not item is Dictionary:
 				continue
@@ -558,9 +559,9 @@ func _prepare_questions() -> void:
 			if not used_areas.has(area):
 				questions.append(data)
 				used_areas.append(area)
-		if questions.size() < TOTAL_ROUNDS:
+		if questions.size() < total_rounds:
 			for item in all_words:
-				if questions.size() >= TOTAL_ROUNDS:
+				if questions.size() >= total_rounds:
 					break
 				if item is Dictionary and not questions.has(item):
 					questions.append(item as Dictionary)
@@ -574,7 +575,7 @@ func _configure_difficulty() -> void:
 		DifficultyManager.apply_difficulty_chip(difficulty_label)
 
 func _start_round(index: int) -> void:
-	if index >= TOTAL_ROUNDS or index >= questions.size():
+	if index >= total_rounds or index >= questions.size():
 		_show_finish()
 		return
 	input_locked = true
@@ -600,7 +601,7 @@ func _reset_keyboard_buttons() -> void:
 		ScreenTools.apply_button(button, self, "secondary", Vector2(48, 42), Vector2(35, 33), 17, 13)
 
 func _update_round_ui() -> void:
-	round_label.text = "RODADA %s/%s" % [current_round_index + 1, TOTAL_ROUNDS]
+	round_label.text = "RODADA %s/%s" % [current_round_index + 1, total_rounds]
 	area_label.text = "ÁREA: %s" % str(current_question.get("area", "Sistemas de Informação"))
 	hint_label.text = "DICA: %s" % str(current_question.get("hint", "Identifique o termo técnico."))
 	terminal_label.text = "> boot: forca_tecnica.v0.11.2\n> área carregada: %s\n> aguardando entrada do jogador" % str(current_question.get("area", "SI"))
@@ -655,10 +656,10 @@ func _complete_round(solved: bool) -> void:
 		if button is Button:
 			(button as Button).disabled = true
 	var word: String = str(current_question.get("word", ""))
-	var explanation: String = _get_current_term_explanation()
+	var explanation: String = _get_current_term_explanation() + FeedbackText.practice_line(str(current_question.get("pratica", "")))   # V0.16.2
 	if solved:
 		success_count += 1
-		var round_points: int = SOLVE_BASE_POINTS + int(round(float(_get_integrity_percent()) / 100.0 * float(INTEGRITY_BONUS_CAP)))
+		var round_points: int = roundi(float(SOLVE_BASE_POINTS + int(round(float(_get_integrity_percent()) / 100.0 * float(INTEGRITY_BONUS_CAP)))) * SettingsManager.question_score_scale("forca_tecnica"))   # V0.16.1
 		earned_points += round_points
 		ScoreManager.add_points(round_points)
 		await _show_feedback(true, "Termo identificado!", "Resposta correta: %s\n%s\nIntegridade preservada: %s%%\n+%s pontos" % [word.to_upper(), explanation, _get_integrity_percent(), round_points])
@@ -680,13 +681,13 @@ func _show_feedback(success: bool, title: String, body: String) -> void:
 func _show_finish() -> void:
 	input_locked = true
 	finish_visible = true
-	if has_node("/root/AchievementManager") and success_count >= TOTAL_ROUNDS and total_errors_count <= 0:
+	if has_node("/root/AchievementManager") and success_count >= total_rounds and total_errors_count <= 0:
 		AchievementManager.unlock("sistema_intacto")
 	if has_node("/root/AudioManager"):
 		AudioManager.play_sfx("correto")
 	var classification: String = _get_final_classification()
 	finish_title_label.text = "Forca Tecnica concluída!"
-	finish_body_label.text = "Termos identificados: %s/%s\nFalhas de sistema: %s\nPontos obtidos no minigame: %s\nResultado: %s\nPontuação total: %s" % [success_count, TOTAL_ROUNDS, failure_count, earned_points, classification, ScoreManager.get_score()]
+	finish_body_label.text = "Termos identificados: %s/%s\nFalhas de sistema: %s\nPontos obtidos no minigame: %s\nResultado: %s\nPontuação total: %s" % [success_count, total_rounds, failure_count, earned_points, classification, ScoreManager.get_score()]
 	finish_layer.visible = true
 
 func _get_final_classification() -> String:
@@ -704,7 +705,7 @@ func _on_finish_continue_pressed() -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
 	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
-	GameManager.report_stage({"total": TOTAL_ROUNDS, "correct": success_count, "wrong": failure_count, "extra": {"erros_totais": total_errors_count}})
+	GameManager.report_stage({"total": total_rounds, "correct": success_count, "wrong": failure_count, "extra": {"erros_totais": total_errors_count}})
 	GameManager.complete_current_stage(0)
 
 
@@ -857,14 +858,14 @@ func _build_feedback_layer() -> void:
 
 	feedback_title_label = Label.new()
 	feedback_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	feedback_title_label.add_theme_font_size_override("font_size", 40)
+	FontScale.set_size(feedback_title_label, 40)
 	box.add_child(feedback_title_label)
 
 	feedback_body_label = Label.new()
 	feedback_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	feedback_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	feedback_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_body_label.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.94, 0.98, 1.0))
 	box.add_child(feedback_body_label)
 	_create_feedback_continue_button(box)
@@ -874,7 +875,7 @@ func _create_feedback_continue_button(parent: VBoxContainer) -> void:
 	feedback_continue_button.text = "Continuar"
 	feedback_continue_button.custom_minimum_size = Vector2(260, 48)
 	feedback_continue_button.focus_mode = Control.FOCUS_ALL
-	feedback_continue_button.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(feedback_continue_button, 20)
 	feedback_continue_button.add_theme_stylebox_override("normal", _make_button_style(Color(0.06, 0.16, 0.24, 0.96), Color(0.34, 0.90, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("hover", _make_button_style(Color(0.10, 0.28, 0.38, 0.98), Color(0.70, 1.0, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("pressed", _make_button_style(Color(0.03, 0.10, 0.16, 1.0), Color(0.34, 0.90, 1.0), 2))
@@ -925,7 +926,7 @@ func _build_finish_layer() -> void:
 
 	finish_title_label = Label.new()
 	finish_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	finish_title_label.add_theme_font_size_override("font_size", 40)
+	FontScale.set_size(finish_title_label, 40)
 	finish_title_label.add_theme_color_override("font_color", Color(0.48, 1.0, 0.82))
 	box.add_child(finish_title_label)
 
@@ -933,7 +934,7 @@ func _build_finish_layer() -> void:
 	finish_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	finish_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	finish_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	finish_body_label.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(finish_body_label, 22)
 	finish_body_label.add_theme_color_override("font_color", Color(0.94, 0.98, 1.0))
 	box.add_child(finish_body_label)
 
@@ -954,6 +955,7 @@ func _create_symbol_particles() -> void:
 		var label: Label = Label.new()
 		label.text = str(TECH_SYMBOLS[i % TECH_SYMBOLS.size()])
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		FontScale.skip(label)
 		label.add_theme_font_size_override("font_size", randi_range(17, 34))
 		label.add_theme_color_override("font_color", Color(0.45, 1.0, 0.86, randf_range(0.14, 0.34)))
 		particle_layer.add_child(label)

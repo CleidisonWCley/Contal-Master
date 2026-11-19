@@ -176,7 +176,7 @@ func _build_scene() -> void:
 	title_label.name = "TitleLabel"
 	title_label.text = "QUAL É A MALETA CERTA?"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 48)
+	FontScale.set_size(title_label, 48)
 	title_label.add_theme_color_override("font_color", Color(1.0, 0.86, 0.16))
 	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.82))
 	title_label.add_theme_constant_override("shadow_offset_x", 3)
@@ -225,7 +225,7 @@ func _build_scene() -> void:
 	badge.text = "PROBLEMA"
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.custom_minimum_size = Vector2(160, 32)
-	badge.add_theme_font_size_override("font_size", 18)
+	FontScale.set_size(badge, 18)
 	badge.add_theme_color_override("font_color", Color(0.04, 0.08, 0.17))
 	badge.add_theme_stylebox_override("normal", _make_panel_style(Color(0.31, 0.86, 1.0), Color(0.85, 1.0, 1.0), 9, 1))
 	problem_box.add_child(badge)
@@ -236,7 +236,7 @@ func _build_scene() -> void:
 	problem_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	problem_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	problem_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	problem_label.add_theme_font_size_override("font_size", 27)
+	FontScale.set_size(problem_label, 27)
 	problem_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	problem_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	problem_box.add_child(problem_label)
@@ -252,7 +252,7 @@ func _build_scene() -> void:
 	var hint_label := Label.new()
 	hint_label.text = "Escolha a maleta com a solução correta. Atalhos: 1, 2, 3 ou A, B, C."
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint_label.add_theme_font_size_override("font_size", 17)
+	FontScale.set_size(hint_label, 17)
 	hint_label.add_theme_color_override("font_color", Color(0.86, 0.92, 1.0, 0.92))
 	main_box.add_child(hint_label)
 
@@ -279,7 +279,7 @@ func _create_chip_label(text_value: String, font_size: int, bg_color: Color, tex
 	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(220, 38)
-	label.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_stylebox_override("normal", _make_panel_style(bg_color, Color(1, 1, 1, 0.18), 12, 1))
 	return label
@@ -323,14 +323,14 @@ func _build_feedback_layer() -> void:
 
 	feedback_title_label = Label.new()
 	feedback_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	feedback_title_label.add_theme_font_size_override("font_size", 44)
+	FontScale.set_size(feedback_title_label, 44)
 	box.add_child(feedback_title_label)
 
 	feedback_body_label = Label.new()
 	feedback_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	feedback_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	feedback_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_body_label.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.92, 0.94, 1.0))
 	box.add_child(feedback_body_label)
 	_create_feedback_continue_button(box)
@@ -340,7 +340,7 @@ func _create_feedback_continue_button(parent: VBoxContainer) -> void:
 	feedback_continue_button.text = "Continuar"
 	feedback_continue_button.custom_minimum_size = Vector2(260, 48)
 	feedback_continue_button.focus_mode = Control.FOCUS_ALL
-	feedback_continue_button.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(feedback_continue_button, 20)
 	feedback_continue_button.add_theme_stylebox_override("normal", _make_button_style(Color(0.06, 0.16, 0.24, 0.96), Color(0.34, 0.90, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("hover", _make_button_style(Color(0.10, 0.28, 0.38, 0.98), Color(0.70, 1.0, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("pressed", _make_button_style(Color(0.03, 0.10, 0.16, 1.0), Color(0.34, 0.90, 1.0), 2))
@@ -391,20 +391,20 @@ func _build_finish_layer() -> void:
 	var title := Label.new()
 	title.text = "Desafio Completo!"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 46)
+	FontScale.set_size(title, 46)
 	title.add_theme_color_override("font_color", Color(1.0, 0.82, 0.0))
 	box.add_child(title)
 
 	finish_score_label = Label.new()
 	finish_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	finish_score_label.add_theme_font_size_override("font_size", 26)
+	FontScale.set_size(finish_score_label, 26)
 	finish_score_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	box.add_child(finish_score_label)
 
 	var continue_button := Button.new()
 	continue_button.text = "Continuar"
 	continue_button.custom_minimum_size = Vector2(260, 58)
-	continue_button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(continue_button, 22)
 	continue_button.pressed.connect(_on_finish_continue_pressed)
 	box.add_child(continue_button)
 
@@ -417,7 +417,7 @@ func _prepare_challenges() -> void:
 	correct_answers_count = 0
 	var rules := DifficultyManager.get_rules()
 	var challenge_type := str(rules.get("pergunta_tipo", "normal"))
-	challenges = DynamicQuestionBank.pick_rounds("maleta_certa", challenge_type, 6)
+	challenges = DynamicQuestionBank.pick_rounds("maleta_certa", challenge_type, SettingsManager.get_current_questions_count())
 	if challenges.is_empty():
 		challenges = ALL_CHALLENGES.get(challenge_type, ALL_CHALLENGES["normal"]).duplicate(true)
 		challenges.shuffle()
@@ -452,7 +452,7 @@ func _load_challenge(index: int) -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.clip_text = true
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.add_theme_font_size_override("font_size", 21)
+		FontScale.set_size(button, 21)
 		button.add_theme_stylebox_override("normal", _make_maleta_button_style(Color(0.06, 0.12, 0.28, 0.88), Color(0.15, 0.72, 1.0)))
 		button.add_theme_stylebox_override("hover", _make_maleta_button_style(Color(0.12, 0.22, 0.42, 0.95), Color(0.65, 0.92, 1.0), 3))
 		button.add_theme_stylebox_override("pressed", _make_maleta_button_style(Color(0.18, 0.30, 0.55, 0.98), Color(1.0, 1.0, 1.0), 3))
@@ -520,12 +520,14 @@ func _highlight_answer(selected_button: Button, correct_text: String, is_correct
 func _show_feedback(is_correct: bool, selected_text: String, correct_text: String, _elapsed_seconds: float, awarded_points: int) -> void:
 	var current_challenge: Dictionary = challenges[current_challenge_index]
 	var explanation: String = _clean_feedback_explanation(correct_text, str(current_challenge.get("explanation", _get_solution_explanation(correct_text))))
+	var practice: String = FeedbackText.practice_line(str(current_challenge.get("pratica", "")))   # V0.16.2
 	feedback_title_label.text = "MALETA CERTA!" if is_correct else "MALETA ERRADA!"
 	feedback_title_label.add_theme_color_override("font_color", Color(0.42, 1.0, 0.48) if is_correct else Color(1.0, 0.26, 0.22))
 	if is_correct:
-		feedback_body_label.text = "Resposta correta: %s\n%s\nPontuação adquirida: +%s" % [correct_text, explanation, awarded_points]
+		feedback_body_label.text = "Resposta correta: %s\n%s%s\nPontuação adquirida: +%s" % [correct_text, explanation, practice, awarded_points]
 	else:
-		feedback_body_label.text = "Você escolheu: %s\nEssa opção não resolve bem o cenário apresentado.\n\nSolução correta: %s\n%s\nPontuação perdida: %s" % [selected_text, correct_text, explanation, wrong_points]
+		var why_not: String = FeedbackText.why_not_line(FeedbackText.reason_for_text(current_challenge.get("motivos_texto", {}), selected_text), "Essa opção não resolve bem o cenário apresentado.")
+		feedback_body_label.text = "Você escolheu: %s\n%s\n\nSolução correta: %s\n%s%s\nPontuação perdida: %s" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
 	await _wait_for_feedback_continue()
 

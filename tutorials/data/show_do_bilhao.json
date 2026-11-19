@@ -25,7 +25,7 @@
       "kind": "mecanica",
       "speaker": "priscila",
       "title": "Uma alternativa",
-      "text": "Sou a Priscila, da checagem normativa. Leia o enunciado e clique em UMA alternativa: a resposta trava no clique. São {rounds} perguntas valendo recorde.",
+      "text": "Sou a Priscila. Leia o enunciado e clique em UMA alternativa: a resposta trava no clique. São {rounds} perguntas valendo recorde.",
       "modes": [
         "free"
       ],

@@ -109,9 +109,9 @@ func _build_style() -> void:
 
 	# Textos
 	status_label.add_theme_color_override("font_color", UiPalette.TEXT_ON_DARK)
-	status_label.add_theme_font_size_override("font_size", UiPalette.FONT_BODY.x)
+	FontScale.set_size(status_label, UiPalette.FONT_BODY.x)
 	percent_label.add_theme_color_override("font_color", UiPalette.TEXT_ON_DARK)
-	percent_label.add_theme_font_size_override("font_size", UiPalette.FONT_VALUE.x)
+	FontScale.set_size(percent_label, UiPalette.FONT_VALUE.x)
 
 	# Botoes do estado de erro
 	ButtonStyles.apply(retry_button, "ui_primary", Vector2(220, 48), 18)

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="ContalMaster"
-config/version="0.16.0"
+config/version="0.16.4"
 run/main_scene="res://scenes/loading/LoadingScreen.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 boot_splash/bg_color=Color(0.0627451, 0.043137256, 0.12156863, 1)
@@ -26,6 +26,7 @@ driver/output_latency.web=100
 
 ScoreManager="*res://scripts/autoloads/ScoreManager.gd"
 SettingsManager="*res://scripts/autoloads/SettingsManager.gd"
+FontScale="*res://scripts/autoloads/FontScale.gd"
 AudioManager="*res://scripts/autoloads/AudioManager.gd"
 WebBridge="*res://scripts/autoloads/WebBridge.gd"
 DifficultyManager="*res://scripts/autoloads/DifficultyManager.gd"

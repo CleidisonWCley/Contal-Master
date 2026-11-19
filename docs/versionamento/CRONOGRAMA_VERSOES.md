@@ -53,6 +53,8 @@ Depois: criar o doc `docs/versionamento/V<versão>_<assunto>.md`, atualizar **es
 | **0.14.4** | **Unificação com o patch 0.14.2 do Desvio Lógico: bolinhas de tráfego, ritmo da música por horário, respostas A/B abaixo da pergunta, 2 postes por lado** | `V0_14_4_UNIFICACAO_DESVIO_LOGICO_0_14_2.md` |
 | 0.14.4.1 | Hotfix "WebGL context lost" no Desvio Lógico (web): água em densidade reduzida, tela de recarregar no lugar do alert, log de VRAM/desenhos | `V0_14_4_1_HOTFIX_WEBGL_CONTEXT_LOST.md` |
 | 0.14.4.2 | STOP: título "STOP - CONTROLE NORMATIVO", 6 opções fixas (3×2) sempre da mesma letra, limpeza do script (conteúdo de TI removido) e termos extras no dicionário | `V0_14_4_2_STOP_TITULO_6_OPCOES_LIMPEZA.md` |
+| **0.16.2** | **Limite dinâmico nos 8 minigames (Roleta e Naval), conteúdo sem repetição, feedback didático "Na prática", novels mais enxutas** | `V0_16_2_LIMITE_DINAMICO_8_MINIGAMES_E_FEEDBACK.md` |
+| **0.16.4** | **Roleta de Risco volta a 1 giro (bônus) em qualquer modo; limite dinâmico 2–10 só em Show do Bilhão, Maleta Certa, Perseguição, STOP e Forca Técnica** | `V0_16_4_ROLETA_1_GIRO_LIMITE_DINAMICO_5_MINIGAMES.md` |
 
 ### Observações do histórico
 

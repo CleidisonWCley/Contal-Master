@@ -3,7 +3,8 @@ class_name DLConfig
 ## Constantes e regras de balanceamento do Desvio Logico (dados puros, sem logica).
 
 const TOTAL_ROUNDS := 6
-const DRIVE_DURATION_SECONDS := 35.0
+## V0.16.2: percurso ate a bifurcacao mais curto (era 35 s) para o Desvio ficar mais agil mantendo os 6 desafios.
+const DRIVE_DURATION_SECONDS := 22.0
 const BACKGROUNDS := Paths.DL_BACKGROUNDS
 const STAGE_NAMES := ["Amanhecer", "Manhã", "Tarde", "Entardecer", "Anoitecer", "Noite"]
 const PLAYER_CAR_DISPLAY_NAME := "Bionix"
@@ -36,9 +37,9 @@ const ENGINE_LOOP_VOLUME_DB := -7.0
 const VELOX_SFX_BUS := &"VeloxSFX"
 const VELOX_SFX_BUS_SEND := &"Master"
 const ENGINE_ACCELERATION_DURATION_BY_DIFFICULTY := {
-	"facil": 5.0,
-	"normal": 6.0,
-	"dificil": 7.0
+	"facil": 3.2,
+	"normal": 3.8,
+	"dificil": 4.4
 }
 const CAR_DRIVE_START_Y_RATIO := 0.78
 const CAR_DRIVE_END_Y_RATIO := 0.515
@@ -232,6 +233,14 @@ const TRAFFIC_COUNT_TEMPLATES := {
 		[2, 2, 2, 2, 3, 3, 3, 3, 3]
 	]
 }
+
+## V0.16.1: horario (0..5) de uma questao quando o minigame tem 2, 4, 8 ou 10 questoes: a primeira e sempre o
+## Amanhecer, a ultima a Noite, e o trafego nunca diminui. Com 6 questoes devolve a propria posicao.
+static func stage_for_round(question_index: int, total_questions: int) -> int:
+	if total_questions <= 1:
+		return 0
+	var ratio: float = float(clampi(question_index, 0, total_questions - 1)) / float(total_questions - 1)
+	return clampi(int(round(ratio * float(TOTAL_ROUNDS - 1))), 0, TOTAL_ROUNDS - 1)
 
 static func traffic_index(round_index: int) -> int:
 	return clampi(round_index, 0, TOTAL_ROUNDS - 1)

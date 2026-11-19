@@ -12,7 +12,7 @@ const DEFAULT_SCRIPT_PAGES := [
 	{
 		"background": "recepcao",
 		"title": "Bem-vindo ao ContalMaster",
-		"body": "Olá! Seja muito bem-vindo! Sou o Jales, líder da equipe ContalMaster. É um enorme prazer acompanhar você nessa jornada de aprendizado e auditoria!"
+		"body": "Olá! Bem-vindo! Sou o Jales, líder da ContalMaster. Será um prazer acompanhar você nesta jornada de auditoria!"
 	},
 	{
 		"background": "recepcao",
@@ -22,7 +22,7 @@ const DEFAULT_SCRIPT_PAGES := [
 	{
 		"background": "escritorio",
 		"title": "Sua jornada começa agora",
-		"body": "Você passará por 8 especialistas da nossa equipe, em dois dias, para examinar papéis de trabalho, garantir a independência e proteger o sigilo. Vamos começar!"
+		"body": "Você passará por 8 especialistas em dois dias, para examinar papéis de trabalho, garantir independência e proteger o sigilo. Vamos?"
 	}
 ]
 
@@ -214,7 +214,7 @@ func _build_scene() -> void:
 
 	title_label = Label.new()
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_label.add_theme_font_size_override("font_size", 31)
+	FontScale.set_size(title_label, 31)
 	title_label.add_theme_color_override("font_color", Color(1.0, 0.86, 0.30))
 	title_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
 	title_label.add_theme_constant_override("shadow_offset_x", 2)
@@ -224,7 +224,7 @@ func _build_scene() -> void:
 	page_label = Label.new()
 	page_label.custom_minimum_size = Vector2(90, 0)
 	page_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	page_label.add_theme_font_size_override("font_size", 17)
+	FontScale.set_size(page_label, 17)
 	page_label.add_theme_color_override("font_color", Color(0.9, 0.9, 1.0, 0.72))
 	header_row.add_child(page_label)
 
@@ -232,7 +232,7 @@ func _build_scene() -> void:
 	body_label.custom_minimum_size = Vector2(0, 92)
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	body_label.add_theme_font_size_override("font_size", 24)
+	FontScale.set_size(body_label, 24)
 	body_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
 	dialog_box.add_child(body_label)
 
@@ -240,7 +240,7 @@ func _build_scene() -> void:
 	hint_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint_label.text = "Clique na tela, Espaço ou Enter para avançar"
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint_label.add_theme_font_size_override("font_size", 17)
+	FontScale.set_size(hint_label, 17)
 	hint_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.95, 0.90))
 	dialog_box.add_child(hint_label)
 
@@ -274,7 +274,9 @@ func _apply_responsive_layout() -> void:
 		dialog_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 		dialog_panel.offset_left = 34.0 if compact else 54.0
 		dialog_panel.offset_right = -dialog_panel.offset_left
-		dialog_panel.offset_top = -240.0 if compact else -275.0
+		# V0.16.3: fonte maior = caixa de dialogo mais alta (cresce para cima), o texto nunca sai da caixa.
+		var grow_dialog: float = maxf(FontScale.get_factor(), 1.0) - 1.0
+		dialog_panel.offset_top = (-240.0 if compact else -275.0) - grow_dialog * (170.0 if compact else 200.0)
 		dialog_panel.offset_bottom = -56.0 if compact else -82.0
 	if dialog_margin != null:
 		var side: int = 22 if compact else 34
@@ -289,7 +291,7 @@ func _apply_responsive_layout() -> void:
 	ScreenTools.apply_label_font(body_label, self, 24, 19)
 	ScreenTools.apply_label_font(hint_label, self, 17, 14)
 	if body_label != null:
-		body_label.custom_minimum_size = Vector2(0, 74 if compact else 92)
+		body_label.custom_minimum_size = Vector2(0, (74.0 if compact else 92.0) * maxf(FontScale.get_factor(), 1.0))
 	_update_jales_static()
 
 func _make_background_rect(node_name: String) -> TextureRect:

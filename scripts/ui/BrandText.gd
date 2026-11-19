@@ -7,7 +7,7 @@ extends RefCounted
 ## Ao subir de versao, altere os DOIS: project.godot e DEFAULT_VERSION abaixo.
 
 const BRAND_NAME := "ContalMaster"
-const DEFAULT_VERSION := "0.14.6"
+const DEFAULT_VERSION := "0.16.4"
 
 
 ## Versao atual do jogo (le project.godot; se faltar, usa DEFAULT_VERSION).
@@ -59,6 +59,5 @@ static func make_label(body_bbcode: String, font_size: int, align: String = "lef
 
 ## RichTextLabel nao usa "font_size": os temas sao normal_font_size/bold_font_size.
 static func set_font_size(label: RichTextLabel, font_size: int) -> void:
-	label.add_theme_font_size_override("normal_font_size", font_size)
-	label.add_theme_font_size_override("bold_font_size", font_size)
-	label.add_theme_constant_override("outline_size", maxi(3, int(font_size / 6.0)))
+	# V0.16.3: tamanho base (nivel Media); o FontScale aplica a escala do jogador e o contorno acompanha a fonte.
+	FontScale.set_rich_size(label, font_size, 6.0)

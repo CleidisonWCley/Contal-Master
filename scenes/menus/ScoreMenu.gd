@@ -707,7 +707,9 @@ func _apply_responsive_layout() -> void:
 	var view_size: Vector2 = get_viewport_rect().size
 	var window_size: Vector2 = Vector2(get_window().size) if get_window() != null else view_size
 	var portrait: bool = window_size.y > window_size.x * 0.95
-	var side_by_side: bool = view_size.x >= SIDE_BY_SIDE_MIN_WIDTH and not portrait
+	var grow: float = maxf(FontScale.get_factor(), 1.0)
+	# V0.16.3: fonte Extra grande empilha os dois paineis (campanha em cima, modo livre embaixo) e a tela rola.
+	var side_by_side: bool = view_size.x >= SIDE_BY_SIDE_MIN_WIDTH * (1.0 + (grow - 1.0) * 0.9) and not portrait
 	ScreenTools.apply_safe_margins(safe_area, self, 28, 10)
 	ScreenTools.apply_inner_margins(inner_margin, self, 4, 4)
 	if main_box != null:
@@ -723,11 +725,11 @@ func _apply_responsive_layout() -> void:
 	for entry in _font_targets:
 		var control: Control = entry[0] as Control
 		if control != null:
-			control.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, int(entry[1]), int(entry[2])))
+			FontScale.set_size(control, ScreenTools.responsive_font(self, int(entry[1]), int(entry[2])))
 	for entry in _height_targets:
 		var control: Control = entry[0] as Control
 		if control != null:
-			control.custom_minimum_size.y = ScreenTools.responsive_value(self, float(entry[1]), float(entry[2]))
+			control.custom_minimum_size.y = ScreenTools.responsive_value(self, float(entry[1]), float(entry[2])) * grow
 	if title_label != null:
 		ScreenTools.apply_label_font(title_label, self, UiPalette.FONT_TITLE.x, UiPalette.FONT_TITLE.y)
 	if title_icon != null:
@@ -738,18 +740,18 @@ func _apply_responsive_layout() -> void:
 	if nickname_label != null:
 		ScreenTools.apply_label_font(nickname_label, self, UiPalette.FONT_ROW.x, UiPalette.FONT_ROW.y)
 	if nickname_edit != null:
-		nickname_edit.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 20, 18))
+		FontScale.set_size(nickname_edit, ScreenTools.responsive_font(self, 20, 18))
 	if free_chips_grid != null:
 		var chip_columns: int = 3
 		if view_size.x < 420.0:
 			chip_columns = 1
 		elif view_size.x < 720.0:
 			chip_columns = 2
-		free_chips_grid.columns = chip_columns
+		free_chips_grid.columns = mini(chip_columns, 2) if grow > 1.15 else chip_columns
 	if free_score_grid != null:
-		free_score_grid.columns = 1 if view_size.x < 560.0 else 3
+		free_score_grid.columns = 1 if (view_size.x < 560.0 or grow > 1.3) else 3
 	if free_result_card != null:
-		free_result_card.custom_minimum_size.y = 136.0 if compact else 148.0
+		free_result_card.custom_minimum_size.y = (136.0 if compact else 148.0) * grow
 
 func _apply_styles() -> void:
 	var compact: bool = ScreenTools.is_compact(self)
@@ -816,7 +818,7 @@ func _apply_free_chip_styles() -> void:
 		button.add_theme_color_override("font_focus_color", UiPalette.TEXT_ON_DARK)
 		button.add_theme_color_override("font_pressed_color", selected_text)
 		button.add_theme_color_override("font_hover_pressed_color", selected_text)
-		button.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, UiPalette.FONT_BODY.x, UiPalette.FONT_BODY.y))
+		FontScale.set_size(button, ScreenTools.responsive_font(self, UiPalette.FONT_BODY.x, UiPalette.FONT_BODY.y))
 		button.custom_minimum_size = Vector2(0, 38.0 if compact else 42.0)
 
 func _update_free_chip_states() -> void:

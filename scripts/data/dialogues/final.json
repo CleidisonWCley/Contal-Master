@@ -1,6 +1,6 @@
 {
   "schema": "final_narrative",
-  "version": 5,
+  "version": 6,
   "notes": "Roteiro da cutscene final (V0.13.2). Ordem: farewell (Jales, escritorio a noite) -> meeting_call (Natalia chama e SAI andando para o corredor) -> [corte p/ corredor, 012_corredor] corridor (Natalia, sprite natalia_2, 1 quadro de apoio - V0.13.4) -> [tela escura] arrival (V0.13.2: porta abre, luzes sobem, card pequeno da Natalia, sem botao; clique acelera) -> [tela escura] cast_thanks (agradecimentos em JANELA DE 3 personagens: entra um, o mais antigo sai andando; os 3 ultimos ficam) -> todos saem -> score_dialogue (Jales volta pela esquerda, Ariel pela direita; Jales abre e Ariel responde com tiers[].ariel) -> score sobe -> closing_intro + tiers[].jales (Jales centralizado, MESMA sala, sem corte) -> creditos -> cena final (11_cena_creditos, cortina dourada, LOGO contalmaster_logo.png e 'Obrigado por jogar') -> GAME OVER -> menu. O campo 'title' dos quadros NAO e exibido (a caixa mostra so o nome e a fala). 'backgrounds' mapeia os blocos que TROCAM de cenario (ids de Paths.CUTSCENE_BG_FINAL); na sala de reuniao nao ha mais corte solo para Ariel/Jales. O chao/tamanho de cada cenario fica em Paths.CUTSCENE_FLOOR. 'tiers' vai do melhor para o pior; vale o primeiro cujo min_ratio <= pontos/referencia (ver CutsceneFinal.gd). 'closing_intro' e colado no inicio da 1a fala de tiers[].jales (nao cria caixa nova; vazio = desliga). Nome do jogo: sempre ContalMaster (junto). V0.13.2: meeting_call agora e uma conversa Jales (esquerda) <-> Natalia (direita): Jales avisa que vai na frente e pede que a Natalia guie o revisor; 'arrival' e a frase unica da Natalia na cena 13_entrada_sala_reuniao (campos: speaker, name opcional, text). Para remover a cena de chegada: CutsceneFinal.ARRIVAL_ENABLED := false.",
   "backgrounds": {
     "farewell": "escritorio_noite",
@@ -21,12 +21,12 @@
     {
       "speaker": "jales",
       "title": "Missão cumprida",
-      "text": "Chegamos ao fim da nossa jornada! Percorremos as oito estações lado a lado, em dois dias intensos, e, sinceramente, foi um prazer ter você na equipe."
+      "text": "Chegamos ao fim da jornada! Percorremos as oito estações em dois dias intensos e foi um prazer ter você na equipe."
     },
     {
       "speaker": "jales",
       "title": "Uma família",
-      "text": "Cada especialista deixou um pouco do que sabe com você. É isso que faz da ContalMaster uma família, e a partir de hoje você faz parte dela."
+      "text": "Cada especialista deixou um pouco do que sabe com você. É isso que faz da ContalMaster uma família, e agora você faz parte dela."
     }
   ],
   "meeting_call": [
@@ -41,7 +41,7 @@
         "natalia": "right"
       },
       "title": "Sala de reunião",
-      "text": "Jales, o pessoal já está todo reunido! Ninguém quis começar sem o nosso novo revisor, e a equipe inteira já está esperando na sala de reunião."
+      "text": "Jales, o pessoal já está reunido! Ninguém quis começar sem o nosso novo revisor."
     },
     {
       "speaker": "jales",
@@ -61,7 +61,7 @@
         "jales": "left"
       },
       "title": "Venha comigo",
-      "text": "Pode deixar, Jales! Vem comigo, revisor, eu te acompanho até lá. E não fique nervoso: hoje o assunto é só agradecer. Estou muito orgulhosa de você!"
+      "text": "Pode deixar, Jales! Vem comigo, revisor. E não fique nervoso: hoje o assunto é só agradecer. Estou orgulhosa de você!"
     }
   ],
   "corridor": [
@@ -71,13 +71,13 @@
         "natalia"
       ],
       "title": "Respire fundo",
-      "text": "Enquanto caminhamos, respire fundo e olhe para trás: ontem você começou aprendendo a norma e hoje termina tomando decisões éticas. Cada erro virou lição, e o que você leva daqui é rigor, cuidado e coragem. A sala de reunião é logo ali!"
+      "text": "Olhe para trás: ontem você começou aprendendo a norma e hoje termina decidindo com ética. Cada erro virou lição. A sala é logo ali!"
     }
   ],
   "arrival": {
     "speaker": "natalia",
     "name": "Natalia",
-    "text": "Chegamos! Essa é a sala de reunião e, veja só, estão todos aqui, haha! Fique à vontade, revisor. Estou ansiosa para ver a sua pontuação depois de todos os desafios!"
+    "text": "Chegamos! Estão todos aqui, haha! Fique à vontade, revisor. Estou ansiosa para ver a sua pontuação!"
   },
   "cast_thanks": [
     {
@@ -148,7 +148,7 @@
         },
         {
           "title": "Sempre dá para ir além",
-          "text": "Mas quem é bom continua estudando. Que tal tentar o nível Difícil e superar o seu próprio recorde? Nós estaremos aqui. Obrigado, de coração."
+          "text": "Mas quem é bom continua estudando. Que tal tentar o nível Difícil e superar o seu recorde? Obrigado, de coração."
         }
       ]
     },
@@ -164,7 +164,7 @@
         },
         {
           "title": "Falta pouco",
-          "text": "Ainda existem pontos para lapidar e você sabe quais são: treine os minigames em que tropeçou no modo livre e volte para a campanha. A ContalMaster te espera!"
+          "text": "Ainda há pontos para lapidar: treine no modo livre os minigames em que tropeçou e volte à campanha. A ContalMaster te espera!"
         }
       ]
     },
@@ -180,7 +180,7 @@
         },
         {
           "title": "Vamos de novo?",
-          "text": "Que tal rever no modo livre os minigames mais difíceis e tentar a campanha outra vez? Cada rodada afia o seu raciocínio. Estou torcendo por você!"
+          "text": "Que tal rever no modo livre os minigames mais difíceis e tentar a campanha outra vez? Estou torcendo por você!"
         }
       ]
     },
@@ -196,7 +196,7 @@
         },
         {
           "title": "O começo de tudo",
-          "text": "A pontuação de hoje é só o ponto de partida. Treine no modo livre, tente o nível Fácil e volte quando quiser. A gente acredita em você!"
+          "text": "A pontuação de hoje é só o ponto de partida. Treine no modo livre, tente o nível Fácil e volte quando quiser!"
         }
       ]
     }

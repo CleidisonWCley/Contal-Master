@@ -664,11 +664,11 @@ func _layout() -> void:
 	_margin.add_theme_constant_override("margin_right", side)
 	_margin.add_theme_constant_override("margin_top", 16 if compact else 22)
 	_margin.add_theme_constant_override("margin_bottom", 12 if compact else 16)
-	_name_label.add_theme_font_size_override("font_size", 28 if compact else 34)
-	_counter_label.add_theme_font_size_override("font_size", 15 if compact else 17)
-	_text_label.add_theme_font_size_override("font_size", 19 if compact else 25)
+	FontScale.set_size(_name_label, 28 if compact else 34)
+	FontScale.set_size(_counter_label, 15 if compact else 17)
+	FontScale.set_size(_text_label, 19 if compact else 25)
 	_text_label.custom_minimum_size = Vector2(0, (56 if compact else 66) if panel_top else (66 if compact else 94))
-	_hint_label.add_theme_font_size_override("font_size", 14 if compact else 17)
+	FontScale.set_size(_hint_label, 14 if compact else 17)
 	ButtonStyles.apply_cutscene(_skip_button, "cutscene_skip", ScreenTools.button_size(self, Vector2(106, 40), Vector2(92, 36)), ScreenTools.responsive_font(self, 17, 14))
 	var skip_h: float = 44.0 if not compact else 38.0
 	var skip_w: float = 120.0 if not compact else 104.0
@@ -702,7 +702,7 @@ func _apply_panel_layout() -> void:
 		_panel.offset_bottom = 0.0
 		_text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_text_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_text_label.add_theme_font_size_override("font_size", 23 if compact else 30)
+		FontScale.set_size(_text_label, 23 if compact else 30)
 	elif panel_top:
 		# Personagens em pe no chao: a caixa fica no topo, mais baixa (so nome + fala + dica).
 		_panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -710,19 +710,20 @@ func _apply_panel_layout() -> void:
 		# O botao "Pular" fica ao lado da caixa, na mesma linha (nao cobre os pes de ninguem).
 		_panel.offset_right = -((104.0 if compact else 120.0) + 36.0) if show_skip else -_panel.offset_left
 		_panel.offset_top = 12.0 if compact else 18.0
-		_panel.offset_bottom = _panel.offset_top + (146.0 if compact else 164.0)
+		_panel.offset_bottom = _panel.offset_top + (146.0 if compact else 164.0) + (FontScale.get_factor() - 1.0) * 150.0 if FontScale.get_factor() > 1.0 else _panel.offset_top + (146.0 if compact else 164.0)
 		_text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_text_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-		_text_label.add_theme_font_size_override("font_size", 18 if compact else 23)
+		FontScale.set_size(_text_label, 18 if compact else 23)
 	else:
 		_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 		_panel.offset_left = 34.0 if compact else 54.0
 		_panel.offset_right = -_panel.offset_left
-		_panel.offset_top = -236.0 if compact else -272.0
+		# V0.16.3: fonte maior = caixa mais alta (cresce para cima)
+		_panel.offset_top = (-236.0 if compact else -272.0) - (maxf(FontScale.get_factor(), 1.0) - 1.0) * 190.0
 		_panel.offset_bottom = -40.0 if compact else -58.0
 		_text_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_text_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-		_text_label.add_theme_font_size_override("font_size", 19 if compact else 25)
+		FontScale.set_size(_text_label, 19 if compact else 25)
 
 
 func _fade_dim(alpha: float) -> void:

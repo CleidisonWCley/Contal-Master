@@ -9,7 +9,8 @@ const DynamicQuestionBank := preload("res://scripts/core/question_bank.gd")
 const BACKGROUND_PATH := Paths.BG_STOP
 const STOP_ICON_PATH := Paths.ICON_STOP
 const STOP_TITLE := "STOP - CONTROLE NORMATIVO"
-const ROUNDS := 6
+## V0.16.1: quantidade de rodadas vem das Configuracoes (campanha x modo livre).
+var rounds_total: int = SettingsManager.get_current_questions_count()
 const OPTION_COUNT := 6
 const OPTION_COLUMNS := 3
 const ROULETTE_STEPS := 18
@@ -172,7 +173,7 @@ func _build_title_row(parent: Control) -> void:
 	title_label.name = "TitleLabel"
 	title_label.text = STOP_TITLE
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 42)
+	FontScale.set_size(title_label, 42)
 	title_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.05))
 	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
 	title_label.add_theme_constant_override("shadow_offset_x", 3)
@@ -190,7 +191,7 @@ func _build_status_row(parent: Control) -> void:
 	parent.add_child(status_row)
 
 	var dark: Color = Color(0.04, 0.07, 0.16, 0.95)
-	question_counter_label = _create_chip_label("RODADA 1/%d" % ROUNDS, Color(0.78, 0.05, 0.08, 0.96))
+	question_counter_label = _create_chip_label("RODADA 1/%d" % rounds_total, Color(0.78, 0.05, 0.08, 0.96))
 	score_label = _create_chip_label("Pontuação: 0", dark)
 	difficulty_label = _create_chip_label("Dificuldade: Normal", dark)
 	status_row.add_child(question_counter_label)
@@ -206,7 +207,7 @@ func _build_roulette(parent: Control) -> void:
 	roulette_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	roulette_label.custom_minimum_size = Vector2(190, 150)
 	roulette_label.pivot_offset = Vector2(95, 75)
-	roulette_label.add_theme_font_size_override("font_size", 118)
+	FontScale.set_size(roulette_label, 118)
 	roulette_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.05))
 	roulette_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.92))
 	roulette_label.add_theme_constant_override("shadow_offset_x", 4)
@@ -239,7 +240,7 @@ func _build_question_panel(parent: Control) -> void:
 	category_label.name = "CategoryLabel"
 	category_label.text = "Categoria:"
 	category_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	category_label.add_theme_font_size_override("font_size", 23)
+	FontScale.set_size(category_label, 23)
 	category_label.add_theme_color_override("font_color", Color(0.93, 0.96, 1.0))
 	question_box.add_child(category_label)
 
@@ -249,7 +250,7 @@ func _build_question_panel(parent: Control) -> void:
 	tip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tip_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	tip_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	tip_label.add_theme_font_size_override("font_size", 21)
+	FontScale.set_size(tip_label, 21)
 	tip_label.add_theme_color_override("font_color", Color(0.80, 0.90, 1.0))
 	tip_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	question_box.add_child(tip_label)
@@ -277,7 +278,7 @@ func _build_options_grid(parent: Control) -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		button.add_theme_font_size_override("font_size", 20)
+		FontScale.set_size(button, 20)
 		button.add_theme_stylebox_override("normal", idle)
 		button.add_theme_stylebox_override("hover", hover)
 		button.add_theme_stylebox_override("pressed", pressed)
@@ -306,7 +307,7 @@ func _create_chip_label(text_value: String, bg_color: Color) -> Label:
 	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(220, 36)
-	label.add_theme_font_size_override("font_size", 17)
+	FontScale.set_size(label, 17)
 	label.add_theme_color_override("font_color", Color(1, 1, 1))
 	label.add_theme_stylebox_override("normal", _make_panel_style(bg_color, Color(1, 1, 1, 0.20), 12, 1))
 	return label
@@ -324,21 +325,21 @@ func _build_feedback_layer() -> void:
 
 	feedback_title_label = Label.new()
 	feedback_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	feedback_title_label.add_theme_font_size_override("font_size", 40)
+	FontScale.set_size(feedback_title_label, 40)
 	title_row.add_child(feedback_title_label)
 
 	feedback_body_label = Label.new()
 	feedback_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	feedback_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	feedback_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_body_label.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
 	box.add_child(feedback_body_label)
 
 	feedback_continue_button = Button.new()
 	feedback_continue_button.text = "Continuar"
 	feedback_continue_button.custom_minimum_size = Vector2(260, 48)
-	feedback_continue_button.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(feedback_continue_button, 20)
 	feedback_continue_button.add_theme_stylebox_override("normal", _make_button_style(Color(0.06, 0.16, 0.24, 0.96), Color(0.34, 0.90, 1.0)))
 	feedback_continue_button.add_theme_stylebox_override("hover", _make_button_style(Color(0.10, 0.28, 0.38, 0.98), Color(0.70, 1.0, 1.0)))
 	feedback_continue_button.add_theme_stylebox_override("pressed", _make_button_style(Color(0.03, 0.10, 0.16, 1.0), Color(0.34, 0.90, 1.0)))
@@ -352,19 +353,19 @@ func _build_finish_layer() -> void:
 	var title: Label = Label.new()
 	title.text = "Fim do Desafio STOP!"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 44)
+	FontScale.set_size(title, 44)
 	title.add_theme_color_override("font_color", Color(1.0, 0.84, 0.05))
 	box.add_child(title)
 
 	finish_score_label = Label.new()
 	finish_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	finish_score_label.add_theme_font_size_override("font_size", 26)
+	FontScale.set_size(finish_score_label, 26)
 	box.add_child(finish_score_label)
 
 	var continue_button: Button = Button.new()
 	continue_button.text = "Continuar"
 	continue_button.custom_minimum_size = Vector2(260, 58)
-	continue_button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(continue_button, 22)
 	continue_button.pressed.connect(_on_finish_continue_pressed)
 	box.add_child(continue_button)
 
@@ -423,7 +424,7 @@ func _prepare_questions() -> void:
 	correct_answers_count = 0
 	var rules: Dictionary = DifficultyManager.get_rules()
 	var question_type: String = str(rules.get("pergunta_tipo", "normal"))
-	questions = DynamicQuestionBank.pick_rounds("stop", question_type, ROUNDS)
+	questions = DynamicQuestionBank.pick_rounds("stop", question_type, rounds_total)
 	if questions.is_empty():
 		push_warning("[STOP] Nenhuma pergunta carregada de dicionario.json.")
 	correct_points = DifficultyManager.get_correct_points("stop")
@@ -555,14 +556,20 @@ func _show_feedback(is_correct: bool, selected_text: String, correct_text: Strin
 	var explanation: String = str(current_question.get("explanation", "")).strip_edges()
 	if explanation == "" or explanation.to_lower() == correct_text.to_lower():
 		explanation = "%s atende à categoria e à dica apresentadas nesta rodada." % correct_text
+	var practice: String = FeedbackText.practice_line(str(current_question.get("pratica", "")))   # V0.16.2
 	if is_correct:
 		feedback_title_label.text = "CORRETO"
 		feedback_title_label.add_theme_color_override("font_color", Color(0.42, 1.0, 0.48))
-		feedback_body_label.text = "Resposta correta: %s\n%s\nPontuação adquirida: +%s" % [correct_text, explanation, awarded_points]
+		feedback_body_label.text = "Resposta correta: %s\n%s%s\nPontuação adquirida: +%s" % [correct_text, explanation, practice, awarded_points]
 	else:
 		feedback_title_label.text = "INCORRETO"
 		feedback_title_label.add_theme_color_override("font_color", Color(1.0, 0.24, 0.20))
-		feedback_body_label.text = "Você escolheu: %s\nEssa opção não combina com a categoria e a dica da rodada.\n\nResposta correta: %s\n%s\nPontuação perdida: %s" % [selected_text, correct_text, explanation, wrong_points]
+		# V0.16.2: mostra o que o termo escolhido realmente significa (quando ele esta no dicionario).
+		var chosen_meaning: String = FeedbackText.shorten(FeedbackText.reason_for_text(current_question.get("motivos_texto", {}), selected_text), 110)
+		var why_not: String = "Essa opção não combina com a categoria e a dica da rodada."
+		if chosen_meaning != "":
+			why_not = "%s é outro conceito: %s" % [selected_text, chosen_meaning]
+		feedback_body_label.text = "Você escolheu: %s\n%s\n\nResposta correta: %s\n%s%s\nPontuação perdida: %s" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
 	feedback_continue_button.disabled = false
 	feedback_continue_button.call_deferred("grab_focus")
@@ -620,6 +627,7 @@ func _create_letter_particles() -> void:
 		var label: Label = Label.new()
 		label.text = PARTICLE_CHARS[randi_range(0, PARTICLE_CHARS.size() - 1)]
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		FontScale.skip(label)
 		label.add_theme_font_size_override("font_size", randi_range(28, 58))
 		label.add_theme_color_override("font_color", palette[randi_range(0, palette.size() - 1)])
 		particle_layer.add_child(label)

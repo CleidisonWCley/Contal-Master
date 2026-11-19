@@ -1,6 +1,6 @@
 {
   "schema": "quiz_auditoria",
-  "versao": "1.0",
+  "versao": "1.1",
   "idioma": "pt-BR",
   "fonte": "NBC PA 11 – Revisão Externa de Qualidade pelos Pares (CFC, 8/12/2017, vigente desde 1/1/2019); Instruções aos Revisores (Anexo 2); Base de Conhecimento do jogo; provas EQT/QTG como apoio.",
   "consumidores": [
@@ -33,6 +33,12 @@
           "CRE",
           "CVM"
         ]
+      },
+      "na_pratica": "Antes de indicar o revisor, confira porte, experiência e impedimentos (item 26).",
+      "porque_erradas": {
+        "A": "O CRE administra o programa e aprova relatórios, mas não escolhe o revisor.",
+        "C": "A CVM é reguladora e só observa o CRE; não indica revisor.",
+        "D": "O cliente selecionado não participa da escolha do revisor."
       }
     },
     {
@@ -60,6 +66,12 @@
           "Auditor-revisor",
           "CRE"
         ]
+      },
+      "na_pratica": "Monte o plano com responsável e data para cada fragilidade, dentro do prazo.",
+      "porque_erradas": {
+        "A": "O revisor emite a carta e recebe o plano; quem corrige é o revisado.",
+        "B": "O CRE analisa o plano, mas não o redige.",
+        "C": "O cliente selecionado não responde pelo plano de ação."
       }
     },
     {
@@ -87,6 +99,12 @@
           "Auditor-revisado",
           "Cliente"
         ]
+      },
+      "na_pratica": "Confira se relatório, carta e plano seguem juntos ao CRE.",
+      "porque_erradas": {
+        "A": "O revisado entrega o plano ao revisor; não o envia direto ao CRE.",
+        "C": "O CFC não recebe o plano nesse fluxo: o caminho é revisado, revisor e CRE.",
+        "D": "O cliente selecionado não faz parte desse fluxo."
       }
     },
     {
@@ -114,6 +132,12 @@
           "CVM",
           "Susep"
         ]
+      },
+      "na_pratica": "Dúvida sobre prazos ou procedimentos do programa? O canal é o CRE.",
+      "porque_erradas": {
+        "A": "A CVM é reguladora e acompanha o CRE só como observadora, sem voto.",
+        "C": "A Susep regula seguros e participa do CRE apenas como observadora.",
+        "D": "A Previc supervisiona previdência complementar e só observa o CRE."
       }
     },
     {
@@ -141,6 +165,12 @@
           "3 anos",
           "5 anos"
         ]
+      },
+      "na_pratica": "Anote a data de emissão do relatório e só descarte os papéis depois de 7 anos.",
+      "porque_erradas": {
+        "A": "3 anos é pouco: a norma exige 7 anos de guarda.",
+        "B": "5 anos também é insuficiente: o prazo é de 7 anos.",
+        "D": "10 anos passa do exigido; o prazo é de 7 anos."
       }
     },
     {
@@ -168,6 +198,12 @@
           "Permitida",
           "Opcional"
         ]
+      },
+      "na_pratica": "Recebeu a indicação? Veja se o revisado já foi seu revisor; se sim, peça outro revisor.",
+      "porque_erradas": {
+        "A": "A vedação é da própria norma; aval do CRE não muda isso.",
+        "C": "Nenhum prazo libera: a vedação vale sem limite de tempo.",
+        "D": "Firmas de porte igual não escapam da vedação."
       }
     },
     {
@@ -195,6 +231,12 @@
           "8 do CFC",
           "4 CFC e 4 CVM"
         ]
+      },
+      "na_pratica": "Reguladores nas reuniões do CRE observam, mas não votam.",
+      "porque_erradas": {
+        "B": "O CRE é paritário: o Ibracon também indica membros.",
+        "C": "A CVM só participa como observadora, sem voto.",
+        "D": "A divisão é igual: 4 do CFC e 4 do Ibracon."
       }
     },
     {
@@ -222,6 +264,12 @@
           "Todo ano",
           "A cada 2 anos"
         ]
+      },
+      "na_pratica": "Controle seu ciclo de 4 anos para não ser pego de surpresa pela indicação.",
+      "porque_erradas": {
+        "A": "Não é anual, salvo decisão específica do CRE.",
+        "B": "2 anos é menos que o ciclo da norma.",
+        "D": "5 anos ultrapassa o ciclo: a revisão ocorre ao menos a cada 4 anos."
       }
     },
     {
@@ -249,6 +297,12 @@
           "15 dias",
           "90 dias"
         ]
+      },
+      "na_pratica": "Conte os 30 dias a partir do recebimento do relatório e da carta e confira prazos extras do CRE.",
+      "porque_erradas": {
+        "A": "15 dias é mais curto do que a norma dá: o limite é de 30 dias.",
+        "C": "60 dias passa do limite de 30 dias.",
+        "D": "90 dias passa muito do limite de 30 dias."
       }
     },
     {
@@ -276,6 +330,12 @@
           "Sim, sem nomes",
           "Sim, ao fim"
         ]
+      },
+      "na_pratica": "Nada da revisão sai da equipe: nem depois do fim dos trabalhos, nem em conversa informal.",
+      "porque_erradas": {
+        "A": "Aprovar o relatório não encerra o sigilo; ele vale em todas as fases.",
+        "B": "Omitir nomes não basta: nenhuma informação da revisão pode ser divulgada.",
+        "D": "Outros auditores não são exceção: o sigilo vale para todos."
       }
     },
     {
@@ -303,6 +363,12 @@
           "Clientes do revisado",
           "Honorários"
         ]
+      },
+      "na_pratica": "Foque no sistema de controle de qualidade do revisado; não refaça auditorias.",
+      "porque_erradas": {
+        "A": "A revisão não reaudita clientes; avalia o sistema de qualidade.",
+        "C": "Honorários são aspecto comercial, fora do escopo.",
+        "D": "A revisão acompanha a qualidade; não julga disputas entre auditores."
       }
     },
     {
@@ -330,6 +396,12 @@
           "Auditor-revisado",
           "CRE"
         ]
+      },
+      "na_pratica": "Use o modelo do CRE e inclua a relação de clientes selecionados e as recomendações.",
+      "porque_erradas": {
+        "A": "O revisado responde com o plano de ação, não com a carta.",
+        "B": "O CRE analisa a carta, mas não a emite.",
+        "D": "O CFC não emite a carta: ela é do revisor, no modelo do CRE."
       }
     },
     {
@@ -357,6 +429,12 @@
           "Revisor",
           "CVM"
         ]
+      },
+      "na_pratica": "Relatório entregue não é relatório aprovado: aguarde a análise do CRE.",
+      "porque_erradas": {
+        "A": "O revisor emite o relatório; quem aprova é o CRE.",
+        "B": "O revisado é o avaliado; não aprova o próprio relatório.",
+        "D": "A CVM é comunicada em casos específicos, mas não aprova o relatório."
       }
     },
     {
@@ -384,6 +462,12 @@
           "CRE",
           "Revisado"
         ]
+      },
+      "na_pratica": "Delegue, mas revise o que a equipe fez e registre a supervisão nos papéis de trabalho.",
+      "porque_erradas": {
+        "A": "O CRE administra o programa; não supervisiona a equipe no campo.",
+        "B": "O revisado é o avaliado; supervisionar a equipe comprometeria a independência.",
+        "D": "O cliente não tem papel na equipe revisora."
       }
     },
     {
@@ -411,6 +495,12 @@
           "2 tipos",
           "6 tipos"
         ]
+      },
+      "na_pratica": "Memorize o espectro: adequado, com deficiências, inadequado e limitação de escopo.",
+      "porque_erradas": {
+        "A": "Dois tipos deixariam de fora o 'com deficiências' e a limitação de escopo.",
+        "B": "Falta um: além de adequado, deficiências e inadequado, há a limitação de escopo.",
+        "D": "Cinco é demais: a norma prevê exatamente quatro."
       }
     },
     {
@@ -438,6 +528,12 @@
           "Inadequado",
           "Limitação"
         ]
+      },
+      "na_pratica": "Só conclua 'adequado' com evidência de que o sistema foi bem projetado E está sendo cumprido.",
+      "porque_erradas": {
+        "B": "Se o sistema está bem projetado e plenamente cumprido, não há deficiência relevante a reportar.",
+        "C": "Inadequado exige política em desconformidade com as normas ou descumprimento.",
+        "D": "Limitação de escopo é quando o revisor não consegue concluir; aqui ele concluiu."
       }
     },
     {
@@ -465,6 +561,12 @@
           "Adequado",
           "Com deficiências"
         ]
+      },
+      "na_pratica": "Compare as políticas do revisado com as NBC: desconformidade ou descumprimento aponta para 'inadequado'.",
+      "porque_erradas": {
+        "A": "Adequado pressupõe políticas em conformidade com as normas.",
+        "B": "Desconformidade com as NBC vai além de falhas pontuais e leva ao 'inadequado'.",
+        "C": "Limitação de escopo trata de falta de condições para concluir, não de política fora da norma."
       }
     },
     {
@@ -492,6 +594,12 @@
           "Adequado",
           "Inadequado"
         ]
+      },
+      "na_pratica": "Registre cada limitação que impediu o trabalho: ela sustenta o relatório.",
+      "porque_erradas": {
+        "A": "Sem conseguir concluir, o revisor não pode atestar que o sistema é adequado.",
+        "B": "'Com deficiências' pressupõe conclusão sobre o sistema; aqui faltam condições para concluir.",
+        "D": "Inadequado exige concluir pela desconformidade; aqui o problema é a falta de condições de trabalho."
       }
     },
     {
@@ -519,6 +627,12 @@
           "É limitação",
           "Cancela revisão"
         ]
+      },
+      "na_pratica": "Sem auditoria no ano-base? Use o ano antecedente e siga com a revisão.",
+      "porque_erradas": {
+        "A": "Pelo item 39, não ter auditado no ano-base não é limitação de escopo.",
+        "C": "A norma não cancela a revisão por isso: o ano-base passa a ser o antecedente.",
+        "D": "Não ter auditado no ano-base não torna o sistema inadequado."
       }
     },
     {
@@ -546,6 +660,12 @@
           "Adequado",
           "Com deficiências"
         ]
+      },
+      "na_pratica": "Inadequado e limitação de escopo vão além do CRE: chegam à Fiscalização do CFC e da CVM.",
+      "porque_erradas": {
+        "A": "Adequado e com deficiências não geram essa comunicação específica.",
+        "B": "A comunicação é restrita aos relatórios das alíneas (c) e (d) do item 38.",
+        "D": "Relatório adequado é justamente o que não gera comunicação."
       }
     },
     {
@@ -573,6 +693,12 @@
           "Relatório adequado",
           "Prazo cumprido"
         ]
+      },
+      "na_pratica": "Cumpra os prazos do CRE: perder prazo também leva a nova revisão.",
+      "porque_erradas": {
+        "A": "Relatório adequado não gera nova revisão no ano seguinte.",
+        "B": "'Com deficiências', sozinho, não obriga nova revisão no ano seguinte.",
+        "D": "Plano no prazo é o oposto: descumprir prazos é que gera nova revisão."
       }
     },
     {
@@ -600,6 +726,12 @@
           "Revisa normalmente",
           "Sai de tudo"
         ]
+      },
+      "na_pratica": "Declare o investimento e fique fora dos trabalhos daquele cliente.",
+      "porque_erradas": {
+        "A": "Ter o investimento não impede de ser revisor; afasta só daquele cliente.",
+        "C": "Revisar o cliente em que investe comprometeria a objetividade.",
+        "D": "Avisar o CRE não basta: o membro não pode participar da revisão desse cliente."
       }
     },
     {
@@ -627,6 +759,12 @@
           "Menor",
           "Irrelevante"
         ]
+      },
+      "na_pratica": "Compare carteira, porte e experiência antes de aceitar ou indicar o revisor.",
+      "porque_erradas": {
+        "A": "Revisor de porte e experiência inferiores não tem como avaliar o revisado.",
+        "C": "A norma pede porte e experiência equivalentes, não clientes idênticos.",
+        "D": "Porte e experiência são requisitos expressos da escolha."
       }
     },
     {
@@ -654,6 +792,12 @@
           "Menores clientes",
           "Sem litígio"
         ]
+      },
+      "na_pratica": "Se o revisado tiver clientes regulados por CVM, BCB, Susep ou Previc, inclua-os na amostra.",
+      "porque_erradas": {
+        "A": "A amostra é do revisor; o revisado não escolhe o que será visto.",
+        "B": "Porte não é o critério obrigatório: o que entra é a entidade regulada.",
+        "D": "Litígio não exclui o cliente automaticamente; a restrição é avaliada e documentada."
       }
     },
     {
@@ -681,6 +825,12 @@
           "Ignorar",
           "Acessar assim"
         ]
+      },
+      "na_pratica": "Guarde as razões do revisado e a sua avaliação; se discordar, envie tudo ao CRE.",
+      "porque_erradas": {
+        "A": "Aceitar sem registro deixa a exclusão sem rastro: é preciso avaliar e documentar.",
+        "C": "Acessar mesmo assim ignora a restrição; o caminho é documentar e avaliar o efeito.",
+        "D": "A revisão não encerra por isso; considera-se o efeito no relatório."
       }
     },
     {
@@ -708,6 +858,12 @@
           "Honorários",
           "Lucro da firma"
         ]
+      },
+      "na_pratica": "Mantenha as perguntas no campo técnico e profissional (NBC e normas dos reguladores).",
+      "porque_erradas": {
+        "A": "Honorários e preços são aspectos comerciais, fora do escopo.",
+        "C": "Rentabilidade da firma é tema comercial, não de qualidade técnica.",
+        "D": "A relação comercial com clientes está fora do escopo."
       }
     },
     {
@@ -735,6 +891,12 @@
           "5 dias",
           "60 dias"
         ]
+      },
+      "na_pratica": "Foi notificado? Conte 15 dias para recorrer ao próprio CRE.",
+      "porque_erradas": {
+        "A": "5 dias é curto demais; o prazo é de 15 dias após a notificação.",
+        "B": "10 dias fica aquém: o prazo é de 15 dias.",
+        "D": "30 dias é o prazo do plano de ação, não o do recurso."
       }
     },
     {
@@ -762,6 +924,12 @@
           "31 de março",
           "30 de abril"
         ]
+      },
+      "na_pratica": "Fique atento a fevereiro: é quando saem os selecionados.",
+      "porque_erradas": {
+        "A": "31 de janeiro é cedo demais: a lista sai até 28 de fevereiro.",
+        "C": "31 de março é o prazo das guias de orientação, não da lista.",
+        "D": "30 de abril passa do limite: a lista sai até 28 de fevereiro."
       }
     },
     {
@@ -789,6 +957,12 @@
           "Só CRC",
           "Só Susep"
         ]
+      },
+      "na_pratica": "Confira se o seu registro é na CVM ou no CNAI-PJ para saber se a norma alcança você.",
+      "porque_erradas": {
+        "A": "O alcance é por registro na CVM e/ou no CNAI-PJ, não só no CRC.",
+        "C": "A Susep é reguladora; o que define o alcance é o registro na CVM e/ou no CNAI-PJ.",
+        "D": "Não é qualquer órgão: apenas CVM e/ou CNAI-PJ."
       }
     },
     {
@@ -816,6 +990,12 @@
           "Não entra",
           "Só se pedir"
         ]
+      },
+      "na_pratica": "Obteve registro na CVM? Prepare-se: você entra no programa do ano seguinte.",
+      "porque_erradas": {
+        "A": "Registro recente não dispensa: a inclusão é obrigatória.",
+        "C": "Não é opcional: quem se registrou no ano anterior entra obrigatoriamente.",
+        "D": "Não há espera de 4 anos: a inclusão vale para o programa daquele ano."
       }
     },
     {
@@ -843,6 +1023,12 @@
           "Com deficiências",
           "Adequado"
         ]
+      },
+      "na_pratica": "Antes de aceitar ser revisor, confira o resultado da sua última revisão.",
+      "porque_erradas": {
+        "A": "Relatório adequado não impede ninguém de revisar.",
+        "B": "'Com deficiências', sozinho, não impede; só os das alíneas (c) e (d).",
+        "D": "Existem impedimentos: o inadequado e a limitação de escopo."
       }
     },
     {
@@ -870,6 +1056,12 @@
           "3 anos",
           "5 anos"
         ]
+      },
+      "na_pratica": "Mantenha o registro das auditorias dos últimos 2 anos para comprovar experiência recente.",
+      "porque_erradas": {
+        "A": "1 ano é mais rígido que a norma, que olha os dois anos anteriores.",
+        "C": "3 anos é mais do que a norma exige.",
+        "D": "4 anos é o ciclo de revisão, não a janela de atuação recente."
       }
     },
     {
@@ -897,6 +1089,12 @@
           "Pode",
           "Só com aval"
         ]
+      },
+      "na_pratica": "Primeiro seja revisado; só depois aceite atuar como revisor.",
+      "porque_erradas": {
+        "A": "Quem nunca passou pela primeira revisão está impedido de revisar.",
+        "C": "A norma não prevê exceção por aval do CRE.",
+        "D": "O porte da firma não afasta o impedimento."
       }
     },
     {
@@ -924,6 +1122,12 @@
           "Atua normal",
           "Só firma pequena"
         ]
+      },
+      "na_pratica": "Emitiu relatório com limitação de escopo? Não aceite nova indicação como revisor.",
+      "porque_erradas": {
+        "A": "Ressalva de limitação de escopo no relatório do próprio revisor é impedimento.",
+        "C": "O impedimento não depende do porte do revisado.",
+        "D": "Cliente algum pode afastar um impedimento da norma."
       }
     },
     {
@@ -951,6 +1155,12 @@
           "Revisa duas vezes",
           "Revisor é cliente"
         ]
+      },
+      "na_pratica": "Veja quem foi seu último revisor antes de aceitar revisar essa firma.",
+      "porque_erradas": {
+        "A": "Dois revisores na mesma firma é composição de equipe, não reciprocidade.",
+        "C": "Revisar duas vezes no mesmo ano não caracteriza reciprocidade.",
+        "D": "Ser cliente é outra relação; reciprocidade é o revisor ter sido revisado pelo revisado."
       }
     },
     {
@@ -978,6 +1188,12 @@
           "Ano da indicação",
           "Ano seguinte"
         ]
+      },
+      "na_pratica": "Sem auditoria no ano anterior à indicação? O ano-base é o antecedente.",
+      "porque_erradas": {
+        "A": "O ano-base é o anterior ao da indicação, não o da própria indicação.",
+        "C": "O ano-base é passado, nunca futuro.",
+        "D": "O registro na CVM não define o ano-base."
       }
     },
     {
@@ -1005,6 +1221,12 @@
           "Voto de minerva",
           "Voto pleno"
         ]
+      },
+      "na_pratica": "Observador no CRE: nome indicado antes e sigilo do item 21 valendo para ele também.",
+      "porque_erradas": {
+        "A": "Reguladores observam, mas não votam.",
+        "C": "Não relatam recursos: o papel deles é só observar as reuniões.",
+        "D": "Não integram equipes revisoras; apenas observam o CRE."
       }
     },
     {
@@ -1032,6 +1254,12 @@
           "1 ano",
           "5 anos"
         ]
+      },
+      "na_pratica": "Lembre: a cada nomeação há renovação mínima de 25% do CRE.",
+      "porque_erradas": {
+        "A": "1 ano é curto demais: o mandato é de 3 anos.",
+        "B": "2 anos não é o mandato: são 3 anos.",
+        "D": "Não são 5 anos sem recondução: são 3 anos, com até 2 reconduções."
       }
     },
     {
@@ -1059,6 +1287,12 @@
           "CRE",
           "CVM"
         ]
+      },
+      "na_pratica": "Em clientes regulados, o revisado confere a habilitação específica antes do trabalho.",
+      "porque_erradas": {
+        "A": "O CRE não verifica a habilitação de cada equipe.",
+        "B": "A equipe é do revisor, mas a verificação da habilitação específica cabe ao revisado.",
+        "D": "A CVM regula as entidades; não verifica a equipe revisora."
       }
     },
     {
@@ -1086,6 +1320,12 @@
           "Nenhuma",
           "Só advertência"
         ]
+      },
+      "na_pratica": "Anote todos os prazos do CRE: perdê-los custa mais que o atraso.",
+      "porque_erradas": {
+        "A": "Há consequência, e é automática: impedimento e nova revisão.",
+        "C": "Não é só advertência: a consequência é automática.",
+        "D": "Descumprir prazo não isenta de nova revisão nem de pendências anteriores."
       }
     },
     {
@@ -1113,6 +1353,12 @@
           "Sim, sempre",
           "Sim, se houver carta"
         ]
+      },
+      "na_pratica": "Avalie padrão e impacto de cada falha e registre tudo nos papéis, mesmo as irrelevantes.",
+      "porque_erradas": {
+        "A": "Se são isoladas e irrelevantes, o revisor pode não modificar o relatório.",
+        "C": "A carta não altera o julgamento sobre modificar ou não o relatório.",
+        "D": "Os apontamentos continuam registrados nos papéis de trabalho."
       }
     },
     {
@@ -1140,6 +1386,12 @@
           "Escopo",
           "Opinião sobre políticas"
         ]
+      },
+      "na_pratica": "O relatório fala do sistema de qualidade do revisado, nunca das demonstrações dos clientes.",
+      "porque_erradas": {
+        "A": "Escopo e limitações constam do relatório.",
+        "B": "A carta de recomendações consta do relatório.",
+        "C": "A opinião sobre políticas e procedimentos de qualidade consta do relatório."
       }
     },
     {
@@ -1167,6 +1419,12 @@
           "Pode",
           "Só se quiser"
         ]
+      },
+      "na_pratica": "Para medir esforço, olhe o tempo gasto, nunca os honorários.",
+      "porque_erradas": {
+        "A": "Honorários são aspecto comercial, fora do escopo da revisão.",
+        "C": "A avaliação é profissional; quem pede não a torna comercial.",
+        "D": "Cliente regulado não abre exceção: honorários seguem fora do escopo."
       }
     },
     {
@@ -1194,6 +1452,12 @@
           "Adequada",
           "Só se numerosa"
         ]
+      },
+      "na_pratica": "Monte a equipe pela complexidade dos trabalhos: inclua quem já fez casos similares.",
+      "porque_erradas": {
+        "A": "Equipe só de iniciantes não tem experiência compatível com clientes complexos.",
+        "C": "O aceite do revisado não supre a falta de experiência técnica exigida.",
+        "D": "Quantidade de pessoas não substitui experiência técnica."
       }
     }
   ]

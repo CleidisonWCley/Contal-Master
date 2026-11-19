@@ -5,30 +5,14 @@
   "host": "julios",
   "partner": "",
   "cta": "Começar!",
-  "notes": "3 quadros.",
+  "notes": "3 quadros. Roleta existe so na campanha (bonus de azar, 1 giro).",
   "steps": [
     {
       "id": "como_jogar",
       "kind": "mecanica",
       "speaker": "julios",
       "title": "Gire e encare",
-      "text": "Aperte o botão e a roleta decide por você. Sem escolha, sem estratégia: é um giro só.",
-      "modes": [
-        "campaign"
-      ],
-      "targets": [
-        "spin_button"
-      ]
-    },
-    {
-      "id": "como_jogar_livre",
-      "kind": "mecanica",
-      "speaker": "julios",
-      "title": "Gire e encare",
-      "text": "Julios. Aperte o botão e a roleta decide por você. Sem escolha, um giro só, e o resultado conta para o seu recorde.",
-      "modes": [
-        "free"
-      ],
+      "text": "Aperte o botão e a roleta decide por você, sem escolha e sem estratégia. É um giro só, e vem com uma lição nova.",
       "targets": [
         "spin_button"
       ]
@@ -38,7 +22,7 @@
       "kind": "pontuacao",
       "speaker": "julios",
       "title": "Bônus ou prejuízo",
-      "text": "Setor bom soma pontos, setor ruim tira. No fim você vê o que fazer na vida real. Aprender é o prêmio.",
+      "text": "Setor bom soma pontos, setor ruim tira. Depois de cada giro você vê o que fazer na vida real. Aprender é o prêmio.",
       "targets": [
         "score_label",
         "status_label"

@@ -177,8 +177,8 @@ func _speech(frame: Variant, size_px: int = 16) -> RichTextLabel:
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE   # a rolagem da pagina continua funcionando
-	line.add_theme_font_size_override("normal_font_size", size_px)
-	line.add_theme_font_size_override("bold_font_size", size_px)
+	FontScale.set_size(line, size_px, "normal_font_size")
+	FontScale.set_size(line, size_px, "bold_font_size")
 	line.add_theme_color_override("default_color", UiPalette.TEXT_ON_DARK)
 	var safe_text: String = text.replace("[", "[lb]")
 	if speaker == "":

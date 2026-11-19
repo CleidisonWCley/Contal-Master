@@ -32,7 +32,7 @@ static func label(text: String, size_px: int, color: Color = UiPalette.TEXT_ON_D
 	var l := Label.new()
 	l.text = text
 	l.horizontal_alignment = align as HorizontalAlignment
-	l.add_theme_font_size_override("font_size", size_px)
+	FontScale.set_size(l, size_px)
 	l.add_theme_color_override("font_color", color)
 	return l
 

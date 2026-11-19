@@ -477,21 +477,21 @@ func _show_notification_card(achievement: Dictionary) -> void:
 
 	var header: Label = Label.new()
 	header.text = str(achievement.get("header", "Conquista desbloqueada!"))
-	header.add_theme_font_size_override("font_size", 16)
+	FontScale.set_size(header, 16)
 	header.add_theme_color_override("font_color", Color(1.0, 0.86, 0.24, 1.0))
 	text_box.add_child(header)
 
 	var title: Label = Label.new()
 	title.text = str(achievement.get("title", "Conquista"))
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title.add_theme_font_size_override("font_size", 21)
+	FontScale.set_size(title, 21)
 	title.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 1.0))
 	text_box.add_child(title)
 
 	var description: Label = Label.new()
 	description.text = str(achievement.get("description", ""))
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description.add_theme_font_size_override("font_size", 13)
+	FontScale.set_size(description, 13)
 	description.add_theme_color_override("font_color", Color(0.88, 0.91, 1.0, 0.92))
 	text_box.add_child(description)
 

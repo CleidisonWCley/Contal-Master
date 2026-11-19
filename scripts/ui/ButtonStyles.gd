@@ -105,7 +105,7 @@ static func apply(button: BaseButton, variant: String = "main_settings", min_siz
 		button.custom_minimum_size = min_size
 	button.focus_mode = Control.FOCUS_ALL if accessible else Control.FOCUS_NONE
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	button.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(button, font_size)
 	button.add_theme_color_override("font_color", text_color)
 	button.add_theme_color_override("font_hover_color", text_hover)
 	button.add_theme_color_override("font_pressed_color", text_pressed)
@@ -117,7 +117,7 @@ static func apply(button: BaseButton, variant: String = "main_settings", min_siz
 		button.add_theme_color_override("icon_pressed_color", text_pressed)
 		button.add_theme_color_override("icon_focus_color", text_color)
 		button.add_theme_color_override("icon_disabled_color", Color(text_color.r, text_color.g, text_color.b, 0.5))
-		button.add_theme_constant_override("icon_max_width", int(round(font_size * 1.3)))
+		FontScale.set_icon_ratio(button, 1.3)   # V0.16.3: o icone acompanha a fonte escolhida
 		button.add_theme_constant_override("h_separation", 12)
 	button.add_theme_stylebox_override("normal", _make_style(normal_color, border_color, radius, border_width))
 	button.add_theme_stylebox_override("hover", _make_style(hover_color, hover_border, radius, border_width))

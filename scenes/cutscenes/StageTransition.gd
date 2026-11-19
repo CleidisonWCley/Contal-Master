@@ -188,7 +188,7 @@ func _build_scene() -> void:
 	stage_label = Label.new()
 	stage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stage_label.text = _get_stage_header()
-	stage_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 26, 20))
+	FontScale.set_size(stage_label, ScreenTools.responsive_font(self, 26, 20))
 	stage_label.add_theme_color_override("font_color", Color(0.82, 0.84, 0.92))
 	box.add_child(stage_label)
 
@@ -212,7 +212,7 @@ func _build_scene() -> void:
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	title_label.text = str(phase_info.get("name", "Próxima Fase"))
-	title_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, _get_title_font_size(), 32))
+	FontScale.set_size(title_label, ScreenTools.responsive_font(self, _get_title_font_size(), 32))
 	title_label.add_theme_color_override("font_color", accent)
 	title_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.88))
 	title_label.add_theme_constant_override("shadow_offset_x", 4)
@@ -222,7 +222,7 @@ func _build_scene() -> void:
 	score_label = Label.new()
 	score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	score_label.text = "Pontuação total: %s" % ScoreManager.get_score()
-	score_label.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 22, 17))
+	FontScale.set_size(score_label, ScreenTools.responsive_font(self, 22, 17))
 	score_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.92))
 	score_label.add_theme_stylebox_override("normal", _make_panel_style(Color(0.0, 0.0, 0.0, 0.30), Color(secondary.r, secondary.g, secondary.b, 0.38), 14, 1))
 	score_label.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(340, 40), Vector2(260, 36))
@@ -247,7 +247,7 @@ func _build_day_banner(box: VBoxContainer, accent: Color) -> void:
 	day_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	day_banner.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	day_banner.custom_minimum_size = ScreenTools.responsive_size(self, Vector2(400, 46), Vector2(270, 40))
-	day_banner.add_theme_font_size_override("font_size", ScreenTools.responsive_font(self, 26, 20))
+	FontScale.set_size(day_banner, ScreenTools.responsive_font(self, 26, 20))
 	day_banner.add_theme_color_override("font_color", Color(1.0, 0.95, 0.78))
 	day_banner.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
 	day_banner.add_theme_constant_override("shadow_offset_x", 3)

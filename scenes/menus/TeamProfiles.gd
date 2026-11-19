@@ -272,7 +272,7 @@ func _apply_layout() -> void:
 		var entry: Dictionary = _tiles[key] as Dictionary
 		(entry["button"] as Button).custom_minimum_size = Vector2(cell, cell + (40.0 if small else 46.0))
 		(entry["portrait"] as FaceAvatar).custom_minimum_size = Vector2(cell - 14.0, cell - 14.0)
-		(entry["name"] as Label).add_theme_font_size_override("font_size", 13 if small else 16)
+		FontScale.set_size((entry["name"] as Label), 13 if small else 16)
 		var star_row: StarsRow = entry["stars"] as StarsRow
 		star_row.star_size = 11.0 if small else 14.0
 		star_row.custom_minimum_size = star_row._content_size()

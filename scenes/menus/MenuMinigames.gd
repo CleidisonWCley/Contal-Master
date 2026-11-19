@@ -181,19 +181,24 @@ func _apply_responsive_layout() -> void:
 		columns = 2
 	elif view.x < 1040.0:
 		columns = 3
+	# V0.16.3: fonte maior = menos colunas, cartoes mais largos e mais altos (tudo cabe sem sobrepor).
+	var grow: float = maxf(FontScale.get_factor(), 1.0)
+	if grow > 1.3:
+		columns = mini(columns, 3)
 	var available: float = maxf(220.0, view.x - 2.0 * margin_x - 20.0)
-	var card_width: float = clampf(floor((available - float(gap) * float(columns - 1)) / float(columns)), 200.0, 300.0)
+	var card_width: float = clampf(floor((available - float(gap) * float(columns - 1)) / float(columns)), 200.0, 300.0 * (1.0 + (grow - 1.0) * 1.2))
 
 	ScreenTools.apply_label_font(_title_label, self, UiPalette.FONT_TITLE.x, UiPalette.FONT_TITLE.y)
 	ScreenTools.apply_label_font(_subtitle_label, self, 16, 14)
 	_difficulty_selector.set_compact(view.x < 560.0)
-	var card_height: float = 150.0 if compact else 190.0
+	var card_height: float = (150.0 if compact else 190.0) * grow
 	for i in range(_card_buttons.size()):
+		_card_titles[i].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_card_buttons[i].custom_minimum_size = Vector2(card_width, card_height)
-		_card_titles[i].add_theme_font_size_override("font_size", 18 if compact else 21)
-		_card_descriptions[i].add_theme_font_size_override("font_size", 14 if compact else 15)
-		_card_records[i].add_theme_font_size_override("font_size", 14 if compact else 15)
-		var badge_size: float = 50.0 if compact else 62.0
+		FontScale.set_size(_card_titles[i], 18 if compact else 21)
+		FontScale.set_size(_card_descriptions[i], 14 if compact else 15)
+		FontScale.set_size(_card_records[i], 14 if compact else 15)
+		var badge_size: float = (50.0 if compact else 62.0) * sqrt(grow)
 		_card_badges[i].custom_minimum_size = Vector2(badge_size, badge_size)
 	_layout_rows(columns, gap)
 	ButtonStyles.apply(back_button, "ui_ghost", Vector2(222, 46 if compact else 52), 18)

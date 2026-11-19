@@ -441,8 +441,8 @@ func _layout() -> void:
 	margin.add_theme_constant_override("margin_right", side)
 	margin.add_theme_constant_override("margin_top", 11 if compact else 14)
 	margin.add_theme_constant_override("margin_bottom", 12 if compact else 16)
-	_name_label.add_theme_font_size_override("font_size", 17 if compact else 21)
-	_text_label.add_theme_font_size_override("font_size", 17 if compact else 22)
+	FontScale.set_size(_name_label, 17 if compact else 21)
+	FontScale.set_size(_text_label, 17 if compact else 22)
 	_card.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_card.grow_vertical = Control.GROW_DIRECTION_BEGIN

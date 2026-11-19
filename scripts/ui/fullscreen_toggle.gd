@@ -27,6 +27,11 @@ const MARGIN_TOP: float = 14.0
 ## Y (px) onde termina a faixa do botao. Qualquer HUD no canto esquerdo deve comecar daqui para baixo.
 const HUD_RESERVED_BOTTOM: float = 60.0
 
+## V0.16.2: botao mais transparente para nao competir com a cena. Fica "apagado" em repouso e volta a 100% ao passar o
+## mouse / tocar, entao continua facil de achar para quem nao conhece jogos.
+const IDLE_ALPHA: float = 0.42
+const ACTIVE_ALPHA: float = 1.0
+
 const POLL_INTERVAL: float = 0.25
 const REQUEST_GRACE_MSEC: int = 1500
 
@@ -57,6 +62,11 @@ func _ready() -> void:
 	_icon_enter = load(ICON_ENTER_PATH) as Texture2D
 	_icon_exit = load(ICON_EXIT_PATH) as Texture2D
 	pressed.connect(_on_pressed)
+	mouse_entered.connect(_set_alpha.bind(ACTIVE_ALPHA))
+	mouse_exited.connect(_set_alpha.bind(IDLE_ALPHA))
+	button_down.connect(_set_alpha.bind(ACTIVE_ALPHA))
+	button_up.connect(_set_alpha.bind(IDLE_ALPHA))
+	self_modulate = Color(1.0, 1.0, 1.0, IDLE_ALPHA)
 	get_window().size_changed.connect(_sync_from_display)
 
 	_shown_fullscreen = _is_real_fullscreen()
@@ -136,6 +146,12 @@ func _refresh_visuals() -> void:
 	tooltip_text = "Clique para sair da tela cheia (ou aperte Esc)" if _shown_fullscreen else "Clique para jogar em tela cheia"
 	ButtonStyles.apply(self, "ui_toggle_on" if _shown_fullscreen else "ui_ghost", BUTTON_SIZE, FONT_SIZE)
 	focus_mode = Control.FOCUS_NONE  # ButtonStyles.apply devolve o foco; aqui ele precisa continuar desligado
+
+
+func _set_alpha(alpha: float) -> void:
+	# Em toque nao existe "mouse_exited" confiavel: o button_up devolve o botao ao estado apagado.
+	var tween: Tween = create_tween()
+	tween.tween_property(self, "self_modulate:a", alpha, 0.12)
 
 
 func _play_click() -> void:

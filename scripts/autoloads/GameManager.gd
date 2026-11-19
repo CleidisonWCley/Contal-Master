@@ -141,10 +141,17 @@ func open_mode_select() -> void:
 		AudioManager.play_click()
 	_change_scene(MODE_SELECT_SCENE)
 
-func open_settings() -> void:
+## V0.16.1: show_saved_notice = true quando o jogador volta da tela de questoes (Settings mostra o card de confirmacao).
+var settings_saved_notice_pending: bool = false
+
+func open_settings(show_saved_notice: bool = false) -> void:
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
+	settings_saved_notice_pending = show_saved_notice
 	_change_scene(SETTINGS_SCENE)
+
+func open_question_settings() -> void:
+	_change_scene(Paths.SCENE_QUESTION_SETTINGS)
 
 func open_scores() -> void:
 	current_mode = GameMode.NONE

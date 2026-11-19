@@ -84,7 +84,7 @@ static func panel_size(node: Node, desktop: Vector2, compact: Vector2, horizonta
 static func apply_label_font(label: Label, node: Node, desktop: int, compact: int) -> void:
 	if label == null:
 		return
-	label.add_theme_font_size_override("font_size", responsive_font(node, desktop, compact))
+	FontScale.set_size(label, responsive_font(node, desktop, compact))
 
 static func apply_button(button: BaseButton, node: Node, variant: String, desktop_size: Vector2, compact_size: Vector2, desktop_font: int, compact_font: int) -> void:
 	if button == null:

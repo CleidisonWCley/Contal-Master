@@ -199,15 +199,19 @@ func _apply_layout() -> void:
 	_cards_box.add_theme_constant_override("separation", int(gap))
 	var usable: float = view.x - 2.0 * margin_x - 40.0
 	var count: float = float(_cards.size())
-	var card_width: float = clampf((usable - (0.0 if stacked else gap * (count - 1.0))) / (1.0 if stacked else count), 200.0, base_size.x)
+	var card_width: float = clampf((usable - (0.0 if stacked else gap * (count - 1.0))) / (1.0 if stacked else count), 200.0, base_size.x * maxf(FontScale.get_factor(), 1.0))
 	var card_height: float = CARD_HEIGHT_STACKED if stacked else base_size.y
 	var text_area: float = 132.0 if compact else 140.0
+	# V0.16.3: fonte maior = faixa de texto maior; o cartao cresce o mesmo tanto.
+	var extra_text: float = text_area * (FontScale.get_factor() - 1.0) * 1.9 if FontScale.get_factor() > 1.0 else 0.0
+	text_area += extra_text
+	card_height += extra_text
 	for entry in _cards:
 		var button: Button = entry["button"] as Button
 		button.custom_minimum_size = Vector2(card_width, card_height)
-		(entry["title"] as Label).add_theme_font_size_override("font_size", 19 if compact else 22)
-		(entry["desc"] as Label).add_theme_font_size_override("font_size", 13 if compact else 14)
-		(entry["best"] as Label).add_theme_font_size_override("font_size", 13 if compact else 14)
+		FontScale.set_size((entry["title"] as Label), 19 if compact else 22)
+		FontScale.set_size((entry["desc"] as Label), 13 if compact else 14)
+		FontScale.set_size((entry["best"] as Label), 13 if compact else 14)
 		var art: UiFrameArt = entry["art"] as UiFrameArt
 		art.text_area = text_area
 		art.inner_pad = 16.0 if compact else 22.0

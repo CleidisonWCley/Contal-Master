@@ -8,7 +8,11 @@ var waterfx: DLWaterFX = DLWaterFX.new(self)
 var tutorial: DLTutorial = DLTutorial.new(self)
 var difficulty: String = "normal"
 var questions: Array = []
+## V0.16.1: current_round = HORARIO do dia (0..5: cenario, trafego, musica, agua). round_index = numero da questao (0..N-1).
+## Com N questoes, os 6 horarios sao distribuidos do Amanhecer a Noite, mantendo o trafego sempre crescente.
 var current_round: int = 0
+var round_index: int = 0
+var total_rounds: int = DLConfig.TOTAL_ROUNDS   # V0.16.2: sempre 6 desafios (1 por horario do dia), fora do limite dinamico
 var current_lane: int = DLConfig.LANE_RIGHT
 var state: String = DLConfig.STATE_DRIVE
 var drive_elapsed: float = 0.0
@@ -660,7 +664,7 @@ func _build_feedback_layer() -> void:
 	feedback_continue_button = Button.new()
 	feedback_continue_button.text = "Continuar"
 	feedback_continue_button.custom_minimum_size = Vector2(250, 40)
-	feedback_continue_button.add_theme_font_size_override("font_size", 19)
+	FontScale.set_size(feedback_continue_button, 19)
 	feedback_continue_button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.0, 0.30, 0.48, 0.95), Color(0.45, 0.95, 1.0), 13, 2))
 	feedback_continue_button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.0, 0.45, 0.66, 1.0), Color(1.0, 1.0, 1.0), 13, 2))
 	feedback_continue_button.pressed.connect(_on_feedback_continue_pressed)
@@ -712,7 +716,7 @@ func _build_finish_layer() -> void:
 	finish_continue_button = Button.new()
 	finish_continue_button.text = "Continuar"
 	finish_continue_button.custom_minimum_size = Vector2(320, 54)
-	finish_continue_button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(finish_continue_button, 22)
 	finish_continue_button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.44, 0.18, 0.00, 0.96), Color(1.0, 0.86, 0.20), 14, 2))
 	finish_continue_button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.62, 0.28, 0.00, 1.0), Color(1.0, 1.0, 1.0), 14, 2))
 	finish_continue_button.pressed.connect(_on_finish_continue_pressed)
@@ -728,15 +732,16 @@ func _build_fade_layer() -> void:
 	add_child(fade_rect)
 
 func _prepare_questions() -> void:
-	questions = DynamicQuestionBank.pick_rounds("desvio_logico", difficulty, DLConfig.TOTAL_ROUNDS)
+	questions = DynamicQuestionBank.pick_rounds("desvio_logico", difficulty, total_rounds)
 	if questions.is_empty():
-		questions = DynamicQuestionBank.pick_rounds("show_do_bilhao", difficulty, DLConfig.TOTAL_ROUNDS)
+		questions = DynamicQuestionBank.pick_rounds("show_do_bilhao", difficulty, total_rounds)
 
 func _start_round(index: int) -> void:
-	if index >= DLConfig.TOTAL_ROUNDS or index >= questions.size():
+	if index >= total_rounds or index >= questions.size():
 		_show_finish()
 		return
-	current_round = index
+	round_index = index
+	current_round = DLConfig.stage_for_round(index, total_rounds)
 	state = DLConfig.STATE_ACCELERATION
 	input_locked = true
 	finish_was_failure = false
@@ -788,7 +793,7 @@ func _start_round(index: int) -> void:
 	# V0.14.2: ritmo da música sobe gradualmente a cada horário.
 	AudioManager.set_music_tempo(DLConfig.music_tempo_for_round(index), 2.5)
 	_fade_from_black()
-	if current_round == 0:
+	if round_index == 0:
 		tutorial.start_sequence()
 	else:
 		_begin_real_drive_after_tutorial()
@@ -1031,18 +1036,21 @@ func _show_feedback(is_correct: bool, choice: String, q: Dictionary, route_damag
 	var chosen_text: String = str(opts.get(choice, ""))
 	var correct_text: String = str(opts.get(correct_letter, ""))
 	var explanation: String = _clean_feedback(correct_text, _get_reason(q, correct_letter))
+	var practice: String = FeedbackText.practice_line(str(q.get("pratica", "")))   # V0.16.2
 	feedback_title_label.text = "ROTA CORRETA!" if is_correct else "ROTA INCORRETA"
 	feedback_title_label.add_theme_color_override("font_color", Color(0.38, 1.0, 0.48) if is_correct else Color(1.0, 0.28, 0.25))
 	if is_correct:
-		feedback_body_label.text = "Você escolheu: %s\n\n%s" % [correct_text, explanation]
+		feedback_body_label.text = "Você escolheu: %s\n\n%s%s" % [correct_text, explanation, practice]
 	else:
 		var wrong_reason: String = _get_reason(q, choice)
 		if wrong_reason == "" or wrong_reason == explanation:
 			wrong_reason = "Essa rota não resolve melhor a situação apresentada."
+		else:
+			wrong_reason = FeedbackText.why_not_line(wrong_reason, wrong_reason)
 		var damage_line: String = ""
 		if route_damage_loss > 0.0:
 			damage_line = "\n\nPenalidade da rota: -%s%% de integridade." % int(round(route_damage_loss))
-		feedback_body_label.text = "Você escolheu: %s\n%s%s\n\nResposta correta: %s\n%s" % [chosen_text, wrong_reason, damage_line, correct_text, explanation]
+		feedback_body_label.text = "Você escolheu: %s\n%s%s\n\nResposta correta: %s\n%s%s" % [chosen_text, wrong_reason, damage_line, correct_text, explanation, practice]
 	feedback_continue_requested = false
 	if pause_button != null:
 		pause_button.visible = false
@@ -1053,12 +1061,12 @@ func _on_feedback_continue_pressed() -> void:
 		AudioManager.play_click()
 	feedback_continue_requested = true
 	feedback_layer.visible = false
-	if current_round + 1 >= DLConfig.TOTAL_ROUNDS or current_round + 1 >= questions.size():
+	if round_index + 1 >= total_rounds or round_index + 1 >= questions.size():
 		await _fade_to_black()
 		_show_finish()
 	else:
 		await _fade_to_black()
-		_start_round(current_round + 1)
+		_start_round(round_index + 1)
 
 func _show_finish(is_failure: bool = false) -> void:
 	if fade_rect != null:
@@ -1088,7 +1096,7 @@ func _show_finish(is_failure: bool = false) -> void:
 		rating = "Rota concluída com falhas. Revise os conceitos e tente novamente."
 	else:
 		rating = "Rota crítica. O treino ajudará a reconhecer os melhores caminhos técnicos."
-	finish_body_label.text = "Acertos: %s/%s\nColisões: %s\nIntegridade final: %s%%\nPontos do minigame: %s\n\n%s" % [correct_count, DLConfig.TOTAL_ROUNDS, collisions, int(round(integrity)), local_points, rating]
+	finish_body_label.text = "Acertos: %s/%s\nColisões: %s\nIntegridade final: %s%%\nPontos do minigame: %s\n\n%s" % [correct_count, total_rounds, collisions, int(round(integrity)), local_points, rating]
 	if has_node("/root/AchievementManager") and not is_failure and difficulty == "dificil" and collisions <= 0:
 		AchievementManager.unlock("piloto_imbativel")
 	finish_layer.visible = true
@@ -1102,7 +1110,7 @@ func _on_finish_continue_pressed() -> void:
 	engineaudio._clear_desvio_music_audio_profile()
 	_save_desvio_free_mode_record_if_needed()
 	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
-	GameManager.report_stage({"total": DLConfig.TOTAL_ROUNDS, "correct": correct_count})
+	GameManager.report_stage({"total": total_rounds, "correct": correct_count})
 	GameManager.complete_current_stage(0)
 
 func _save_desvio_free_mode_record_if_needed() -> void:
@@ -1599,7 +1607,7 @@ func _stage_name(index: int) -> String:
 func _update_hud() -> void:
 	var difficulty_label := DifficultyManager.get_label(difficulty) if has_node("/root/DifficultyManager") else "Normal"
 	if round_label != null:
-		round_label.text = "Desafio %s/%s • %s" % [current_round + 1, DLConfig.TOTAL_ROUNDS, _stage_name(current_round)]
+		round_label.text = "Desafio %s/%s • %s" % [round_index + 1, total_rounds, _stage_name(current_round)]
 	if traffic_dots != null:
 		traffic_dots.queue_redraw()
 	if score_label != null:
@@ -1613,8 +1621,8 @@ func _update_hud() -> void:
 		question_label.text = str(q.get("pergunta", "Escolha o caminho técnico correto."))
 
 func _current_question() -> Dictionary:
-	if current_round >= 0 and current_round < questions.size() and questions[current_round] is Dictionary:
-		return questions[current_round]
+	if round_index >= 0 and round_index < questions.size() and questions[round_index] is Dictionary:
+		return questions[round_index]
 	return {}
 
 func _get_reason(q: Dictionary, letter: String) -> String:
@@ -1655,6 +1663,7 @@ func _apply_route_failed_penalty_once() -> void:
 func _apply_score_delta(delta_points: int) -> void:
 	if delta_points == 0:
 		return
+	delta_points = roundi(float(delta_points) * SettingsManager.question_score_scale("desvio_logico"))   # V0.16.1
 	local_points += delta_points
 	if has_node("/root/ScoreManager"):
 		ScoreManager.add_points(delta_points)
@@ -1670,7 +1679,7 @@ func _spawn_score_delta_popup(delta_points: int) -> void:
 	label.text = "+%d" % delta_points if delta_points > 0 else "%d" % delta_points
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.z_index = 85
-	label.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(label, 20)
 	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.88))
 	label.add_theme_constant_override("shadow_offset_x", 2)
 	label.add_theme_constant_override("shadow_offset_y", 2)
@@ -2078,7 +2087,7 @@ func _apply_choice_arrow(button: Button, points_right: bool) -> void:
 func _make_choice_button(label: String) -> Button:
 	var button := Button.new()
 	button.text = label
-	button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(button, 22)
 	button.add_theme_color_override("font_color", Color(1, 1, 1))
 	button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.02, 0.04, 0.10, 0.82), Color(0.0, 0.95, 1.0, 0.78), 18, 2))
 	button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.03, 0.16, 0.26, 0.95), Color(1.0, 1.0, 1.0, 0.88), 18, 2))
@@ -2090,7 +2099,7 @@ func _make_label(text: String, font_size: int, color: Color, align: HorizontalAl
 	label.text = text
 	label.horizontal_alignment = align
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.88))
 	label.add_theme_constant_override("shadow_offset_x", 2)

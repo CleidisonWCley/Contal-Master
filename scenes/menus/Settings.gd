@@ -12,7 +12,11 @@ var fullscreen_button: Button
 var animations_button: Button
 var tutorials_button: Button
 var novel_button: Button
+var questions_button: Button
 var back_button: Button
+var font_selector: FontSizeSelector   # V0.16.3: acessibilidade - tamanho da fonte
+var _font_row: BoxContainer
+var _toggle_grid: GridContainer
 
 var _safe_area: MarginContainer
 var _panel: PanelContainer
@@ -34,6 +38,9 @@ func _ready() -> void:
 	_load_current_settings()
 	_apply_responsive_layout()
 	back_button.call_deferred("grab_focus")
+	if GameManager.settings_saved_notice_pending:
+		GameManager.settings_saved_notice_pending = false
+		SavedToast.show_on(self, "Configurações salvas com sucesso")
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
@@ -86,31 +93,47 @@ func _build_ui() -> void:
 	# ---- JOGO
 	_content.add_child(_make_section_header("JOGO"))
 	_content.add_child(_make_difficulty_row())
+	# V0.16.1: tela propria para a quantidade de questoes (campanha x modo livre).
+	questions_button = Button.new()
+	questions_button.name = "QuestionsButton"
+	questions_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_content.add_child(questions_button)
 
 	# ---- TELA
 	_content.add_child(_make_section_header("TELA"))
-	var toggles := HBoxContainer.new()
-	toggles.add_theme_constant_override("separation", 12)
-	_content.add_child(toggles)
+	# V0.16.3: grade 2 colunas (1 coluna quando a fonte e Grande/Extra grande, para o painel nao alargar demais).
+	_toggle_grid = GridContainer.new()
+	_toggle_grid.name = "ToggleGrid"
+	_toggle_grid.columns = 2
+	_toggle_grid.add_theme_constant_override("h_separation", 12)
+	_toggle_grid.add_theme_constant_override("v_separation", 10)
+	_content.add_child(_toggle_grid)
 	fullscreen_button = Button.new()
 	fullscreen_button.name = "FullscreenToggle"
 	fullscreen_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	toggles.add_child(fullscreen_button)
+	_toggle_grid.add_child(fullscreen_button)
 	animations_button = Button.new()
 	animations_button.name = "AnimationsToggle"
 	animations_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	toggles.add_child(animations_button)
-	var toggles_row_2 := HBoxContainer.new()
-	toggles_row_2.add_theme_constant_override("separation", 12)
-	_content.add_child(toggles_row_2)
+	_toggle_grid.add_child(animations_button)
 	tutorials_button = Button.new()
 	tutorials_button.name = "TutorialsToggle"
 	tutorials_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	toggles_row_2.add_child(tutorials_button)
+	_toggle_grid.add_child(tutorials_button)
 	novel_button = Button.new()
 	novel_button.name = "NovelModeToggle"
 	novel_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	toggles_row_2.add_child(novel_button)
+	_toggle_grid.add_child(novel_button)
+
+	# ---- Fonte (V0.16.3, acessibilidade): [A Fonte] [Pequena][Media][Grande][Extra grande]. Muda o jogo todo, na hora.
+	_font_row = BoxContainer.new()
+	_font_row.name = "FontRow"
+	_font_row.add_theme_constant_override("separation", 12)
+	_content.add_child(_font_row)
+	_font_row.add_child(_make_font_title_row())
+	font_selector = FontSizeSelector.create(4, 48.0, 17)
+	font_selector.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_font_row.add_child(font_selector)
 
 	var back_holder := CenterContainer.new()
 	back_holder.add_theme_constant_override("separation", 0)
@@ -120,6 +143,20 @@ func _build_ui() -> void:
 	back_holder.add_child(back_button)
 
 	_connect_signals()
+
+## "[A] Fonte" (rotulo da linha de opcoes de tamanho).
+func _make_font_title_row() -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "FontTitleRow"
+	row.add_theme_constant_override("separation", 12)
+	row.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var icon := UiIcons.make_rect("font", 24, UiPalette.TEXT_ON_DARK)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(icon)
+	var label: Label = UiKit.label("Fonte", 19, UiPalette.TEXT_ON_DARK)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(label)
+	return row
 
 ## Cabecalho de secao: TITULO lilas + linha fina.
 func _make_section_header(text: String) -> VBoxContainer:
@@ -270,12 +307,26 @@ func _option_style(fill: Color, border: Color) -> StyleBoxFlat:
 var _shown_fullscreen: bool = false
 
 func _refresh_toggles() -> void:
+	if font_selector != null:
+		font_selector.refresh()
 	_shown_fullscreen = SettingsManager.is_fullscreen()
+	_refresh_questions_button()
 	_set_toggle(fullscreen_button, "monitor", "Tela cheia", SettingsManager.is_fullscreen())
 	_set_toggle(animations_button, "sparkles", "Animações visuais", SettingsManager.animations_enabled())
 	_set_toggle(tutorials_button, "compass", "Tutoriais", SettingsManager.tutorials_enabled())
 	# V0.14: Novel AUTO (passa sozinha) ou CLIQUE (o jogador avanca).
 	_set_toggle(novel_button, "compass", "Novel automática", SettingsManager.novel_auto())
+
+func _refresh_questions_button() -> void:
+	if questions_button == null:
+		return
+	var q_sep: String = "\n" if FontScale.get_factor() > 1.1 else "  •  "
+	questions_button.text = ("Duração dos minigames" + q_sep + "Campanha: %d  |  Modo livre: %d") % [SettingsManager.get_campaign_questions_count(), SettingsManager.get_free_mode_questions_count()]
+	questions_button.icon = UiIcons.texture("sliders")
+	questions_button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	questions_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	questions_button.expand_icon = false
+	ButtonStyles.apply(questions_button, "ui_ghost", Vector2(0, 46.0 if ScreenTools.is_compact(self) else 54.0), 17)
 
 func _set_toggle(button: Button, icon_name: String, label: String, enabled: bool) -> void:
 	button.text = "%s: %s" % [label, "LIGADO" if enabled else "DESLIGADO"]
@@ -298,10 +349,18 @@ func _apply_responsive_layout() -> void:
 	_safe_area.add_theme_constant_override("margin_top", margin)
 	_safe_area.add_theme_constant_override("margin_bottom", margin)
 	_panel.custom_minimum_size.x = minf(745.0, maxf(300.0, view.x - 2.0 * margin - 20.0))
-	_content.add_theme_constant_override("separation", 7 if compact else 11)
+	_content.add_theme_constant_override("separation", 7 if compact else 9)
+	(_panel.get_child(0) as MarginContainer).add_theme_constant_override("margin_top", 22)
+	(_panel.get_child(0) as MarginContainer).add_theme_constant_override("margin_bottom", 18)
 	ScreenTools.apply_label_font(_title_label, self, 32, 26)
 	for key in DIFFICULTY_KEYS:
-		(_difficulty_buttons[key] as Button).custom_minimum_size.y = 40.0 if compact else 48.0
+		var diff_button: Button = _difficulty_buttons[key] as Button
+		diff_button.custom_minimum_size.y = (40.0 if compact else 48.0) * maxf(FontScale.get_factor(), 1.0)
+		diff_button.custom_minimum_size.x = 110.0 * maxf(FontScale.get_factor(), 1.0) * 1.15   # pontos + nome sao filhos: o botao cresce junto
+	# V0.16.3: fonte maior -> 1 coluna de botoes e linha "Fonte" empilhada (rotulo em cima, opcoes embaixo).
+	var big: bool = FontScale.get_factor() > 1.1
+	_toggle_grid.columns = 1 if (big or view.x < 640.0) else 2
+	_font_row.vertical = big or view.x < 640.0
 	_refresh_toggles()
 	ButtonStyles.apply(back_button, "ui_ghost", Vector2(222, 46 if compact else 54), 18)
 
@@ -313,9 +372,17 @@ func _connect_signals() -> void:
 	animations_button.pressed.connect(_on_animations_pressed)
 	tutorials_button.pressed.connect(_on_tutorials_pressed)
 	novel_button.pressed.connect(_on_novel_pressed)
+	questions_button.pressed.connect(_on_questions_pressed)
 	back_button.pressed.connect(_on_back_pressed)
 	# V0.14.3: o navegador pode sair da tela cheia sozinho (Esc): o botao acompanha o estado real.
 	SettingsManager.settings_changed.connect(_on_settings_changed)
+	# V0.16.3: ao trocar a fonte, os botoes sao refeitos na nova escala e o painel se reajusta.
+	FontScale.scale_changed.connect(_on_font_scale_changed)
+
+func _on_font_scale_changed(_level: String) -> void:
+	_apply_responsive_layout()
+	if is_instance_valid(font_selector) and font_selector.get_viewport() != null and get_viewport().gui_get_focus_owner() == null:
+		font_selector.focus_current()
 
 func _on_settings_changed(_changed_settings: Dictionary) -> void:
 	if SettingsManager.is_fullscreen() != _shown_fullscreen:
@@ -347,6 +414,10 @@ func _on_fullscreen_pressed() -> void:
 	SettingsManager.toggle_fullscreen()
 	_refresh_toggles()
 	_click()
+
+func _on_questions_pressed() -> void:
+	_click()
+	GameManager.open_question_settings()
 
 func _on_tutorials_pressed() -> void:
 	SettingsManager.toggle_tutorials_enabled()

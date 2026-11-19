@@ -1,6 +1,6 @@
 {
   "schema": "dilemas",
-  "versao": "1.0",
+  "versao": "1.1",
   "idioma": "pt-BR",
   "fonte": "NBC PA 11 – Revisão Externa de Qualidade pelos Pares (CFC, 8/12/2017, vigente desde 1/1/2019); Instruções aos Revisores (Anexo 2); Base de Conhecimento do jogo; provas EQT/QTG como apoio.",
   "tipos": [
@@ -40,7 +40,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Descobriu o parentesco? Declare o vínculo na hora e peça para sair da revisão."
 	},
 	{
 	  "id": "DL-002",
@@ -64,7 +65,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Recuse o presente e registre o ocorrido nos papéis de trabalho."
 	},
 	{
 	  "id": "DL-003",
@@ -88,7 +90,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Em eventos, a resposta padrão é: não comento revisões."
 	},
 	{
 	  "id": "DL-004",
@@ -112,7 +115,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Informação obtida na revisão nunca serve para captar clientes."
 	},
 	{
 	  "id": "DL-005",
@@ -136,7 +140,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "O plano nasce no revisado; o revisor só confere o recebimento e encaminha ao CRE."
 	},
 	{
 	  "id": "DL-006",
@@ -160,7 +165,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Antes de pedir papéis, confirme que o revisado já obteve a autorização do cliente."
 	},
 	{
 	  "id": "DL-007",
@@ -184,7 +190,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Guarde os papéis em local protegido por 7 anos, a contar da emissão do relatório."
 	},
 	{
 	  "id": "DL-008",
@@ -208,7 +215,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Só conclua 'adequado' com evidência de que o sistema foi bem projetado e está sendo cumprido."
 	},
 	{
 	  "id": "DL-009",
@@ -232,7 +240,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Declare o investimento e fique fora dos trabalhos daquele cliente."
 	},
 	{
 	  "id": "DL-010",
@@ -256,7 +265,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Registre a tentativa de pressão e mantenha as conclusões apoiadas em evidências."
 	},
 	{
 	  "id": "DL-011",
@@ -280,7 +290,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Amizade íntima com o responsável pela firma? Declare e peça substituição."
 	},
 	{
 	  "id": "DL-012",
@@ -304,7 +315,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Registre as razões do revisado, avalie o efeito no relatório e, se discordar, envie tudo ao CRE."
 	},
 	{
 	  "id": "DL-013",
@@ -328,7 +340,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Sem trabalhos no ano-base, siga a revisão usando o ano antecedente."
 	},
 	{
 	  "id": "DL-014",
@@ -352,7 +365,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Liste cada desconformidade com as NBC: é isso que sustenta o relatório inadequado."
 	},
 	{
 	  "id": "DL-015",
@@ -376,7 +390,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Vazou algo? Avise o responsável na hora: contenção rápida reduz o dano."
 	},
 	{
 	  "id": "DL-016",
@@ -400,7 +415,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Controle os prazos do CRE: perdê-los gera nova revisão e impede você de revisar."
 	},
 	{
 	  "id": "DL-017",
@@ -424,7 +440,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Percebeu a reciprocidade? O revisado deve indicar outro revisor."
 	},
 	{
 	  "id": "DL-018",
@@ -448,7 +465,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Registre cada recusa do revisado: são elas que sustentam a limitação de escopo."
 	},
 	{
 	  "id": "DL-019",
@@ -472,7 +490,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Participou do trabalho no passado? Declare e deixe-o para outro membro da equipe."
 	},
 	{
 	  "id": "DL-020",
@@ -496,7 +515,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Monte a equipe pela complexidade: inclua quem já revisou entidades similares."
 	},
 	{
 	  "id": "DL-021",
@@ -520,7 +540,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Em clientes regulados, confirme com o revisado a habilitação da equipe antes de começar."
 	},
 	{
 	  "id": "DL-022",
@@ -544,7 +565,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Registre a discordância por escrito para que o CRE possa analisá-la."
 	},
 	{
 	  "id": "DL-023",
@@ -568,7 +590,8 @@
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"
-	  ]
+	  ],
+	  "na_pratica": "Informe prontamente quem tem autoridade no revisado e acompanhe as ações documentadas."
 	},
 	{
 	  "id": "DL-024",
@@ -589,6 +612,607 @@
 		}
 	  ],
 	  "explicacao": "O revisor avalia padrão e impacto no sistema; se isolada e irrelevante, não modifica o relatório, mas registra o apontamento.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ],
+	  "na_pratica": "Avalie padrão e impacto e registre o apontamento nos papéis, mesmo se irrelevante."
+	},
+	{
+	  "id": "DL-025",
+	  "nivel": "facil",
+	  "tema": "Prazos",
+	  "tipo": "prazo",
+	  "referencia": "NBC PA 11, item 48",
+	  "cenario": "A firma Aurora recebeu hoje o relatório e a carta de recomendações. Em quanto tempo deve entregar o plano de ação?",
+	  "acao_correta": "Em até 30 dias",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Em até 90 dias",
+		  "porque": "90 dias passa do limite de 30 dias, contados do recebimento."
+		},
+		{
+		  "texto": "Quando achar conveniente",
+		  "porque": "O prazo é fixado pela norma e pelo CRE; não fica a critério do revisado."
+		}
+	  ],
+	  "explicacao": "O plano de ação deve ser elaborado em até 30 dias do recebimento do relatório e da carta, além dos prazos fixados pelo CRE.",
+	  "na_pratica": "Marque a data de recebimento e já distribua as ações do plano entre os responsáveis.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-026",
+	  "nivel": "facil",
+	  "tema": "Organização do trabalho",
+	  "tipo": "organizacao",
+	  "referencia": "NBC PA 11, item 28(b)",
+	  "cenario": "O revisor Pedro delegou tarefas a três membros da equipe e foi cuidar de outro trabalho, sem acompanhar ninguém. O que faltou?",
+	  "acao_correta": "Supervisionar a equipe",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Nada: delegar basta",
+		  "porque": "Delegar sem supervisionar é falha de organização do trabalho."
+		},
+		{
+		  "texto": "Pedir ao CRE que supervisione",
+		  "porque": "O CRE administra o programa; a supervisão da equipe é do revisor."
+		}
+	  ],
+	  "explicacao": "O revisor organiza, planeja, conduz e supervisiona os trabalhos da equipe revisora.",
+	  "na_pratica": "Delegue, mas revise o que a equipe fez e registre a supervisão nos papéis de trabalho.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-027",
+	  "nivel": "facil",
+	  "tema": "Carta de recomendações",
+	  "tipo": "responsabilidade",
+	  "referencia": "NBC PA 11, item 45",
+	  "cenario": "Terminada a revisão, quem emite a carta de recomendações, no modelo do CRE?",
+	  "acao_correta": "O auditor-revisor",
+	  "acoes_incorretas": [
+		{
+		  "texto": "O auditor-revisado",
+		  "porque": "O revisado responde à carta com o plano de ação; não a emite."
+		},
+		{
+		  "texto": "O cliente selecionado",
+		  "porque": "O cliente selecionado não participa da emissão da carta."
+		}
+	  ],
+	  "explicacao": "A carta é obrigatória, segue o modelo do CRE e é emitida pelo revisor, com a relação de clientes selecionados e as recomendações.",
+	  "na_pratica": "Use o modelo do CRE e confira se a carta lista os clientes selecionados.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-028",
+	  "nivel": "facil",
+	  "tema": "Confidencialidade",
+	  "tipo": "confidencialidade",
+	  "referencia": "NBC PA 11, item 21",
+	  "cenario": "A revisora Ana quer contar, num grupo de mensagens, as falhas que viu na firma revisada. Ela pode?",
+	  "acao_correta": "Não: é informação confidencial",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, só a colegas da firma",
+		  "porque": "O sigilo vale também para colegas e outros auditores que não integram a revisão."
+		},
+		{
+		  "texto": "Sim, após aprovar o relatório",
+		  "porque": "A aprovação não encerra o sigilo: ele permanece depois da revisão."
+		}
+	  ],
+	  "explicacao": "É vedado divulgar qualquer informação obtida na revisão, em qualquer fase e mesmo depois do término dos trabalhos.",
+	  "na_pratica": "Nada da revisão vai para grupos, redes ou conversas informais.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-029",
+	  "nivel": "facil",
+	  "tema": "Escolha do revisor",
+	  "tipo": "organizacao",
+	  "referencia": "NBC PA 11, item 15",
+	  "cenario": "A firma Vértice, de grande porte, pensa em indicar como revisora uma firma bem menor e iniciante. É adequado?",
+	  "acao_correta": "Não: exige porte equivalente",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, qualquer firma serve",
+		  "porque": "A norma exige porte e experiência no mínimo equivalentes aos do revisado."
+		},
+		{
+		  "texto": "Sim, se tiver muitos clientes",
+		  "porque": "Quantidade de clientes não substitui porte e experiência equivalentes."
+		}
+	  ],
+	  "explicacao": "Ao escolher o revisor, o revisado deve observar porte e experiência no mínimo equivalentes aos seus, além dos impedimentos do item 26.",
+	  "na_pratica": "Compare porte, carteira e experiência antes de indicar o revisor.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-030",
+	  "nivel": "facil",
+	  "tema": "Aprovação do relatório",
+	  "tipo": "responsabilidade",
+	  "referencia": "NBC PA 11, item 20",
+	  "cenario": "O revisor acaba de emitir o relatório de revisão. Ele já está aprovado?",
+	  "acao_correta": "Não: o CRE analisa e aprova",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, o revisor aprova o que emite",
+		  "porque": "O revisor emite o relatório; quem aprova, ou não, é o CRE."
+		},
+		{
+		  "texto": "Sim, o revisado aprova",
+		  "porque": "O revisado é o avaliado; não aprova o relatório sobre o próprio sistema."
+		}
+	  ],
+	  "explicacao": "O CRE analisa relatório, plano de ação e esclarecimentos e aprova, ou não, o relatório de revisão.",
+	  "na_pratica": "Relatório entregue não é relatório aprovado: aguarde a análise do CRE.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-031",
+	  "nivel": "facil",
+	  "tema": "Periodicidade",
+	  "tipo": "prazo",
+	  "referencia": "NBC PA 11, item 14",
+	  "cenario": "Joana quer saber com que frequência mínima a firma dela se submete à revisão pelos pares.",
+	  "acao_correta": "Ao menos a cada 4 anos",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Todo ano, sem exceção",
+		  "porque": "Não é anual, salvo decisão específica do CRE."
+		},
+		{
+		  "texto": "Uma única vez na vida",
+		  "porque": "A norma prevê ciclos: ao menos uma revisão a cada 4 anos."
+		}
+	  ],
+	  "explicacao": "A exigência é de pelo menos uma revisão a cada ciclo de quatro anos.",
+	  "na_pratica": "Controle o seu ciclo de 4 anos para não ser pego de surpresa pela indicação.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-032",
+	  "nivel": "facil",
+	  "tema": "Objetivo da revisão",
+	  "tipo": "procedimento",
+	  "referencia": "NBC PA 11, itens 1 e 2",
+	  "cenario": "Um colega acha que o revisor vai reauditar as demonstrações dos clientes do revisado. É isso que a revisão faz?",
+	  "acao_correta": "Não: avalia a qualidade",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, reaudita todos os clientes",
+		  "porque": "A revisão não reaudita os clientes do revisado."
+		},
+		{
+		  "texto": "Sim, mas só os maiores",
+		  "porque": "Nem os maiores são reauditados: o foco é o sistema de qualidade."
+		}
+	  ],
+	  "explicacao": "A revisão pelos pares acompanha o controle de qualidade dos trabalhos dos auditores independentes.",
+	  "na_pratica": "Olhe como o revisado controla a qualidade; não refaça as auditorias dele.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-033",
+	  "nivel": "normal",
+	  "tema": "Aspectos comerciais",
+	  "tipo": "procedimento",
+	  "referencia": "Instruções CRE (Anexo 2), item 15",
+	  "cenario": "Ao avaliar a supervisão de um trabalho, o revisor quer saber quanto o cliente pagou de honorários. Pode?",
+	  "acao_correta": "Não: honorário é aspecto comercial",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, faz parte da supervisão",
+		  "porque": "A revisão trata de aspectos profissionais, não dos comerciais."
+		},
+		{
+		  "texto": "Sim, se o revisado concordar",
+		  "porque": "Concordância do revisado não amplia o escopo: honorários ficam de fora."
+		}
+	  ],
+	  "explicacao": "A revisão trata dos aspectos profissionais, não dos comerciais. O revisor pode considerar o tempo gasto, mas não os honorários cobrados.",
+	  "na_pratica": "Para medir esforço, use o tempo gasto no trabalho, nunca os honorários.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-034",
+	  "nivel": "normal",
+	  "tema": "Seleção da amostra",
+	  "tipo": "procedimento",
+	  "referencia": "NBC PA 11, item 32",
+	  "cenario": "O revisado tem clientes regulados pela CVM, mas pede que o revisor olhe só os pequenos e sem litígio. O que o revisor faz?",
+	  "acao_correta": "Incluir os regulados na amostra",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Aceitar a lista do revisado",
+		  "porque": "A amostra é definida pelo revisor, e as entidades reguladas devem ser incluídas."
+		},
+		{
+		  "texto": "Excluir os clientes grandes",
+		  "porque": "Porte não é o critério: as entidades reguladas entram na amostra."
+		}
+	  ],
+	  "explicacao": "O revisor deve incluir trabalhos de entidades reguladas pela CVM, BCB, Susep e Previc quando o revisado as tiver na carteira.",
+	  "na_pratica": "Antes de fechar a amostra, liste os clientes regulados do revisado.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-035",
+	  "nivel": "normal",
+	  "tema": "Impedimentos do revisor",
+	  "tipo": "organizacao",
+	  "referencia": "NBC PA 11, item 26(e)",
+	  "cenario": "A firma Zênite teve, em trabalho próprio, relatório com ressalva de limitação de escopo e foi indicada como revisora. Pode atuar?",
+	  "acao_correta": "Não: está impedida de revisar",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, se o revisado concordar",
+		  "porque": "A concordância do revisado não afasta um impedimento da norma."
+		},
+		{
+		  "texto": "Sim, mas só em firmas pequenas",
+		  "porque": "O impedimento não depende do porte do revisado."
+		}
+	  ],
+	  "explicacao": "Existir, no relatório emitido pelo revisor, ressalva de limitação de escopo na execução dos seus trabalhos é impedimento.",
+	  "na_pratica": "Antes de aceitar a indicação, confira os impedimentos do item 26.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-036",
+	  "nivel": "normal",
+	  "tema": "Impedimentos do revisor",
+	  "tipo": "organizacao",
+	  "referencia": "NBC PA 11, item 26(g)",
+	  "cenario": "A firma Beta nunca passou pela primeira revisão pelos pares e foi convidada a ser revisora. O que fazer?",
+	  "acao_correta": "Recusar: ainda não pode revisar",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Aceitar e ser revisada depois",
+		  "porque": "Primeiro é preciso ter passado pela primeira revisão."
+		},
+		{
+		  "texto": "Aceitar com o aval de um cliente",
+		  "porque": "Cliente nenhum pode afastar um impedimento da norma."
+		}
+	  ],
+	  "explicacao": "Não ter sido submetido à primeira revisão pelos pares é hipótese de impedimento para atuar como revisor.",
+	  "na_pratica": "Primeiro seja revisado; só depois aceite atuar como revisor.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-037",
+	  "nivel": "normal",
+	  "tema": "Definições",
+	  "tipo": "procedimento",
+	  "referencia": "NBC PA 11, item 5",
+	  "cenario": "A firma Sol não auditou nada no ano anterior à indicação. Qual ano será o ano-base da revisão dela?",
+	  "acao_correta": "O ano antecedente ao anterior",
+	  "acoes_incorretas": [
+		{
+		  "texto": "O ano da própria indicação",
+		  "porque": "O ano-base é passado, nunca o ano da indicação."
+		},
+		{
+		  "texto": "Não haverá ano-base nem revisão",
+		  "porque": "A revisão segue normalmente; muda apenas o ano-base."
+		}
+	  ],
+	  "explicacao": "O ano-base é o anterior ao da indicação ou, se o revisado não fez serviço de auditoria nele, o antecedente.",
+	  "na_pratica": "Sem auditoria no ano anterior? Volte um ano e use o antecedente como base.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-038",
+	  "nivel": "normal",
+	  "tema": "Recurso",
+	  "tipo": "prazo",
+	  "referencia": "NBC PA 11, item 56",
+	  "cenario": "O CRE decidiu contra a firma Lume, que quer recorrer. Em quanto tempo e a quem?",
+	  "acao_correta": "Em 15 dias, ao próprio CRE",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Em 30 dias, à CVM",
+		  "porque": "O recurso é interposto ao próprio CRE, e o prazo é de 15 dias."
+		},
+		{
+		  "texto": "Em 5 dias, ao CFC",
+		  "porque": "5 dias é curto demais, e o recurso vai ao CRE, não ao CFC."
+		}
+	  ],
+	  "explicacao": "O recurso é interposto ao próprio CRE em 15 dias após a notificação, e analisado por membro diferente do relator.",
+	  "na_pratica": "Notificado da decisão? Conte 15 dias e prepare o recurso para o CRE.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-039",
+	  "nivel": "normal",
+	  "tema": "Prazos do programa",
+	  "tipo": "prazo",
+	  "referencia": "NBC PA 11, itens 51 e 52",
+	  "cenario": "A firma Íris quer saber até quando o CRE divulga a lista dos auditores selecionados.",
+	  "acao_correta": "Até 28 de fevereiro",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Até 31 de março",
+		  "porque": "31 de março é o prazo das guias de orientação, não o da lista."
+		},
+		{
+		  "texto": "Até 30 de abril",
+		  "porque": "A lista é divulgada até 28 de fevereiro, bem antes de abril."
+		}
+	  ],
+	  "explicacao": "A lista é divulgada até 28 de fevereiro; as guias de orientação são emitidas e atualizadas até 31 de março.",
+	  "na_pratica": "Fique atento a fevereiro: é quando saem os selecionados.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-040",
+	  "nivel": "normal",
+	  "tema": "Composição do CRE",
+	  "tipo": "responsabilidade",
+	  "referencia": "NBC PA 11, item 11",
+	  "cenario": "Um representante da CVM presente numa reunião do CRE quer votar numa decisão. Pode?",
+	  "acao_correta": "Não: é observador, sem voto",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, tem voto pleno",
+		  "porque": "Reguladores observam as reuniões sem direito a voto."
+		},
+		{
+		  "texto": "Sim, tem voto de minerva",
+		  "porque": "Não existe voto de minerva para reguladores: eles só observam."
+		}
+	  ],
+	  "explicacao": "CVM, BCB, Susep e Previc participam como observadores, sem voto, com nomes indicados previamente e sujeitos ao sigilo do item 21.",
+	  "na_pratica": "Observadores acompanham o CRE; quem decide são os membros.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-041",
+	  "nivel": "dificil",
+	  "tema": "Conteúdo do relatório",
+	  "tipo": "tipo_relatorio",
+	  "referencia": "NBC PA 11, item 37",
+	  "cenario": "O revisor quer incluir no relatório um parecer sobre as demonstrações de um cliente do revisado. É correto?",
+	  "acao_correta": "Não: foca o sistema de qualidade",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, enriquece o relatório",
+		  "porque": "O relatório não opina sobre as demonstrações dos clientes do revisado."
+		},
+		{
+		  "texto": "Sim, se o cliente autorizar",
+		  "porque": "Autorização do cliente não muda o objeto da revisão."
+		}
+	  ],
+	  "explicacao": "O relatório traz escopo, carta, limitações do sistema de qualidade e opinião sobre políticas e procedimentos; não opina sobre as demonstrações dos clientes.",
+	  "na_pratica": "Mantenha o relatório no tema: sistema de controle de qualidade do revisado.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-042",
+	  "nivel": "dificil",
+	  "tema": "Nova revisão",
+	  "tipo": "prazo",
+	  "referencia": "NBC PA 11, item 19",
+	  "cenario": "A firma Orion recebeu relatório de sistema inadequado. O que acontece no ano seguinte?",
+	  "acao_correta": "Nova revisão no ano subsequente",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Nada: o ciclo segue em 4 anos",
+		  "porque": "Relatório inadequado obriga nova revisão no ano seguinte."
+		},
+		{
+		  "texto": "Isenção da próxima revisão",
+		  "porque": "É o oposto: o resultado ruim antecipa a revisão, não a dispensa."
+		}
+	  ],
+	  "explicacao": "Relatório inadequado ou com limitação de escopo, não aprovação pelo CRE e descumprimento de prazos geram nova revisão no ano subsequente.",
+	  "na_pratica": "Relatório inadequado? Comece já a corrigir o sistema: a nova revisão vem no ano seguinte.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-043",
+	  "nivel": "dificil",
+	  "tema": "Comunicação do CRE",
+	  "tipo": "responsabilidade",
+	  "referencia": "NBC PA 11, itens 20 e 38",
+	  "cenario": "O revisor emitiu relatório com limitação de escopo. Além do CRE, quem recebe comunicação específica?",
+	  "acao_correta": "A Fiscalização do CFC e da CVM",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Só o cliente selecionado",
+		  "porque": "O cliente selecionado não recebe comunicação sobre o relatório."
+		},
+		{
+		  "texto": "Ninguém além do CRE",
+		  "porque": "Inadequado e limitação de escopo geram comunicação específica à Fiscalização."
+		}
+	  ],
+	  "explicacao": "A comunicação à Fiscalização do CFC e da CVM ocorre nos relatórios das alíneas (c) e (d) do item 38: inadequado e limitação de escopo.",
+	  "na_pratica": "Inadequado e limitação de escopo saem do CRE e chegam ao CFC e à CVM.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-044",
+	  "nivel": "dificil",
+	  "tema": "Independência",
+	  "tipo": "conflito_interesse",
+	  "referencia": "NBC PA 11, itens 22 e 23",
+	  "cenario": "Durante a revisão, o sócio da firma revisada convida o revisor para uma parceria futura. O que o revisor faz?",
+	  "acao_correta": "Declarar a proposta e se afastar",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Negociar em paralelo até o fim",
+		  "porque": "Negociar vínculo com o revisado durante a revisão ameaça a independência."
+		},
+		{
+		  "texto": "Aceitar sem avisar ninguém",
+		  "porque": "Ocultar a proposta impede o tratamento adequado da ameaça."
+		}
+	  ],
+	  "explicacao": "Interesse econômico futuro no revisado é ameaça de interesse próprio: o revisor declara, documenta e se afasta.",
+	  "na_pratica": "Proposta de vínculo vinda do revisado? Declare na hora e peça substituição.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-045",
+	  "nivel": "dificil",
+	  "tema": "Descumprimento de prazos",
+	  "tipo": "prazo",
+	  "referencia": "NBC PA 11, itens 54 e 55",
+	  "cenario": "O revisor Caio perdeu o prazo do CRE para entregar documentos e agora quer entregar tudo de uma vez. Qual a consequência?",
+	  "acao_correta": "Impedimento e nova revisão",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Apenas uma advertência",
+		  "porque": "A consequência é automática, não só uma advertência."
+		},
+		{
+		  "texto": "Nenhuma, se entregar depois",
+		  "porque": "Entregar depois não apaga o descumprimento nem as pendências anteriores."
+		}
+	  ],
+	  "explicacao": "Quem descumpre prazos do CRE fica automaticamente impedido de atuar como revisor e se submete à revisão no ano subsequente, sem se eximir de pendências anteriores.",
+	  "na_pratica": "Anote todos os prazos do CRE no início: perdê-los custa mais que o atraso.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-046",
+	  "nivel": "dificil",
+	  "tema": "Deficiências isoladas",
+	  "tipo": "tipo_relatorio",
+	  "referencia": "NBC PA 11, itens 41 e 42",
+	  "cenario": "O revisor encontrou a mesma falha em vários trabalhos de clientes diferentes. Como tratá-la?",
+	  "acao_correta": "Avaliar como padrão do sistema",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Tratar como isolada",
+		  "porque": "A repetição em vários trabalhos indica padrão, não falha isolada."
+		},
+		{
+		  "texto": "Ignorar: cada falha é pequena",
+		  "porque": "Falhas pequenas repetidas podem revelar problema no sistema, e todas são registradas."
+		}
+	  ],
+	  "explicacao": "O revisor avalia padrão e impacto: falhas repetidas podem comprometer o sistema, enquanto as isoladas e irrelevantes não modificam o relatório.",
+	  "na_pratica": "Cruze as falhas entre trabalhos: a repetição é o sinal de que o problema é do sistema.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-047",
+	  "nivel": "dificil",
+	  "tema": "Impedimentos do revisor",
+	  "tipo": "organizacao",
+	  "referencia": "NBC PA 11, item 26(i)",
+	  "cenario": "A firma Nova não fez nenhuma auditoria nos dois últimos anos e foi convidada a revisar. Pode?",
+	  "acao_correta": "Não: sem auditoria recente",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Sim, experiência antiga basta",
+		  "porque": "A norma olha os dois anos anteriores à revisão pretendida."
+		},
+		{
+		  "texto": "Sim, se tiver equipe grande",
+		  "porque": "Tamanho da equipe não supre a falta de auditoria recente."
+		}
+	  ],
+	  "explicacao": "O impedimento vale quando não houve nenhum trabalho de auditoria nos dois anos anteriores ao da revisão pretendida.",
+	  "na_pratica": "Mantenha o registro das auditorias dos últimos 2 anos para comprovar experiência recente.",
+	  "modos": [
+		"desvio_logico",
+        "maleta_certa"
+	  ]
+	},
+	{
+	  "id": "DL-048",
+	  "nivel": "dificil",
+	  "tema": "Confidencialidade",
+	  "tipo": "confidencialidade",
+	  "referencia": "NBC PA 11, itens 11 e 21",
+	  "cenario": "Um observador da Susep, indicado previamente, quer comentar em público o que ouviu numa reunião do CRE. O sigilo vale para ele?",
+	  "acao_correta": "Sim: vale para observadores",
+	  "acoes_incorretas": [
+		{
+		  "texto": "Não, reguladores são isentos",
+		  "porque": "Os observadores se sujeitam à confidencialidade do item 21."
+		},
+		{
+		  "texto": "Sim, só durante a reunião",
+		  "porque": "O sigilo permanece depois do fim dos trabalhos."
+		}
+	  ],
+	  "explicacao": "Os observadores indicam previamente os nomes e se sujeitam à confidencialidade do item 21, que vale em qualquer fase e após o término.",
+	  "na_pratica": "Quem acompanha uma reunião do CRE leva o sigilo junto, mesmo depois dela.",
 	  "modos": [
 		"desvio_logico",
         "maleta_certa"

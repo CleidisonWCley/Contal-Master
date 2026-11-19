@@ -44,6 +44,7 @@ var _tutorials_button: Button
 var _novel_auto_button: Button
 var _novel_click_button: Button
 var _settings_back_button: Button
+var _font_selector: FontSizeSelector   # V0.16.3: acessibilidade - tamanho da fonte
 var _grabber: Texture2D
 
 static func attach(host: Node, options: Dictionary = {}) -> MinigamePause:
@@ -128,8 +129,8 @@ func _build_button() -> void:
 	pause_button.offset_top = 14.0
 	pause_button.offset_bottom = 60.0
 	pause_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	pause_button.add_theme_font_size_override("font_size", 18)
-	pause_button.add_theme_constant_override("icon_max_width", 20)
+	FontScale.set_size(pause_button, 18)
+	FontScale.set_icon_ratio(pause_button, 20.0 / 18.0)
 	pause_button.add_theme_constant_override("h_separation", 8)
 	# Mesmos efeitos do pause original do Desvio Logico: translucido, realca no hover, destaca ao pressionar.
 	pause_button.add_theme_stylebox_override("normal", UiKit.panel_style(UiPalette.with_alpha(UiPalette.BG, 0.74), UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.85), 14, 2, 4))
@@ -271,6 +272,22 @@ func _build_settings_view(stack: VBoxContainer) -> void:
 	_novel_click_button.pressed.connect(_on_novel_mode_pressed.bind(false))
 	novel_row.add_child(_novel_click_button)
 
+	# ---- Acessibilidade (V0.16.3): tamanho da fonte, na hora, tambem durante a partida.
+	_settings_box.add_child(_section_header("ACESSIBILIDADE"))
+	var font_title := HBoxContainer.new()
+	font_title.name = "FontTitleRow"
+	font_title.add_theme_constant_override("separation", 10)
+	var font_icon := UiIcons.make_rect("font", 24, UiPalette.TEXT_ON_DARK)
+	font_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	font_title.add_child(font_icon)
+	var font_label: Label = UiKit.label("Fonte", 19, UiPalette.TEXT_ON_DARK)
+	font_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	font_title.add_child(font_label)
+	_settings_box.add_child(font_title)
+	_font_selector = FontSizeSelector.create(2, 48.0, 17)
+	_settings_box.add_child(_font_selector)
+	FontScale.scale_changed.connect(_on_font_scale_changed)
+
 	# ---- Dificuldade: so informativa (bloqueada durante a partida)
 	var difficulty_label := UiKit.label("Dificuldade: %s (não pode ser alterada durante a partida)" % DifficultyManager.get_label(), 15, UiPalette.TEXT_MUTED, HORIZONTAL_ALIGNMENT_CENTER)
 	difficulty_label.name = "DifficultyLockedLabel"
@@ -281,7 +298,9 @@ func _build_settings_view(stack: VBoxContainer) -> void:
 	_settings_back_button = _make_menu_button("Voltar", "back", "ui_ghost")
 	_settings_back_button.name = "SettingsBackButton"
 	_settings_back_button.pressed.connect(_on_settings_back_pressed)
-	_settings_box.add_child(_settings_back_button)
+	# V0.16.3: "Voltar" fica FORA da rolagem (sempre visivel, mesmo com fonte Grande/Extra grande).
+	_settings_back_button.visible = false
+	stack.add_child(_settings_back_button)
 
 func _section_header(text_value: String) -> VBoxContainer:
 	var box := VBoxContainer.new()
@@ -377,15 +396,32 @@ func _show_settings(value: bool) -> void:
 		return
 	_main_box.visible = not value
 	_settings_scroll.visible = value
+	_settings_back_button.visible = value
 	if value:
 		_refresh_settings_view()
-		var view_height: float = get_viewport().get_visible_rect().size.y
-		_settings_scroll.custom_minimum_size = Vector2(0, minf(_settings_box.get_combined_minimum_size().y, maxf(220.0, view_height - 170.0)))
+		_fit_settings_scroll()
 		_settings_back_button.grab_focus()
 	elif is_open:
 		settings_button.grab_focus()
 
+## Altura da rolagem das configuracoes: cabe na tela; se o conteudo for maior (fonte Grande/Extra grande), rola.
+func _fit_settings_scroll() -> void:
+	if _settings_scroll == null or _settings_box == null:
+		return
+	var view_height: float = get_viewport().get_visible_rect().size.y
+	_settings_scroll.custom_minimum_size = Vector2(0, minf(_settings_box.get_combined_minimum_size().y, maxf(200.0, view_height - 120.0 - _settings_back_button.get_combined_minimum_size().y)))
+
+## V0.16.3: fonte trocada enquanto o pause esta aberto - refaz os botoes na nova escala e reajusta a altura.
+func _on_font_scale_changed(_level: String) -> void:
+	if _settings_scroll == null or not _settings_scroll.visible:
+		return
+	_refresh_settings_view()
+	await get_tree().process_frame
+	_fit_settings_scroll()
+
 func _refresh_settings_view() -> void:
+	if _font_selector != null:
+		_font_selector.refresh()
 	_music_slider.set_value_no_signal(SettingsManager.get_music_volume())
 	_sfx_slider.set_value_no_signal(SettingsManager.get_sfx_volume())
 	_update_volume_labels()

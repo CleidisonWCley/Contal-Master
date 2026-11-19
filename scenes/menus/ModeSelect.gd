@@ -250,17 +250,22 @@ func _apply_responsive_layout() -> void:
 
 	var usable_width: float = view.x - 2.0 * margin_x - 40.0   # 40 = folga interna do scroll + respiro
 	var card_count: float = float(_cards.size())
-	var card_width: float = clampf((usable_width - (0.0 if stacked else gap * (card_count - 1.0))) / (1.0 if stacked else card_count), 190.0, base_size.x)
+	var card_width: float = clampf((usable_width - (0.0 if stacked else gap * (card_count - 1.0))) / (1.0 if stacked else card_count), 190.0, base_size.x * maxf(FontScale.get_factor(), 1.0))
 	var card_height: float = CARD_HEIGHT_STACKED if stacked else base_size.y
 	var text_area: float = 132.0 if compact else 140.0
+	# V0.16.3: fonte maior = faixa de texto maior; o cartao cresce o mesmo tanto (a moldura/icone nao encolhe).
+	var extra_text: float = text_area * (FontScale.get_factor() - 1.0) * 1.9 if FontScale.get_factor() > 1.0 else 0.0
+	text_area += extra_text
+	card_height += extra_text
 	var title_px: int = 19 if compact else 22
 	var body_px: int = 13 if compact else 14
 	for entry in _cards:
+		(entry["title"] as Label).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		var button: Button = entry["button"] as Button
 		button.custom_minimum_size = Vector2(card_width, card_height)
-		(entry["title"] as Label).add_theme_font_size_override("font_size", title_px)
-		(entry["desc"] as Label).add_theme_font_size_override("font_size", body_px)
-		(entry["best"] as Label).add_theme_font_size_override("font_size", body_px)
+		FontScale.set_size((entry["title"] as Label), title_px)
+		FontScale.set_size((entry["desc"] as Label), body_px)
+		FontScale.set_size((entry["best"] as Label), body_px)
 		var art: UiFrameArt = entry["art"] as UiFrameArt
 		art.text_area = text_area
 		art.inner_pad = 16.0 if compact else 22.0

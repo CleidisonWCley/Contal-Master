@@ -1,6 +1,6 @@
 {
   "schema": "dicionario",
-  "versao": "1.0",
+  "versao": "1.1",
   "idioma": "pt-BR",
   "fonte": "NBC PA 11 – Revisão Externa de Qualidade pelos Pares (CFC, 8/12/2017, vigente desde 1/1/2019); Instruções aos Revisores (Anexo 2); Base de Conhecimento do jogo; provas EQT/QTG como apoio.",
   "observacao_stop": "distratores_stop: termos da mesma inicial usados so como opcoes erradas do STOP (nao viram palavras da Forca). Cada inicial precisa ter 6+ termos no total (termos + distratores).",
@@ -9,17 +9,81 @@
     "stop"
   ],
   "distratores_stop": {
-	"A": ["Asseguração", "Auditoria interna", "Ajustes de auditoria", "Amortização", "Apuração do resultado"],
-	"C": ["Conciliação bancária", "Controle interno", "Contingência", "Custo histórico"],
-	"D": ["Depreciação", "Demonstrações contábeis", "Duplicata", "Débito", "Diário contábil"],
-	"E": ["Estoque", "Estimativa contábil", "Encerramento do exercício", "Exercício social", "Equivalência patrimonial"],
-	"F": ["Fluxo de caixa", "Fornecedores", "Folha de pagamento", "Faturamento", "Fundo de reserva"],
-	"I": ["Inventário", "Imobilizado", "Impostos a recuperar", "Inadimplência"],
-	"L": ["Lucro líquido", "Liquidez", "Livro Razão", "Lançamento contábil", "Lucros acumulados"],
-	"O": ["Orçamento", "Obrigações a pagar", "Operações descontinuadas", "Outras receitas", "Obrigações fiscais"],
-	"P": ["Passivo circulante", "Patrimônio líquido", "Provisão", "Prestação de contas", "Provisão para devedores"],
-	"R": ["Receita", "Reserva de lucros", "Resultado do exercício", "Reconhecimento de receita", "Realizável a longo prazo"],
-	"S": ["Saldo inicial", "Subvenção governamental", "Sociedade anônima", "Saldo devedor", "Superávit"]
+	"A": [
+	  "Asseguração",
+	  "Auditoria interna",
+	  "Ajustes de auditoria",
+	  "Amortização",
+      "Apuração do resultado"
+	],
+	"C": [
+	  "Conciliação bancária",
+	  "Controle interno",
+	  "Contingência",
+      "Custo histórico"
+	],
+	"D": [
+	  "Depreciação",
+	  "Demonstrações contábeis",
+	  "Duplicata",
+	  "Débito",
+      "Diário contábil"
+	],
+	"E": [
+	  "Estoque",
+	  "Estimativa contábil",
+	  "Encerramento do exercício",
+	  "Exercício social",
+      "Equivalência patrimonial"
+	],
+	"F": [
+	  "Fluxo de caixa",
+	  "Fornecedores",
+	  "Folha de pagamento",
+	  "Faturamento",
+      "Fundo de reserva"
+	],
+	"I": [
+	  "Inventário",
+	  "Imobilizado",
+	  "Impostos a recuperar",
+      "Inadimplência"
+	],
+	"L": [
+	  "Lucro líquido",
+	  "Liquidez",
+	  "Livro Razão",
+	  "Lançamento contábil",
+      "Lucros acumulados"
+	],
+	"O": [
+	  "Orçamento",
+	  "Obrigações a pagar",
+	  "Operações descontinuadas",
+	  "Outras receitas",
+      "Obrigações fiscais"
+	],
+	"P": [
+	  "Passivo circulante",
+	  "Patrimônio líquido",
+	  "Provisão",
+	  "Prestação de contas",
+      "Provisão para devedores"
+	],
+	"R": [
+	  "Receita",
+	  "Reserva de lucros",
+	  "Resultado do exercício",
+	  "Reconhecimento de receita",
+      "Realizável a longo prazo"
+	],
+	"S": [
+	  "Saldo inicial",
+	  "Subvenção governamental",
+	  "Sociedade anônima",
+	  "Saldo devedor",
+      "Superávit"
+	]
   },
   "termos": [
 	{
@@ -29,7 +93,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Comitê que administra o programa de revisão pelos pares.",
 	  "definicao": "CRE é o Comitê Administrador da Revisão Externa de Qualidade: administra o programa, analisa relatórios e planos de ação e os aprova ou não.",
-	  "referencia": "NBC PA 11, itens 6, 7 e 12"
+	  "referencia": "NBC PA 11, itens 6, 7 e 12",
+	  "na_pratica": "Dúvidas sobre prazos e procedimentos do programa? O CRE é o canal."
 	},
 	{
 	  "id": "DC-002",
@@ -38,7 +103,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Conselho responsável pelas atividades operacionais do CRE.",
 	  "definicao": "CFC é o Conselho Federal de Contabilidade. Emite as NBC e responde pelas atividades operacionais do CRE, indicando o Coordenador-Geral.",
-	  "referencia": "NBC PA 11, item 6"
+	  "referencia": "NBC PA 11, item 6",
+	  "na_pratica": "As NBC vêm do CFC: é nelas que a revisão se apoia."
 	},
 	{
 	  "id": "DC-003",
@@ -47,7 +113,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Comissão cujo registro de auditor o submete à revisão pelos pares.",
 	  "definicao": "CVM é a Comissão de Valores Mobiliários. O registro nela sujeita o auditor ao programa, e o CRE comunica a ela situações relevantes.",
-	  "referencia": "NBC PA 11, itens 4 e 12(g)"
+	  "referencia": "NBC PA 11, itens 4 e 12(g)",
+	  "na_pratica": "Registro na CVM significa entrar no programa de revisão."
 	},
 	{
 	  "id": "DC-004",
@@ -56,7 +123,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Superintendência que fiscaliza o mercado de seguros.",
 	  "definicao": "Susep é a Superintendência de Seguros Privados. Seus supervisionados devem entrar na amostra quando forem clientes do revisado.",
-	  "referencia": "NBC PA 11, item 32"
+	  "referencia": "NBC PA 11, item 32",
+	  "na_pratica": "Cliente supervisionado pela Susep entra na amostra se o revisado o tiver."
 	},
 	{
 	  "id": "DC-005",
@@ -65,7 +133,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Superintendência da previdência complementar fechada.",
 	  "definicao": "Previc é a Superintendência Nacional de Previdência Complementar. Clientes regulados por ela entram obrigatoriamente na amostra.",
-	  "referencia": "NBC PA 11, item 32"
+	  "referencia": "NBC PA 11, item 32",
+	  "na_pratica": "Cliente regulado pela Previc entra obrigatoriamente na amostra."
 	},
 	{
 	  "id": "DC-006",
@@ -74,7 +143,8 @@
 	  "categoria": "Papéis",
 	  "dica": "Auditor contratado pelo revisado para fazer a revisão.",
 	  "definicao": "Revisor é o auditor contratado pelo revisado para realizar o trabalho de revisão pelos pares: planeja, conduz, supervisiona e emite o relatório.",
-	  "referencia": "NBC PA 11, itens 5 e 28"
+	  "referencia": "NBC PA 11, itens 5 e 28",
+	  "na_pratica": "O revisor planeja, conduz e supervisiona: não delegue sem acompanhar."
 	},
 	{
 	  "id": "DC-007",
@@ -83,7 +153,8 @@
 	  "categoria": "Papéis",
 	  "dica": "Auditor ou firma submetido ao programa de revisão.",
 	  "definicao": "Revisado é o auditor independente, firma ou pessoa física, que se submete ao programa. Escolhe o revisor e elabora o plano de ação.",
-	  "referencia": "NBC PA 11, itens 5 e 15"
+	  "referencia": "NBC PA 11, itens 5 e 15",
+	  "na_pratica": "Como revisado, você escolhe o revisor e responde pelo plano de ação."
 	},
 	{
 	  "id": "DC-008",
@@ -92,7 +163,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Seleção limitada de clientes para revisar os papéis de trabalho.",
 	  "definicao": "Amostra é o conjunto limitado de clientes do revisado cujos papéis de trabalho são revisados para confirmar a aplicação dos controles de qualidade.",
-	  "referencia": "NBC PA 11, itens 30(c) e 32"
+	  "referencia": "NBC PA 11, itens 30(c) e 32",
+	  "na_pratica": "A amostra mostra como a qualidade funciona na prática; não é todo o cliente."
 	},
 	{
 	  "id": "DC-009",
@@ -101,7 +173,8 @@
 	  "categoria": "Princípios",
 	  "dica": "Capacidade de avaliar sem influências indevidas.",
 	  "definicao": "Independência é agir com imparcialidade e objetividade, sem relações pessoais, familiares, financeiras ou comerciais que comprometam o julgamento.",
-	  "referencia": "NBC PA 11, itens 22 a 24"
+	  "referencia": "NBC PA 11, itens 22 a 24",
+	  "na_pratica": "Vínculo pessoal, familiar ou financeiro? Declare antes de começar."
 	},
 	{
 	  "id": "DC-010",
@@ -110,7 +183,8 @@
 	  "categoria": "Princípios",
 	  "dica": "Dever de não divulgar o que se soube na revisão.",
 	  "definicao": "Confidencialidade é o dever de não divulgar nem usar em benefício próprio informações obtidas na revisão, em qualquer fase e depois dela.",
-	  "referencia": "NBC PA 11, item 21"
+	  "referencia": "NBC PA 11, item 21",
+	  "na_pratica": "Nada da revisão sai da equipe, nem depois que ela termina."
 	},
 	{
 	  "id": "DC-011",
@@ -119,7 +193,8 @@
 	  "categoria": "Documentos",
 	  "dica": "Documento do revisado com as ações para corrigir fragilidades.",
 	  "definicao": "Plano de ação é elaborado pelo revisado após a carta de recomendações, em até 30 dias, e encaminhado ao CRE por meio do revisor.",
-	  "referencia": "NBC PA 11, itens 5, 46 e 48"
+	  "referencia": "NBC PA 11, itens 5, 46 e 48",
+	  "na_pratica": "Plano com responsável e data para cada falha, entregue em até 30 dias."
 	},
 	{
 	  "id": "DC-012",
@@ -128,7 +203,8 @@
 	  "categoria": "Documentos",
 	  "dica": "Documento do revisor com sugestões de melhoria.",
 	  "definicao": "Carta de recomendações é emitida pelo revisor com sugestões para melhorar as políticas e os procedimentos de controle de qualidade.",
-	  "referencia": "NBC PA 11, itens 5 e 45"
+	  "referencia": "NBC PA 11, itens 5 e 45",
+	  "na_pratica": "A carta é obrigatória e segue o modelo do CRE."
 	},
 	{
 	  "id": "DC-013",
@@ -137,7 +213,8 @@
 	  "categoria": "Documentos",
 	  "dica": "Documento final do revisor com a opinião sobre o sistema.",
 	  "definicao": "Relatório de revisão apresenta ao CRE a conclusão do revisor sobre a conformidade do sistema de controle de qualidade do revisado.",
-	  "referencia": "NBC PA 11, itens 5 e 37"
+	  "referencia": "NBC PA 11, itens 5 e 37",
+	  "na_pratica": "O relatório conclui sobre o sistema de qualidade, não sobre os clientes."
 	},
 	{
 	  "id": "DC-014",
@@ -146,7 +223,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Instituto que indica metade dos membros do CRE.",
 	  "definicao": "Ibracon é o Instituto dos Auditores Independentes do Brasil: indica 4 dos 8 representantes que compõem o CRE.",
-	  "referencia": "NBC PA 11, item 8"
+	  "referencia": "NBC PA 11, item 8",
+	  "na_pratica": "Ibracon e CFC dividem o CRE: 4 representantes de cada."
 	},
 	{
 	  "id": "DC-015",
@@ -155,7 +233,8 @@
 	  "categoria": "Prazos",
 	  "dica": "Tempo de guarda da documentação pelo revisor.",
 	  "definicao": "Sete anos é o prazo em que o revisor guarda a documentação da revisão, contado da emissão do relatório.",
-	  "referencia": "NBC PA 11, item 28(g)"
+	  "referencia": "NBC PA 11, item 28(g)",
+	  "na_pratica": "Marque a data de emissão do relatório: ali começam os 7 anos de guarda."
 	},
 	{
 	  "id": "DC-016",
@@ -164,7 +243,8 @@
 	  "categoria": "Papéis",
 	  "dica": "Profissionais que auxiliam o revisor na coleta de evidências.",
 	  "definicao": "Equipe revisora é o grupo que apoia o revisor, com experiência compatível à complexidade dos trabalhos revisados e sob sua supervisão.",
-	  "referencia": "NBC PA 11, itens 25 e 28"
+	  "referencia": "NBC PA 11, itens 25 e 28",
+	  "na_pratica": "Monte a equipe pela complexidade dos trabalhos que serão revisados."
 	},
 	{
 	  "id": "DC-017",
@@ -173,7 +253,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Conversas com profissionais do revisado para entender a prática.",
 	  "definicao": "Entrevistas com pessoas de níveis e experiências adequados permitem ao revisor confirmar como as políticas de qualidade funcionam na prática.",
-	  "referencia": "NBC PA 11, item 30(b)"
+	  "referencia": "NBC PA 11, item 30(b)",
+	  "na_pratica": "Entreviste pessoas de níveis diferentes para confirmar o que está no manual."
 	},
 	{
 	  "id": "DC-018",
@@ -182,7 +263,8 @@
 	  "categoria": "Definições",
 	  "dica": "Ano a ser revisado: o anterior ao da indicação do revisado.",
 	  "definicao": "Ano-base é o ano objeto da revisão: o anterior ao da indicação, ou o antecedente, caso o revisado não tenha feito auditoria.",
-	  "referencia": "NBC PA 11, item 5"
+	  "referencia": "NBC PA 11, item 5",
+	  "na_pratica": "Sem auditoria no ano anterior à indicação? Use o ano antecedente."
 	},
 	{
 	  "id": "DC-019",
@@ -191,7 +273,8 @@
 	  "categoria": "Papéis",
 	  "dica": "Outro nome do revisor: quem realiza a revisão pelos pares.",
 	  "definicao": "Auditor-revisor organiza, planeja e conduz a revisão, supervisiona a equipe, discute resultados, emite relatório e carta e guarda a documentação.",
-	  "referencia": "NBC PA 11, item 28"
+	  "referencia": "NBC PA 11, item 28",
+	  "na_pratica": "Sinônimo de revisor: quem planeja, conduz e emite relatório e carta."
 	},
 	{
 	  "id": "DC-020",
@@ -200,7 +283,8 @@
 	  "categoria": "Papéis",
 	  "dica": "Outro nome do revisado: quem é avaliado no programa.",
 	  "definicao": "Auditor-revisado fornece informações, autoriza o acesso aos clientes selecionados, comenta os pontos levantados e elabora o plano de ação.",
-	  "referencia": "NBC PA 11, itens 15 e 46"
+	  "referencia": "NBC PA 11, itens 15 e 46",
+	  "na_pratica": "Sinônimo de revisado: colabore, autorize acessos e elabore o plano."
 	},
 	{
 	  "id": "DC-021",
@@ -209,7 +293,8 @@
 	  "categoria": "Princípios",
 	  "dica": "Relação que pode comprometer a objetividade do revisor.",
 	  "definicao": "Conflito de interesses existe quando há relação capaz de influenciar indevidamente o revisor, mesmo sem decisão errada: deve ser avaliado, documentado e tratado.",
-	  "referencia": "NBC PA 11, itens 22 e 23"
+	  "referencia": "NBC PA 11, itens 22 e 23",
+	  "na_pratica": "Não precisa haver erro: a simples relação já exige declarar e tratar."
 	},
 	{
 	  "id": "DC-022",
@@ -218,7 +303,8 @@
 	  "categoria": "Documentos",
 	  "dica": "Documentos que evidenciam o trabalho de auditoria.",
 	  "definicao": "Papéis de trabalho registram os exames feitos. O revisor os compara às políticas declaradas do revisado para confirmar o controle de qualidade.",
-	  "referencia": "NBC PA 11, itens 28(g) e 30(c)"
+	  "referencia": "NBC PA 11, itens 28(g) e 30(c)",
+	  "na_pratica": "Compare os papéis de trabalho com as políticas declaradas do revisado."
 	},
 	{
 	  "id": "DC-023",
@@ -227,7 +313,8 @@
 	  "categoria": "Definições",
 	  "dica": "Programa de trabalho do CRE para selecionar e revisar auditores.",
 	  "definicao": "Programa de revisão define abrangência, seleção dos revisados, etapas e prazos que os revisores devem cumprir. Cada auditor passa por ele ao menos a cada quatro anos.",
-	  "referencia": "NBC PA 11, itens 5 e 14"
+	  "referencia": "NBC PA 11, itens 5 e 14",
+	  "na_pratica": "Cada auditor passa pelo programa ao menos a cada 4 anos."
 	},
 	{
 	  "id": "DC-024",
@@ -236,7 +323,8 @@
 	  "categoria": "Ameaças",
 	  "dica": "Ameaça em que o revisor sofre pressão para não apontar falhas.",
 	  "definicao": "Intimidação é a pressão indevida sobre o revisor para influenciar sua conclusão, como ameaçar perda de indicações. Ele recusa e documenta.",
-	  "referencia": "Base do jogo, seção 4"
+	  "referencia": "Base do jogo, seção 4",
+	  "na_pratica": "Sofreu pressão para apontar menos? Recuse e registre."
 	},
 	{
 	  "id": "DC-025",
@@ -245,7 +333,8 @@
 	  "categoria": "Ameaças",
 	  "dica": "Ameaça por ganho pessoal, como presente ou emprego futuro.",
 	  "definicao": "Interesse próprio surge quando o revisor tem vantagem financeira ou pessoal no resultado, como presentes, investimentos ou desejo de emprego na firma revisada.",
-	  "referencia": "Base do jogo, seção 4"
+	  "referencia": "Base do jogo, seção 4",
+	  "na_pratica": "Presente, investimento ou emprego futuro: declare e afaste-se."
 	},
 	{
 	  "id": "DC-026",
@@ -254,7 +343,8 @@
 	  "categoria": "Princípios",
 	  "dica": "Medidas que reduzem ameaças à independência a nível aceitável.",
 	  "definicao": "Salvaguardas são ações que eliminam ou reduzem ameaças à independência, como afastar a pessoa envolvida ou submeter o trabalho a outro revisor.",
-	  "referencia": "NBC PA 400 (QTG 27º EQT)"
+	  "referencia": "NBC PA 400 (QTG 27º EQT)",
+	  "na_pratica": "Afastar a pessoa ou trocar o revisor são salvaguardas típicas."
 	},
 	{
 	  "id": "DC-027",
@@ -263,7 +353,8 @@
 	  "categoria": "Relatórios",
 	  "dica": "Relatório em que o revisor não consegue concluir.",
 	  "definicao": "Limitação de escopo ocorre quando condições limitam o trabalho a ponto de o revisor não concluir sobre a revisão. Gera comunicação do CRE ao CFC e à CVM.",
-	  "referencia": "NBC PA 11, itens 20 e 38(d)"
+	  "referencia": "NBC PA 11, itens 20 e 38(d)",
+	  "na_pratica": "Registre cada limitação que impediu a conclusão do trabalho."
 	},
 	{
 	  "id": "DC-028",
@@ -272,7 +363,8 @@
 	  "categoria": "Papéis",
 	  "dica": "Quem coordena a equipe e revisa o trabalho dos membros.",
 	  "definicao": "Líder da equipe revisora coordena os membros, revisa e supervisiona o trabalho e apoia o revisor na comunicação de resultados.",
-	  "referencia": "NBC PA 11, item 28(b)"
+	  "referencia": "NBC PA 11, item 28(b)",
+	  "na_pratica": "O líder revisa o trabalho dos membros e apoia o revisor nos resultados."
 	},
 	{
 	  "id": "DC-029",
@@ -281,7 +373,8 @@
 	  "categoria": "Princípios",
 	  "dica": "Julgamento imparcial, sem se deixar influenciar.",
 	  "definicao": "Objetividade é manter o julgamento livre de vieses, conflitos de interesses e influências indevidas ao concluir sobre a revisão.",
-	  "referencia": "NBC PA 11, item 22"
+	  "referencia": "NBC PA 11, item 22",
+	  "na_pratica": "Antes de concluir, pergunte-se se algo está influenciando seu julgamento."
 	},
 	{
 	  "id": "DC-030",
@@ -290,7 +383,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Reguladores que acompanham reuniões do CRE sem voto.",
 	  "definicao": "Observadores são representantes de CVM, BCB, Susep e Previc nas reuniões do CRE: sem direito a voto e sujeitos ao dever de confidencialidade.",
-	  "referencia": "NBC PA 11, item 11"
+	  "referencia": "NBC PA 11, item 11",
+	  "na_pratica": "Reguladores observam o CRE; quem decide são os membros."
 	},
 	{
 	  "id": "DC-031",
@@ -299,7 +393,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Definição de quem planeja, conduz, supervisiona e conclui.",
 	  "definicao": "Organização do trabalho define as responsabilidades: o revisor planeja e conduz, a equipe executa, o revisado colabora e o CRE analisa e decide.",
-	  "referencia": "NBC PA 11, item 28"
+	  "referencia": "NBC PA 11, item 28",
+	  "na_pratica": "Saiba quem faz o quê: revisor conduz, revisado colabora, CRE decide."
 	},
 	{
 	  "id": "DC-032",
@@ -308,7 +403,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Registro que evidencia discussões e exames da revisão.",
 	  "definicao": "Documentação da revisão evidencia contratação, planejamento, papéis, comentários do revisado e demais provas, e é guardada por sete anos.",
-	  "referencia": "NBC PA 11, itens 28(g) e 30(f)"
+	  "referencia": "NBC PA 11, itens 28(g) e 30(f)",
+	  "na_pratica": "Se não está documentado, não dá para comprovar: guarde por 7 anos."
 	},
 	{
 	  "id": "DC-033",
@@ -317,7 +413,8 @@
 	  "categoria": "Relatórios",
 	  "dica": "Falhas nos manuais ou na aplicação que podem modificar o relatório.",
 	  "definicao": "Deficiências são falhas nos manuais de qualidade ou na aplicação de procedimentos que não tornam o sistema inadequado; o revisor avalia padrão e impacto.",
-	  "referencia": "NBC PA 11, itens 38(b) e 41"
+	  "referencia": "NBC PA 11, itens 38(b) e 41",
+	  "na_pratica": "Cruze as falhas entre trabalhos para ver se são pontuais ou do sistema."
 	},
 	{
 	  "id": "DC-034",
@@ -326,7 +423,8 @@
 	  "categoria": "Ameaças",
 	  "dica": "Ameaça por amizade ou parentesco com o revisado.",
 	  "definicao": "Familiaridade é a ameaça que a proximidade pessoal, como amizade íntima ou parentesco, cria ao reduzir o ceticismo e a objetividade do revisor.",
-	  "referencia": "Base do jogo, seção 4"
+	  "referencia": "Base do jogo, seção 4",
+	  "na_pratica": "Amizade íntima ou parentesco com o revisado? Declare e afaste-se."
 	},
 	{
 	  "id": "DC-035",
@@ -335,7 +433,8 @@
 	  "categoria": "Ameaças",
 	  "dica": "Ameaça de revisar um trabalho do qual o revisor participou.",
 	  "definicao": "Autorrevisão é a ameaça criada quando o revisor avalia trabalho em que atuou antes; exige tratamento e, em regra, afastamento daquele trabalho.",
-	  "referencia": "Base do jogo, seção 4"
+	  "referencia": "Base do jogo, seção 4",
+	  "na_pratica": "Participou do trabalho no passado? Deixe a revisão dele para outro."
 	},
 	{
 	  "id": "DC-036",
@@ -344,7 +443,8 @@
 	  "categoria": "Registros",
 	  "dica": "Cadastro em que o profissional da revisão deve estar inscrito.",
 	  "definicao": "CNAI é o Cadastro Nacional de Auditores Independentes: todos os profissionais envolvidos na revisão devem estar nele inscritos.",
-	  "referencia": "NBC PA 11, item 25(b)"
+	  "referencia": "NBC PA 11, item 25(b)",
+	  "na_pratica": "Confirme o registro no CNAI de todos os profissionais antes de começar."
 	},
 	{
 	  "id": "DC-037",
@@ -353,7 +453,8 @@
 	  "categoria": "Prazos",
 	  "dica": "Período mínimo em que o auditor é submetido à revisão.",
 	  "definicao": "Ciclo de quatro anos é a periodicidade mínima da revisão pelos pares: o auditor deve se submeter ao menos uma vez a cada ciclo.",
-	  "referencia": "NBC PA 11, item 14"
+	  "referencia": "NBC PA 11, item 14",
+	  "na_pratica": "Controle seu ciclo de 4 anos para não ser pego de surpresa."
 	},
 	{
 	  "id": "DC-038",
@@ -362,7 +463,8 @@
 	  "categoria": "Definições",
 	  "dica": "Situação vedada em que dois auditores se revisam mutuamente.",
 	  "definicao": "Revisão recíproca ocorre quando o revisor teve sua última revisão feita pelo atual revisado, não importando o intervalo. É vedada.",
-	  "referencia": "NBC PA 11, itens 5 e 24"
+	  "referencia": "NBC PA 11, itens 5 e 24",
+	  "na_pratica": "Veja quem foi seu último revisor antes de aceitar revisar essa firma."
 	},
 	{
 	  "id": "DC-039",
@@ -371,7 +473,8 @@
 	  "categoria": "Prazos",
 	  "dica": "Instrumento contra decisão do CRE, em 15 dias.",
 	  "definicao": "Recurso é interposto ao próprio CRE em 15 dias após a notificação, com análise por membro revisor diferente do relator.",
-	  "referencia": "NBC PA 11, item 56"
+	  "referencia": "NBC PA 11, item 56",
+	  "na_pratica": "Foi notificado de decisão do CRE? Conte 15 dias para recorrer."
 	},
 	{
 	  "id": "DC-040",
@@ -380,7 +483,8 @@
 	  "categoria": "Princípios",
 	  "dica": "Princípio ligado à objetividade e à honestidade profissional.",
 	  "definicao": "Integridade é a conduta honesta e direta do profissional; junto com a objetividade sustenta a independência exigida nos trabalhos.",
-	  "referencia": "NBC PO 900 (SUSEP 27º EQT)"
+	  "referencia": "NBC PO 900 (SUSEP 27º EQT)",
+	  "na_pratica": "Agir com honestidade e franqueza sustenta a independência."
 	},
 	{
 	  "id": "DC-041",
@@ -389,7 +493,8 @@
 	  "categoria": "Definições",
 	  "dica": "Estrutura e metodologia que o revisado usa para garantir a qualidade.",
 	  "definicao": "Sistema de qualidade é a estrutura organizacional e a metodologia de auditoria do revisado, que deve atender às NBC técnicas e profissionais.",
-	  "referencia": "NBC PA 11, itens 16 e 17"
+	  "referencia": "NBC PA 11, itens 16 e 17",
+	  "na_pratica": "O que se revisa é o sistema de qualidade, não cada decisão isolada."
 	},
 	{
 	  "id": "DC-042",
@@ -398,7 +503,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Disputa que pode justificar excluir cliente da amostra.",
 	  "definicao": "Litígio é motivo justificável para o revisado pedir a exclusão de um cliente da amostra; a equipe avalia e documenta as razões.",
-	  "referencia": "NBC PA 11, item 33"
+	  "referencia": "NBC PA 11, item 33",
+	  "na_pratica": "Cliente excluído por litígio? Avalie e documente as razões."
 	},
 	{
 	  "id": "DC-043",
@@ -407,7 +513,8 @@
 	  "categoria": "Prazos",
 	  "dica": "Relação de auditores divulgada pelo CRE até 28 de fevereiro.",
 	  "definicao": "Lista de selecionados indica os auditores que passarão pela revisão no ano, com os prazos para indicar o revisor e entregar a documentação.",
-	  "referencia": "NBC PA 11, item 52"
+	  "referencia": "NBC PA 11, item 52",
+	  "na_pratica": "Saiu a lista? Confira os prazos para indicar o revisor e entregar documentos."
 	},
 	{
 	  "id": "DC-044",
@@ -416,7 +523,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Abrangência da revisão, restrita ao atendimento às normas.",
 	  "definicao": "Escopo da revisão abrange exclusivamente o atendimento às NBC técnicas e profissionais e, quando aplicável, às normas de órgãos reguladores.",
-	  "referencia": "NBC PA 11, itens 29 e 37(a)"
+	  "referencia": "NBC PA 11, itens 29 e 37(a)",
+	  "na_pratica": "Mantenha as perguntas no campo técnico e profissional."
 	},
 	{
 	  "id": "DC-045",
@@ -425,7 +533,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Informação usada para fundamentar a conclusão do revisor.",
 	  "definicao": "Evidência de auditoria é a informação, como documentos e respostas em entrevistas, em que o revisor se baseia para concluir sobre o sistema.",
-	  "referencia": "NBC PA 11, item 31; NBC TA 500"
+	  "referencia": "NBC PA 11, item 31; NBC TA 500",
+	  "na_pratica": "Toda conclusão precisa de evidência: documento ou resposta de entrevista."
 	},
 	{
 	  "id": "DC-046",
@@ -434,7 +543,8 @@
 	  "categoria": "Relatórios",
 	  "dica": "Conclusão do revisor sobre as políticas de qualidade.",
 	  "definicao": "Opinião do revisor trata das políticas e procedimentos de controle de qualidade frente às normas e depende de seu julgamento profissional.",
-	  "referencia": "NBC PA 11, itens 37(d) e 43"
+	  "referencia": "NBC PA 11, itens 37(d) e 43",
+	  "na_pratica": "A opinião é sobre políticas e procedimentos de qualidade frente às normas."
 	},
 	{
 	  "id": "DC-047",
@@ -443,7 +553,8 @@
 	  "categoria": "Procedimentos",
 	  "dica": "Divergência entre revisor e revisado a ser referenciada.",
 	  "definicao": "Discordância sobre o tipo de relatório ou os itens da carta deve ser referenciada no documento do revisor e/ou do revisado.",
-	  "referencia": "Instruções CRE (Anexo 2), item 56"
+	  "referencia": "Instruções CRE (Anexo 2), item 56",
+	  "na_pratica": "Discordou do revisado? Registre nos documentos para o CRE analisar."
 	},
 	{
 	  "id": "DC-048",
@@ -452,7 +563,8 @@
 	  "categoria": "Auditoria geral",
 	  "dica": "Diferença entre o valor apresentado e o exigido pela estrutura contábil.",
 	  "definicao": "Distorção é a diferença entre valor, classificação, apresentação ou divulgação de um item e o requerido pela estrutura de relatório aplicável.",
-	  "referencia": "NBC TA 450 (QTG 27º EQT)"
+	  "referencia": "NBC TA 450 (QTG 27º EQT)",
+	  "na_pratica": "Distorção é diferença frente à estrutura contábil aplicável; avalie sempre o efeito."
 	},
 	{
 	  "id": "DC-049",
@@ -461,7 +573,8 @@
 	  "categoria": "Auditoria geral",
 	  "dica": "Ato intencional para obter vantagem indevida.",
 	  "definicao": "Fraude é ato intencional de um ou mais indivíduos para obter vantagem indevida. A administração está em posição privilegiada para praticá-la.",
-	  "referencia": "NBC TA 240 (QTG 27º EQT)"
+	  "referencia": "NBC TA 240 (QTG 27º EQT)",
+	  "na_pratica": "Lembre que a administração está em posição privilegiada para a fraude: mantenha ceticismo."
 	},
 	{
 	  "id": "DC-050",
@@ -470,7 +583,8 @@
 	  "categoria": "Órgãos",
 	  "dica": "Área à qual o CRE comunica situações que pedem diligência.",
 	  "definicao": "Fiscalização do CFC recebe do CRE as comunicações sobre situações que indicam necessidade de diligências nos trabalhos de revisados e revisores.",
-	  "referencia": "NBC PA 11, itens 12(g) e 20"
+	  "referencia": "NBC PA 11, itens 12(g) e 20",
+	  "na_pratica": "Situação que pede diligência chega à Fiscalização do CFC por meio do CRE."
 	},
 	{
 	  "id": "DC-051",
@@ -479,7 +593,8 @@
 	  "categoria": "Definições",
 	  "dica": "Pessoa jurídica ou física que presta serviços de auditoria.",
 	  "definicao": "Firma de auditoria é o profissional, sociedade ou entidade de profissionais da contabilidade que presta auditoria; o revisado pode ser firma ou pessoa física.",
-	  "referencia": "NBC TA 220 (QTG 27º EQT)"
+	  "referencia": "NBC TA 220 (QTG 27º EQT)",
+	  "na_pratica": "O revisado pode ser firma ou pessoa física: a regra vale para os dois."
 	}
   ]
 }

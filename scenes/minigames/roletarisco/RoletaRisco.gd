@@ -19,6 +19,16 @@ const PRACTICE_BAD := "bad"
 const PRACTICE_TARGET_COUNT := 16
 
 var events: Array[Dictionary] = []
+## V0.16.2 (limite dinamico): a Roleta passa a ter N giros (2/4/8/10, opcao "Duracao dos minigames").
+## Cada giro monta uma roda NOVA, sem nenhum evento ja sorteado antes (nesta partida ou nas recentes).
+## V0.16.4: bonus da campanha/modo livre = sempre 1 giro (nao segue a configuracao de questoes 2-10).
+const FIXED_SPINS: int = 1
+var spins_total: int = FIXED_SPINS
+var spins_done: int = 0
+var net_points_total: int = 0
+var seen_event_ids: Array[String] = []
+var seen_event_names: Array[String] = []
+var spin_counter_label: Label
 var sector_labels: Array[Label] = []
 var orbit_angles: Array[float] = []
 var orbit_speeds: Array[float] = []
@@ -54,6 +64,7 @@ var continue_button: Button
 
 func _ready() -> void:
 	randomize()
+	spins_total = FIXED_SPINS
 	_prepare_events()
 	_build_scene()
 	pause_menu = MinigamePause.attach(self)
@@ -146,6 +157,10 @@ func _prepare_events() -> void:
 		events = _build_default_practice_events()
 	events = _reorder_events_for_tension(events)
 
+	if orbit_angles.is_empty():
+		_reset_orbit_sparks()
+
+func _reset_orbit_sparks() -> void:
 	orbit_angles.clear()
 	orbit_speeds.clear()
 	for _i in range(ORBIT_SPARK_COUNT):
@@ -154,24 +169,47 @@ func _prepare_events() -> void:
 
 func _select_practice_events(diff: String, target_count: int) -> Array[Dictionary]:
 	var source: Array[Dictionary] = _build_practice_event_pool(diff)
+	var history: Array = DynamicQuestionBank.get_seen_ids("roleta_risco", diff)
 	var good_events: Array[Dictionary] = []
 	var bad_events: Array[Dictionary] = []
 	for item in source:
 		var prepared: Dictionary = _prepare_practice_event(item)
+		# V0.16.2: evento ja sorteado nesta partida NUNCA volta para a roda (se sobrar evento novo).
+		if seen_event_ids.has(str(prepared.get("id", ""))):
+			continue
 		if str(prepared.get("practice", PRACTICE_BAD)) == PRACTICE_GOOD:
 			good_events.append(prepared)
 		else:
 			bad_events.append(prepared)
-	good_events.shuffle()
-	bad_events.shuffle()
 	var half_count: int = int(target_count / 2)
 	var selected: Array[Dictionary] = []
-	for i in range(half_count):
-		if i < good_events.size():
-			selected.append(good_events[i])
-		if i < bad_events.size():
-			selected.append(bad_events[i])
+	selected.append_array(_pick_wheel_side(good_events, half_count, history))
+	selected.append_array(_pick_wheel_side(bad_events, half_count, history))
 	return selected
+
+## Entre os candidatos, primeiro os que o jogador ainda nao viu nas partidas recentes (embaralhados);
+## so se faltar, entram os vistos, dos mais antigos para os mais novos.
+func _pick_wheel_side(candidates: Array[Dictionary], count: int, history: Array) -> Array[Dictionary]:
+	var fresh: Array[Dictionary] = []
+	var old: Array[Dictionary] = []
+	for item in candidates:
+		if history.has(str(item.get("id", ""))):
+			old.append(item)
+		else:
+			fresh.append(item)
+	fresh.shuffle()
+	old.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return history.find(str(a.get("id", ""))) < history.find(str(b.get("id", ""))))
+	var result: Array[Dictionary] = []
+	for item in fresh:
+		if result.size() >= count:
+			break
+		result.append(item)
+	for item in old:
+		if result.size() >= count:
+			break
+		result.append(item)
+	return result
 
 func _prepare_practice_event(raw: Dictionary) -> Dictionary:
 	var practice_type: String = str(raw.get("practice", PRACTICE_BAD))
@@ -185,6 +223,7 @@ func _prepare_practice_event(raw: Dictionary) -> Dictionary:
 	elif strength == "high":
 		effect = high_penalty
 	return {
+		"id": str(raw.get("id", raw.get("name", ""))),
 		"name": str(raw.get("name", "Evento técnico")),
 		"effect": effect,
 		"practice": practice_type,
@@ -301,7 +340,7 @@ func _build_scene() -> void:
 	title_label.name = "TitleLabel"
 	title_label.text = "RODADA BÔNUS  ►  ROLETA DO RISCO"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 38)
+	FontScale.set_size(title_label, 38)
 	title_label.add_theme_color_override("font_color", COLOR_GOLD)
 	title_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.88))
 	title_label.add_theme_constant_override("shadow_offset_x", 3)
@@ -324,6 +363,11 @@ func _build_scene() -> void:
 	DifficultyManager.apply_difficulty_chip(difficulty_label, "", 18)
 	status_row.add_child(difficulty_label)
 
+	# V0.16.4: com 1 giro unico o contador "GIRO 1/1" nao agrega nada; so aparece se FIXED_SPINS for > 1.
+	if spins_total > 1:
+		spin_counter_label = _create_chip_label("GIRO 1/%d" % spins_total, 18, Color(0.04, 0.05, 0.12, 0.94), Color(1.0, 1.0, 1.0))
+		status_row.add_child(spin_counter_label)
+
 	var spacer_top: Control = Control.new()
 	spacer_top.custom_minimum_size = Vector2(0, 318)
 	main_box.add_child(spacer_top)
@@ -334,7 +378,7 @@ func _build_scene() -> void:
 	status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status_label.custom_minimum_size = Vector2(0, 32)
-	status_label.add_theme_font_size_override("font_size", 18)
+	FontScale.set_size(status_label, 18)
 	status_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0, 0.96))
 	status_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.82))
 	status_label.add_theme_constant_override("shadow_offset_x", 2)
@@ -353,7 +397,7 @@ func _build_scene() -> void:
 	spin_button.name = "SpinButton"
 	spin_button.text = "GIRAR!"
 	spin_button.custom_minimum_size = Vector2(280, 56)
-	spin_button.add_theme_font_size_override("font_size", 23)
+	FontScale.set_size(spin_button, 23)
 	spin_button.add_theme_stylebox_override("normal", _make_button_style(Color(0.88, 0.02, 0.32, 0.98), Color(1.0, 1.0, 1.0), 3))
 	spin_button.add_theme_stylebox_override("hover", _make_button_style(Color(1.0, 0.12, 0.45, 1.0), COLOR_GOLD, 3))
 	spin_button.add_theme_stylebox_override("pressed", _make_button_style(Color(0.62, 0.02, 0.24, 1.0), Color(1.0, 1.0, 1.0), 3))
@@ -383,7 +427,7 @@ func _create_chip_label(text_value: String, font_size: int, bg_color: Color, tex
 	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(230, 38)
-	label.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_stylebox_override("normal", _make_panel_style(bg_color, Color(1.0, 1.0, 1.0, 0.18), 12, 1))
 	return label
@@ -400,7 +444,10 @@ func _create_sector_labels() -> void:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.custom_minimum_size = Vector2(92, 34)
 		label.size = Vector2(92, 34)
-		label.add_theme_font_size_override("font_size", 10)
+		# V0.16.3: rotulos dos gomos ficam num tamanho fixo (cada gomo tem ~92x34 px); o resultado sorteado
+		# aparece depois no painel de resultado, que ESCALA com a fonte escolhida.
+		FontScale.skip(label)
+		FontScale.set_size(label, 10)
 		label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
 		label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.94))
 		label.add_theme_constant_override("shadow_offset_x", 1)
@@ -532,12 +579,12 @@ func _build_result_layer() -> void:
 
 	result_title_label = Label.new()
 	result_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	result_title_label.add_theme_font_size_override("font_size", 39)
+	FontScale.set_size(result_title_label, 39)
 	box.add_child(result_title_label)
 
 	result_name_label = Label.new()
 	result_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	result_name_label.add_theme_font_size_override("font_size", 29)
+	FontScale.set_size(result_name_label, 29)
 	result_name_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
 	box.add_child(result_name_label)
 
@@ -545,19 +592,19 @@ func _build_result_layer() -> void:
 	result_description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	result_description_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	result_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	result_description_label.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(result_description_label, 22)
 	result_description_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
 	box.add_child(result_description_label)
 
 	result_impact_label = Label.new()
 	result_impact_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	result_impact_label.add_theme_font_size_override("font_size", 26)
+	FontScale.set_size(result_impact_label, 26)
 	box.add_child(result_impact_label)
 
 	continue_button = Button.new()
 	continue_button.text = "Continuar"
 	continue_button.custom_minimum_size = Vector2(260, 58)
-	continue_button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(continue_button, 22)
 	continue_button.pressed.connect(_on_continue_pressed)
 	box.add_child(continue_button)
 
@@ -589,9 +636,11 @@ func _resolve_spin() -> void:
 	var result_index: int = int(floor(fposmod(270.0 - wheel_angle, 360.0) / angle_per_sector))
 	result_index = clampi(result_index, 0, events.size() - 1)
 	selected_event = events[result_index]
+	_register_seen_event(selected_event)
 	if has_node("/root/AchievementManager"):
 		AchievementManager.unlock("boas_praticas")
 	points_this_stage = int(selected_event.get("effect", 0))
+	net_points_total += points_this_stage
 	if points_this_stage >= 0:
 		ScoreManager.add_points(points_this_stage)
 	else:
@@ -611,6 +660,8 @@ func _show_result_overlay() -> void:
 	result_name_label.text = event_name
 	result_description_label.text = "%s\n\nAprendizado: %s" % [description, _get_result_learning(good_result)]
 	result_impact_label.text = "Resultado: %s%s pontos" % [impact_prefix, points_this_stage]
+	if continue_button != null:
+		continue_button.text = "Continuar" if spins_done + 1 < spins_total else "Concluir"
 	result_impact_label.add_theme_color_override("font_color", COLOR_GOOD if good_result else COLOR_BAD)
 	_set_sector_labels_visible(false)
 	result_layer.visible = true
@@ -652,10 +703,50 @@ func _on_continue_pressed() -> void:
 		return
 	if has_node("/root/AudioManager"):
 		AudioManager.play_click()
+	spins_done += 1
+	if spins_done < spins_total:
+		_start_next_spin()
+		return
 	# V0.15: desempenho da estacao para o feedback do anfitriao (GameManager.report_stage).
-	GameManager.report_stage({"tier": "bom" if points_this_stage >= 0 else "ruim", "extra": {"event_name": str(selected_event.get("name", ""))}})
+	# V0.16.2: com varios giros, o desempenho e o saldo de TODOS os giros.
+	GameManager.report_stage({"tier": "bom" if net_points_total >= 0 else "ruim", "extra": {"event_name": str(selected_event.get("name", "")), "spins": spins_total}})
 	GameManager.complete_current_stage(0)
 
+## V0.16.2: guarda o evento sorteado (nesta partida e no historico persistente) para nao voltar tao cedo.
+func _register_seen_event(event: Dictionary) -> void:
+	var event_id: String = str(event.get("id", event.get("name", "")))
+	if event_id != "" and not seen_event_ids.has(event_id):
+		seen_event_ids.append(event_id)
+	seen_event_names.append(str(event.get("name", "")))
+	DynamicQuestionBank.mark_seen("roleta_risco", DifficultyManager.get_difficulty(), {"id": event_id})
+
+## V0.16.2: prepara o giro seguinte com uma roda nova (sem os eventos ja sorteados).
+func _start_next_spin() -> void:
+	for label in sector_labels:
+		if label != null:
+			label.queue_free()
+	sector_labels.clear()
+	events = _select_practice_events(DifficultyManager.get_difficulty(), PRACTICE_TARGET_COUNT)
+	if events.is_empty():
+		events = _build_default_practice_events()
+	events = _reorder_events_for_tension(events)
+	wheel_angle = randf_range(0.0, 360.0)
+	wheel_velocity = 0.0
+	points_this_stage = 0
+	selected_event = {}
+	burst_particles.clear()
+	_create_sector_labels()
+	_set_sector_labels_visible(true)
+	_update_sector_label_positions()
+	if result_layer != null:
+		result_layer.visible = false
+	if spin_counter_label != null:
+		spin_counter_label.text = "GIRO %d/%d" % [spins_done + 1, spins_total]
+	if spin_button != null:
+		spin_button.disabled = false
+	state = "ready"
+	_set_status("Giro %d de %d: gire a roleta para revelar o próximo imprevisto." % [spins_done + 1, spins_total])
+	_request_wheel_redraw()
 
 func _on_score_changed(new_score: int) -> void:
 	if score_label != null:

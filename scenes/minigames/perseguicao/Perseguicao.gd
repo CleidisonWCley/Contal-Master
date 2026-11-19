@@ -213,7 +213,7 @@ func _build_scene() -> void:
 	title_label.name = "TitleLabel"
 	title_label.text = "ALERTA DE SEGURANÇA"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 50)
+	FontScale.set_size(title_label, 50)
 	title_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.05))
 	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
 	title_label.add_theme_constant_override("shadow_offset_x", 3)
@@ -260,7 +260,7 @@ func _build_scene() -> void:
 	var warning_label := Label.new()
 	warning_label.text = "> INCIDENTE DETECTADO <"
 	warning_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	warning_label.add_theme_font_size_override("font_size", 23)
+	FontScale.set_size(warning_label, 23)
 	warning_label.add_theme_color_override("font_color", Color(1.0, 0.1, 0.1))
 	incident_box.add_child(warning_label)
 
@@ -270,7 +270,7 @@ func _build_scene() -> void:
 	incident_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	incident_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	incident_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	incident_label.add_theme_font_size_override("font_size", 29)
+	FontScale.set_size(incident_label, 29)
 	incident_label.add_theme_color_override("font_color", Color(0.78, 1.0, 0.78))
 	incident_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	incident_box.add_child(incident_label)
@@ -292,7 +292,7 @@ func _build_scene() -> void:
 	timer_label = Label.new()
 	timer_label.text = "Tempo: 0.0s"
 	timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	timer_label.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(timer_label, 20)
 	timer_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	timer_box.add_child(timer_label)
 
@@ -312,7 +312,7 @@ func _build_scene() -> void:
 	hint_label.text = "Decida rápido antes do tempo acabar. Atalhos: 1, A ou seta esquerda para a primeira opção; 2, B ou seta direita para a segunda."
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint_label.add_theme_font_size_override("font_size", 17)
+	FontScale.set_size(hint_label, 17)
 	hint_label.add_theme_color_override("font_color", Color(0.90, 0.94, 1.0, 0.92))
 	main_box.add_child(hint_label)
 
@@ -339,7 +339,7 @@ func _create_chip_label(text_value: String, font_size: int, bg_color: Color, tex
 	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.custom_minimum_size = Vector2(220, 38)
-	label.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", text_color)
 	label.add_theme_stylebox_override("normal", _make_panel_style(bg_color, Color(1, 1, 1, 0.18), 12, 1))
 	return label
@@ -380,14 +380,14 @@ func _build_feedback_layer() -> void:
 
 	feedback_title_label = Label.new()
 	feedback_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	feedback_title_label.add_theme_font_size_override("font_size", 43)
+	FontScale.set_size(feedback_title_label, 43)
 	box.add_child(feedback_title_label)
 
 	feedback_body_label = Label.new()
 	feedback_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	feedback_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	feedback_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_body_label.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
 	box.add_child(feedback_body_label)
 	_create_feedback_continue_button(box)
@@ -397,7 +397,7 @@ func _create_feedback_continue_button(parent: VBoxContainer) -> void:
 	feedback_continue_button.text = "Continuar"
 	feedback_continue_button.custom_minimum_size = Vector2(260, 48)
 	feedback_continue_button.focus_mode = Control.FOCUS_ALL
-	feedback_continue_button.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(feedback_continue_button, 20)
 	feedback_continue_button.add_theme_stylebox_override("normal", _make_button_style(Color(0.06, 0.16, 0.24, 0.96), Color(0.34, 0.90, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("hover", _make_button_style(Color(0.10, 0.28, 0.38, 0.98), Color(0.70, 1.0, 1.0), 2))
 	feedback_continue_button.add_theme_stylebox_override("pressed", _make_button_style(Color(0.03, 0.10, 0.16, 1.0), Color(0.34, 0.90, 1.0), 2))
@@ -448,20 +448,20 @@ func _build_finish_layer() -> void:
 	var title := Label.new()
 	title.text = "Relatório da Perseguição"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 44)
+	FontScale.set_size(title, 44)
 	title.add_theme_color_override("font_color", Color(1.0, 0.84, 0.05))
 	box.add_child(title)
 
 	finish_score_label = Label.new()
 	finish_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	finish_score_label.add_theme_font_size_override("font_size", 26)
+	FontScale.set_size(finish_score_label, 26)
 	finish_score_label.add_theme_color_override("font_color", Color(1, 1, 1))
 	box.add_child(finish_score_label)
 
 	var continue_button := Button.new()
 	continue_button.text = "Continuar"
 	continue_button.custom_minimum_size = Vector2(260, 58)
-	continue_button.add_theme_font_size_override("font_size", 22)
+	FontScale.set_size(continue_button, 22)
 	continue_button.pressed.connect(_on_finish_continue_pressed)
 	box.add_child(continue_button)
 
@@ -474,7 +474,7 @@ func _prepare_incidents() -> void:
 	damage_count = 0
 	var rules := DifficultyManager.get_rules()
 	var incident_type := str(rules.get("pergunta_tipo", "normal"))
-	incidents = DynamicQuestionBank.pick_rounds("perseguicao", incident_type, 6)
+	incidents = DynamicQuestionBank.pick_rounds("perseguicao", incident_type, SettingsManager.get_current_questions_count())
 	if incidents.is_empty():
 		incidents = ALL_INCIDENTS.get(incident_type, ALL_INCIDENTS["normal"]).duplicate(true)
 		incidents.shuffle()
@@ -510,7 +510,7 @@ func _load_incident(index: int) -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.clip_text = true
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.add_theme_font_size_override("font_size", 22)
+		FontScale.set_size(button, 22)
 		button.add_theme_stylebox_override("normal", _make_option_button_style(Color(0.04, 0.11, 0.25, 0.92), Color(0.15, 0.70, 1.0)))
 		button.add_theme_stylebox_override("hover", _make_option_button_style(Color(0.10, 0.22, 0.42, 0.98), Color(0.90, 0.95, 1.0), 3))
 		button.add_theme_stylebox_override("pressed", _make_option_button_style(Color(0.18, 0.30, 0.55, 1.0), Color(1, 1, 1), 3))
@@ -613,17 +613,19 @@ func _highlight_answer(selected_button, correct_text: String, is_correct: bool, 
 func _show_feedback(is_correct: bool, selected_text: String, correct_text: String, timed_out: bool, _remaining_ratio: float, awarded_points: int) -> void:
 	var current_incident: Dictionary = incidents[current_incident_index]
 	var explanation: String = _clean_feedback_explanation(correct_text, str(current_incident.get("explanation", _get_action_explanation(correct_text))))
+	var practice: String = FeedbackText.practice_line(str(current_incident.get("pratica", "")))   # V0.16.2
 	if is_correct:
 		feedback_title_label.text = "AMEAÇA BLOQUEADA"
 		feedback_title_label.add_theme_color_override("font_color", Color(0.42, 1.0, 0.48))
-		feedback_body_label.text = "Ação correta: %s\n%s\nPontuação adquirida: +%s" % [correct_text, explanation, awarded_points]
+		feedback_body_label.text = "Ação correta: %s\n%s%s\nPontuação adquirida: +%s" % [correct_text, explanation, practice, awarded_points]
 	else:
 		feedback_title_label.text = "TEMPO ESGOTADO" if timed_out else "ERRO CRÍTICO"
 		feedback_title_label.add_theme_color_override("font_color", Color(1.0, 0.24, 0.20))
 		if timed_out:
-			feedback_body_label.text = "Você demorou demais.\n\nAção segura: %s\n%s\n%s pontos" % [correct_text, explanation, wrong_points]
+			feedback_body_label.text = "Você demorou demais.\n\nAção segura: %s\n%s%s\n%s pontos" % [correct_text, explanation, practice, wrong_points]
 		else:
-			feedback_body_label.text = "Você escolheu: %s\nEssa decisão aumenta o risco do incidente.\n\nAção segura: %s\n%s\n%s pontos" % [selected_text, correct_text, explanation, wrong_points]
+			var why_not: String = FeedbackText.why_not_line(FeedbackText.reason_for_text(current_incident.get("motivos_texto", {}), selected_text), "Essa decisão aumenta o risco do incidente.")
+			feedback_body_label.text = "Você escolheu: %s\n%s\n\nAção segura: %s\n%s%s\n%s pontos" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
 	await _wait_for_feedback_continue()
 

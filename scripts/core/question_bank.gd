@@ -25,6 +25,16 @@ const DIFFICULTIES: Array[String] = ["facil", "normal", "dificil"]
 const DEFAULT_ROUND_COUNT := 6
 const STOP_OPTIONS_PER_ITEM := 6   # V0.14.4.2: o STOP mostra sempre 6 opcoes (grade 3x2)
 const RECENT_MEMORY_MAX := 60
+## V0.16.2: historico de itens ja vistos. Fica em user:// (vira IndexedDB na web) para as rodadas nao repetirem
+## conteudo nem ao reabrir o jogo, e e COMPARTILHADO entre os minigames que leem o mesmo banco
+## (Show do Bilhao + Perseguicao, Desvio Logico + Maleta Certa, Forca + STOP, Batalha Naval + Roleta).
+const HISTORY_PATH := "user://contal_master_question_history.json"
+const FAMILY_BY_MINIGAME := {
+	"show_do_bilhao": "quiz", "perseguicao": "quiz",
+	"desvio_logico": "dilemas", "maleta_certa": "dilemas",
+	"forca_tecnica": "dicionario", "stop": "dicionario",
+	"batalha_naval": "naval", "roleta_risco": "roleta",
+}
 
 const ACCENT_MAP := {
 	"Á": "A", "À": "A", "Â": "A", "Ã": "A", "Ä": "A",
@@ -39,8 +49,10 @@ static var _loaded: bool = false
 static var _errors: Array[String] = []
 static var _banks: Dictionary = {}          # minigame -> { dificuldade -> Array[Dictionary] }
 static var _stop_terms: Dictionary = {}     # "A" -> Array[String]
+static var _term_definitions: Dictionary = {}  # V0.16.2: "CRE" -> definicao (motivo da opcao errada no STOP)
 static var _roleta_events: Array[Dictionary] = []
-static var _recent_by_key: Dictionary = {}  # "minigame|dificuldade" -> Array[String]
+static var _recent_by_key: Dictionary = {}  # "familia|dificuldade" -> Array[String] (ids dos itens ja vistos)
+static var _history_loaded: bool = false
 
 
 # ======================================================================
@@ -54,6 +66,7 @@ static func ensure_loaded() -> void:
 	_errors.clear()
 	_banks.clear()
 	_stop_terms.clear()
+	_term_definitions.clear()
 	_roleta_events.clear()
 	_build_quiz(_read_json(FILE_QUIZ))
 	_build_dilemas(_read_json(FILE_DILEMAS))
@@ -86,8 +99,9 @@ static func get_bank(minigame: String, difficulty: String) -> Array[Dictionary]:
 	return result
 
 
-static func pick_rounds(minigame: String, difficulty: String, count: int = DEFAULT_ROUND_COUNT) -> Array[Dictionary]:
+static func pick_rounds(minigame: String, difficulty: String, count: int = DEFAULT_ROUND_COUNT, record: bool = true) -> Array[Dictionary]:
 	ensure_loaded()
+	_load_history()
 	var diff: String = _norm_difficulty(difficulty)
 	var pool: Array[Dictionary] = get_bank(minigame, diff)
 	if pool.size() < count:
@@ -95,19 +109,24 @@ static func pick_rounds(minigame: String, difficulty: String, count: int = DEFAU
 	if pool.is_empty():
 		return []
 
-	var key: String = "%s|%s" % [minigame, diff]
+	# V0.16.2: o historico e por FAMILIA de banco (nao por minigame): se o Desvio Logico ja usou o dilema DL-003,
+	# a Maleta Certa na mesma campanha prefere outro. "Visto" = id do item (estavel entre sessoes).
+	var key: String = _history_key(minigame, diff)
 	var recent: Array = _recent_by_key.get(key, [])
+	# Guarda ate (pool - count) itens: sempre sobra material novo suficiente para a proxima rodada.
 	var memory: int = maxi(0, mini(RECENT_MEMORY_MAX, pool.size() - count))
 
 	var fresh: Array[Dictionary] = []
 	var seen: Array[Dictionary] = []
 	for item in pool:
-		if recent.has(_item_signature(item)):
+		if recent.has(_item_id(item)):
 			seen.append(item)
 		else:
 			fresh.append(item)
 	fresh.shuffle()
-	seen.shuffle()
+	# Os ja vistos entram so se faltar item novo; os MAIS ANTIGOS na memoria voltam primeiro.
+	seen.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return recent.find(_item_id(a)) < recent.find(_item_id(b)))
 	var ordered: Array[Dictionary] = []
 	for item in fresh:
 		ordered.append(item)
@@ -133,12 +152,35 @@ static func pick_rounds(minigame: String, difficulty: String, count: int = DEFAU
 				picked.append(item)
 	picked.shuffle()
 
-	for item in picked:
-		recent.append(_item_signature(item))
-	while recent.size() > memory:
-		recent.pop_front()
-	_recent_by_key[key] = recent
+	if record:
+		for item in picked:
+			_remember_item(key, _item_id(item), memory)
+		_save_history()
 	return picked
+
+
+## V0.16.2: registra um item como "visto" (usado pela Roleta, que monta uma roda com 16 setores mas so o
+## sorteado deve contar como conteudo ja mostrado).
+static func mark_seen(minigame: String, difficulty: String, item: Dictionary) -> void:
+	ensure_loaded()
+	_load_history()
+	var diff: String = _norm_difficulty(difficulty)
+	var pool_size: int = (get_bank(minigame, diff) as Array).size()
+	_remember_item(_history_key(minigame, diff), _item_id(item), maxi(0, pool_size - 1))
+	_save_history()
+
+
+## V0.16.2: ids ja vistos (mais antigo primeiro) para o minigame/dificuldade.
+static func get_seen_ids(minigame: String, difficulty: String) -> Array:
+	_load_history()
+	return (_recent_by_key.get(_history_key(minigame, _norm_difficulty(difficulty)), []) as Array).duplicate()
+
+
+## Zera o historico (autoteste / opcao futura de "recomecar conteudo").
+static func clear_history() -> void:
+	_recent_by_key.clear()
+	_history_loaded = true
+	_save_history()
 
 
 ## Termos do dicionario + distratores_stop agrupados pela inicial (opcoes erradas do STOP).
@@ -210,14 +252,22 @@ static func _build_quiz(data: Dictionary) -> void:
 			_errors.append("Quiz %s: resposta_correta invalida" % str(it.get("id", "?")))
 			continue
 		var explicacao: String = str(it.get("explicacao", ""))
+		var pratica: String = str(it.get("na_pratica", ""))
 		if modos.has("show_do_bilhao"):
+			# V0.16.2: cada alternativa errada tem o seu motivo ("porque_erradas"); a certa leva a explicacao.
+			var motivos: Dictionary = {resp: explicacao}
+			var porque_erradas: Dictionary = it.get("porque_erradas", {})
+			for letter in porque_erradas.keys():
+				if str(letter) != resp and alts.has(str(letter)):
+					motivos[str(letter)] = str(porque_erradas[letter])
 			_push("show_do_bilhao", diff, {
 				"id": str(it.get("id", "")),
 				"topic": str(it.get("tema", "")),
 				"pergunta": str(it.get("enunciado", "")),
 				"opcoes": alts.duplicate(),
 				"resposta": resp,
-				"motivos": {resp: explicacao},
+				"motivos": motivos,
+				"pratica": pratica,
 				"explanation": explicacao,
 				"referencia": str(it.get("referencia", "")),
 			})
@@ -225,17 +275,52 @@ static func _build_quiz(data: Dictionary) -> void:
 		if modos.has("perseguicao") and not rapida.is_empty():
 			var certa: String = str(rapida.get("correta", ""))
 			var opcoes: Array = [certa]
+			var motivos_rapidos: Dictionary = {}   # V0.16.2: distrator -> motivo (quando casa com uma alternativa do quiz)
 			for d in rapida.get("distratores", []):
 				opcoes.append(str(d))
+				var reason_match: String = _match_wrong_reason(str(d), alts, resp, it.get("porque_erradas", {}))
+				if reason_match != "":
+					motivos_rapidos[str(d)] = reason_match
 			_push("perseguicao", diff, {
 				"id": "P-" + str(it.get("id", "")),
 				"topic": str(it.get("tema", "")),
 				"descricao": str(rapida.get("enunciado", "")),
 				"opcoes": opcoes,
 				"correta": certa,
+				"motivos_texto": motivos_rapidos,
+				"pratica": pratica,
 				"explanation": explicacao,
 				"referencia": str(it.get("referencia", "")),
 			})
+
+
+## V0.16.2: liga um distrator da versao rapida ("CRE") a uma alternativa errada do quiz ("O CRE") para reaproveitar
+## o motivo especifico. Sem correspondencia segura, devolve "" e o jogo usa a mensagem generica.
+static func _match_wrong_reason(distractor: String, alternatives: Dictionary, correct_letter: String, reasons: Variant) -> String:
+	if not (reasons is Dictionary):
+		return ""
+	var wanted: String = _plain_option(distractor)
+	if wanted == "":
+		return ""
+	for letter in alternatives.keys():
+		if str(letter) == correct_letter:
+			continue
+		var candidate: String = _plain_option(str(alternatives[letter]))
+		# Contem-se so por PALAVRA inteira ("adequado" nao casa com "inadequado").
+		var wanted_in_candidate: bool = (" " + candidate + " ").contains(" " + wanted + " ")
+		var candidate_in_wanted: bool = (" " + wanted + " ").contains(" " + candidate + " ")
+		if candidate == wanted or (wanted.length() >= 3 and (wanted_in_candidate or candidate_in_wanted)):
+			return str((reasons as Dictionary).get(str(letter), ""))
+	return ""
+
+
+static func _plain_option(text: String) -> String:
+	var t: String = text.strip_edges().to_lower()
+	for article in ["o ", "a ", "os ", "as "]:
+		if t.begins_with(article):
+			t = t.substr(article.length())
+			break
+	return t
 
 
 static func _build_dilemas(data: Dictionary) -> void:
@@ -249,16 +334,22 @@ static func _build_dilemas(data: Dictionary) -> void:
 			_errors.append("Dilema %s: acao_correta/acoes_incorretas ausentes" % str(it.get("id", "?")))
 			continue
 		var explicacao: String = str(it.get("explicacao", ""))
+		var pratica: String = str(it.get("na_pratica", ""))
 		if modos.has("maleta_certa"):
 			var opcoes: Array = [certa]
+			var motivos_texto: Dictionary = {}   # V0.16.2: texto da opcao errada -> por que ela nao resolve
 			for e in erradas:
-				opcoes.append(str((e as Dictionary).get("texto", "")))
+				var texto_errado: String = str((e as Dictionary).get("texto", ""))
+				opcoes.append(texto_errado)
+				motivos_texto[texto_errado] = str((e as Dictionary).get("porque", ""))
 			_push("maleta_certa", diff, {
 				"id": str(it.get("id", "")),
 				"topic": str(it.get("tema", "")),
 				"problema": str(it.get("cenario", "")),
 				"opcoes": opcoes,
 				"correta": certa,
+				"motivos_texto": motivos_texto,
+				"pratica": pratica,
 				"explanation": explicacao,
 				"referencia": str(it.get("referencia", "")),
 			})
@@ -271,6 +362,7 @@ static func _build_dilemas(data: Dictionary) -> void:
 				"_certa": certa,
 				"_erradas": erradas.duplicate(true),
 				"_explicacao": explicacao,
+				"pratica": pratica,
 				"referencia": str(it.get("referencia", "")),
 			})
 
@@ -285,6 +377,8 @@ static func _build_dicionario(data: Dictionary) -> void:
 		var categoria: String = str(it.get("categoria", ""))
 		var definicao: String = str(it.get("definicao", ""))
 		var initial: String = _initial_of(termo)
+		var pratica: String = str(it.get("na_pratica", ""))
+		_term_definitions[termo] = definicao
 		if not _stop_terms.has(initial):
 			_stop_terms[initial] = []
 		(_stop_terms[initial] as Array).append(termo)
@@ -294,6 +388,7 @@ static func _build_dicionario(data: Dictionary) -> void:
 			"word": termo,
 			"area": categoria,
 			"hint": str(it.get("dica", "")),
+			"pratica": pratica,
 			"explanation": definicao,
 			"referencia": str(it.get("referencia", "")),
 		})
@@ -304,6 +399,7 @@ static func _build_dicionario(data: Dictionary) -> void:
 			"letra": initial,
 			"dica": str(it.get("dica", "")),
 			"correta": termo,
+			"pratica": pratica,
 			"explanation": definicao,
 			"referencia": str(it.get("referencia", "")),
 		})
@@ -394,6 +490,7 @@ static func _materialize_desvio(raw: Dictionary) -> Dictionary:
 		"opcoes": opcoes,
 		"resposta": key_certa,
 		"motivos": motivos,
+		"pratica": raw.get("pratica", ""),
 		"explanation": explicacao,
 		"referencia": raw.get("referencia", ""),
 	}
@@ -415,7 +512,58 @@ static func _materialize_stop(raw: Dictionary) -> Dictionary:
 		opcoes.append(t)
 	opcoes.shuffle()
 	item["opcoes"] = opcoes
+	# V0.16.2: se o jogador errar, mostramos o que a opcao escolhida realmente significa (didatico).
+	var motivos_texto: Dictionary = {}
+	for t in opcoes:
+		var termo: String = str(t)
+		if termo != correta and _term_definitions.has(termo):
+			motivos_texto[termo] = str(_term_definitions[termo])
+	item["motivos_texto"] = motivos_texto
 	return item
+
+
+# ======================================================================
+# HISTORICO (V0.16.2)
+# ======================================================================
+
+static func _history_key(minigame: String, difficulty: String) -> String:
+	return "%s|%s" % [str(FAMILY_BY_MINIGAME.get(minigame, minigame)), difficulty]
+
+
+static func _remember_item(key: String, item_id: String, memory: int) -> void:
+	if item_id == "":
+		return
+	var recent: Array = _recent_by_key.get(key, [])
+	recent.erase(item_id)          # re-visto vai para o fim (o mais "recente")
+	recent.append(item_id)
+	while recent.size() > memory:
+		recent.pop_front()
+	_recent_by_key[key] = recent
+
+
+static func _load_history() -> void:
+	if _history_loaded:
+		return
+	_history_loaded = true
+	if not FileAccess.file_exists(HISTORY_PATH):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(HISTORY_PATH))
+	if not (parsed is Dictionary):
+		return   # arquivo corrompido: comeca do zero, sem travar o jogo
+	for key in (parsed as Dictionary).keys():
+		var ids: Variant = (parsed as Dictionary)[key]
+		if ids is Array:
+			var clean: Array = []
+			for v in (ids as Array):
+				clean.append(str(v))
+			_recent_by_key[str(key)] = clean
+
+
+static func _save_history() -> void:
+	var file: FileAccess = FileAccess.open(HISTORY_PATH, FileAccess.WRITE)
+	if file == null:
+		return   # sem permissao de escrita (ex.: web sem IndexedDB): o historico vale so nesta sessao
+	file.store_string(JSON.stringify(_recent_by_key))
 
 
 # ======================================================================
@@ -463,12 +611,16 @@ static func _item_topic(item: Dictionary) -> String:
 	return str(item.get("topic", item.get("id", "")))
 
 
-static func _item_signature(item: Dictionary) -> String:
+## Identificador estavel do item. Os itens do Desvio Logico/STOP variam a cada sorteio (alternativas embaralhadas),
+## entao o historico usa o ID do banco (QA-001, DL-003...) e nao o texto. O prefixo "P-"/"S-" das versoes rapidas
+## e removido para Show do Bilhao e Perseguicao contarem como o MESMO conteudo.
+static func _item_id(item: Dictionary) -> String:
+	var id_text: String = str(item.get("id", ""))
+	if id_text.begins_with("P-") or id_text.begins_with("S-"):
+		id_text = id_text.substr(2)
+	if id_text != "":
+		return id_text
 	for key in ["correta", "word", "controle", "name"]:
 		if item.has(key):
 			return str(item[key])
-	if item.has("resposta") and item.has("opcoes"):
-		var ops: Variant = item["opcoes"]
-		if ops is Dictionary:
-			return str((ops as Dictionary).get(str(item["resposta"]), item.get("id", "")))
-	return str(item.get("id", ""))
+	return ""

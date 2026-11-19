@@ -260,7 +260,7 @@ static func resolve_sprite_path(character_id: String, variant: String = "v3") ->
 ## Valores reais do jogo injetados nos textos ({correct}, {wrong}, {stage}...): o tutorial nunca fica
 ## desatualizado quando a pontuacao ou a dificuldade mudam.
 static func placeholders(host: Node, minigame_key: String) -> Dictionary:
-	var ctx: Dictionary = {"rounds": 6, "stage": 1, "total": 8, "difficulty": "Normal", "correct": 0, "wrong": 0, "threats": 0, "chase_time": 0}
+	var ctx: Dictionary = {"rounds": SettingsManager.get_current_questions_count(), "stage": 1, "total": 8, "difficulty": "Normal", "correct": 0, "wrong": 0, "threats": 0, "chase_time": 0}
 	if host == null or not host.has_node("/root/DifficultyManager"):
 		return ctx
 	ctx["difficulty"] = DifficultyManager.get_label()

@@ -10,8 +10,28 @@ const DEFAULT_SETTINGS := {
 	"difficulty": "normal",
 	"animations_enabled": true,
 	"tutorials_enabled": true,
-	"novel_auto": false
+	"novel_auto": false,
+	"campaign_questions_count": 2,
+	"free_mode_questions_count": 4,
+	"font_size_level": "media"
 }
+
+## V0.16.3 (acessibilidade): tamanho da fonte do jogo. Os fatores de escala ficam em FontScale (autoload).
+## Padrao = "media" (o tamanho de sempre). Salvo no mesmo settings.json.
+const FONT_LEVELS: Array[String] = ["pequena", "media", "grande", "extra_grande"]
+const DEFAULT_FONT_LEVEL: String = "media"
+
+## V0.16.1: quantidade de questoes/rodadas por minigame. Mesmas opcoes nos dois modos; o PADRAO muda
+## (campanha = 2, modo livre = 4). Salvo no mesmo settings.json do volume (user:// vira IndexedDB na web).
+const QUESTION_COUNT_OPTIONS: Array[int] = [2, 4, 8, 10]
+const DEFAULT_CAMPAIGN_QUESTIONS: int = 2
+const DEFAULT_FREE_QUESTIONS: int = 4
+## Base dos pontos configurados em DifficultyManager (6 questoes). Ver question_score_scale().
+const SCORE_BASE_QUESTIONS: float = 6.0
+## V0.16.4: limite dinamico (2/4/8/10) VALE APENAS para Show do Bilhao, Maleta Certa, Perseguicao, STOP e Forca Tecnica.
+## FICAM DE FORA: Roleta de Risco (mini game bonus: 1 giro em qualquer modo), Batalha Naval (ameacas fixas por
+## dificuldade: 16/12/8) e Desvio Logico (sempre 6 desafios, um por horario do dia).
+const QUESTION_BASED_GAMES: Array[String] = ["show_do_bilhao", "perseguicao", "maleta_certa", "stop", "forca_tecnica"]
 
 var settings: Dictionary = DEFAULT_SETTINGS.duplicate(true)
 
@@ -49,6 +69,11 @@ func load_settings() -> void:
 		for key in DEFAULT_SETTINGS.keys():
 			if parsed.has(key):
 				settings[key] = parsed[key]
+		# V0.16.1: save antigo (sem as chaves novas) ou editado a mao nunca deixa o jogo com valor invalido.
+		settings["campaign_questions_count"] = _sanitize_question_count(settings.get("campaign_questions_count"), DEFAULT_CAMPAIGN_QUESTIONS)
+		settings["free_mode_questions_count"] = _sanitize_question_count(settings.get("free_mode_questions_count"), DEFAULT_FREE_QUESTIONS)
+		# V0.16.3: save antigo (sem a chave "font_size_level") ou editado a mao volta para "media".
+		settings["font_size_level"] = _sanitize_font_level(settings.get("font_size_level"))
 	else:
 		push_warning("settings.json inválido. As configurações padrão foram carregadas.")
 
@@ -143,6 +168,62 @@ func novel_auto() -> bool:
 
 func toggle_novel_auto() -> void:
 	set_novel_auto(not novel_auto())
+
+# ---------------------------------------------------------------- V0.16.3: tamanho da fonte (acessibilidade)
+func _sanitize_font_level(value: Variant) -> String:
+	var level: String = str(value) if value is String else DEFAULT_FONT_LEVEL
+	return level if FONT_LEVELS.has(level) else DEFAULT_FONT_LEVEL
+
+func get_font_level() -> String:
+	return _sanitize_font_level(settings.get("font_size_level"))
+
+## Salva NA HORA (e uma escolha unica, nao um arrasto). O FontScale ouve o sinal settings_changed e
+## refaz todos os textos que estao na tela.
+func set_font_level(level: String) -> void:
+	set_setting("font_size_level", _sanitize_font_level(level))
+	flush_pending_save()
+
+## Proximo/anterior nivel (teclado/controle: setas esquerda/direita no seletor).
+func step_font_level(direction: int) -> void:
+	var index: int = FONT_LEVELS.find(get_font_level())
+	set_font_level(FONT_LEVELS[clampi(index + direction, 0, FONT_LEVELS.size() - 1)])
+
+# ---------------------------------------------------------------- V0.16.1: questoes por minigame
+func _sanitize_question_count(value: Variant, fallback: int) -> int:
+	var number: int = int(value) if (value is int or value is float) else fallback
+	return number if QUESTION_COUNT_OPTIONS.has(number) else fallback
+
+func get_campaign_questions_count() -> int:
+	return _sanitize_question_count(settings.get("campaign_questions_count"), DEFAULT_CAMPAIGN_QUESTIONS)
+
+func get_free_mode_questions_count() -> int:
+	return _sanitize_question_count(settings.get("free_mode_questions_count"), DEFAULT_FREE_QUESTIONS)
+
+## Metodo publico pedido: quantidade alvo de questoes para o modo informado.
+func get_target_questions_count(is_campaign: bool) -> int:
+	return get_campaign_questions_count() if is_campaign else get_free_mode_questions_count()
+
+## Atalho para os minigames: usa o modo em andamento (campanha x livre).
+func get_current_questions_count() -> int:
+	var campaign: bool = has_node("/root/GameManager") and GameManager.is_campaign_mode()
+	return get_target_questions_count(campaign)
+
+## Salva NA HORA (sem esperar o atraso do slider): a escolha e um clique unico, nao um arrasto.
+func set_campaign_questions_count(value: int) -> void:
+	set_setting("campaign_questions_count", _sanitize_question_count(value, DEFAULT_CAMPAIGN_QUESTIONS))
+	flush_pending_save()
+
+func set_free_mode_questions_count(value: int) -> void:
+	set_setting("free_mode_questions_count", _sanitize_question_count(value, DEFAULT_FREE_QUESTIONS))
+	flush_pending_save()
+
+## Multiplicador de pontos por questao: o MAXIMO de pontos do minigame continua o mesmo de 6 questoes.
+## Assim recordes, capitulos da firma, platina e finais por pontuacao seguem comparaveis em qualquer duracao.
+func question_score_scale(minigame_key: String) -> float:
+	if not QUESTION_BASED_GAMES.has(minigame_key):
+		return 1.0
+	var count: float = float(get_current_questions_count())
+	return SCORE_BASE_QUESTIONS / count
 
 func set_difficulty(value: String) -> void:
 	if not ["facil", "normal", "dificil"].has(value):

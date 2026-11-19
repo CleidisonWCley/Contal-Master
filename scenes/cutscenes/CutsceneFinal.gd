@@ -539,14 +539,14 @@ func _build_score_layer() -> void:
 	score_title_label = Label.new()
 	score_title_label.text = "PONTUAÇÃO FINAL DA JORNADA"
 	score_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	score_title_label.add_theme_font_size_override("font_size", 29)
+	FontScale.set_size(score_title_label, 29)
 	score_title_label.add_theme_color_override("font_color", Color(0.82, 0.84, 0.92))
 	box.add_child(score_title_label)
 
 	score_value_label = Label.new()
 	score_value_label.text = "0"
 	score_value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	score_value_label.add_theme_font_size_override("font_size", 86)
+	FontScale.set_size(score_value_label, 86)
 	score_value_label.add_theme_color_override("font_color", GOLD)
 	score_value_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
 	score_value_label.add_theme_constant_override("shadow_offset_x", 4)
@@ -556,14 +556,14 @@ func _build_score_layer() -> void:
 	difficulty_label = Label.new()
 	difficulty_label.text = "Dificuldade: %s" % DifficultyManager.get_label()
 	difficulty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	difficulty_label.add_theme_font_size_override("font_size", 25)
+	FontScale.set_size(difficulty_label, 25)
 	difficulty_label.add_theme_color_override("font_color", Color(0.42, 0.78, 1.0))
 	box.add_child(difficulty_label)
 
 	tier_label = Label.new()
 	tier_label.text = str(tier.get("title", ""))
 	tier_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tier_label.add_theme_font_size_override("font_size", 34)
+	FontScale.set_size(tier_label, 34)
 	tier_label.add_theme_color_override("font_color", Color(1.0, 0.92, 0.55))
 	tier_label.modulate.a = 0.0
 	box.add_child(tier_label)
@@ -571,7 +571,7 @@ func _build_score_layer() -> void:
 	record_label = Label.new()
 	record_label.text = _record_text()
 	record_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	record_label.add_theme_font_size_override("font_size", 21)
+	FontScale.set_size(record_label, 21)
 	record_label.add_theme_color_override("font_color", Color(0.62, 1.0, 0.72))
 	record_label.modulate.a = 0.0
 	box.add_child(record_label)
@@ -580,7 +580,7 @@ func _build_score_layer() -> void:
 	motivation_label.text = "\"%s\"" % _get_motivation()
 	motivation_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	motivation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	motivation_label.add_theme_font_size_override("font_size", 20)
+	FontScale.set_size(motivation_label, 20)
 	motivation_label.add_theme_color_override("font_color", Color(0.82, 0.82, 0.86))
 	motivation_label.modulate.a = 0.0
 	box.add_child(motivation_label)
@@ -588,7 +588,7 @@ func _build_score_layer() -> void:
 	score_hint_label = Label.new()
 	score_hint_label.text = "Clique, Espaço ou Enter para continuar"
 	score_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	score_hint_label.add_theme_font_size_override("font_size", 17)
+	FontScale.set_size(score_hint_label, 17)
 	score_hint_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.95, 0.85))
 	score_hint_label.modulate.a = 0.0
 	box.add_child(score_hint_label)
@@ -723,7 +723,7 @@ func _build_finale_layer() -> void:
 	finale_thanks_label = Label.new()
 	finale_thanks_label.text = str(texts.get("thanks", "Obrigado por jogar!"))
 	finale_thanks_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	finale_thanks_label.add_theme_font_size_override("font_size", 54)
+	FontScale.set_size(finale_thanks_label, 54)
 	finale_thanks_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.78))
 	finale_thanks_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
 	finale_thanks_label.add_theme_constant_override("shadow_offset_x", 3)
@@ -736,7 +736,7 @@ func _build_finale_layer() -> void:
 	finale_subtitle_label.visible = finale_subtitle_label.text != ""
 	finale_subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	finale_subtitle_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	finale_subtitle_label.add_theme_font_size_override("font_size", 24)
+	FontScale.set_size(finale_subtitle_label, 24)
 	finale_subtitle_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.96, 0.92))
 	finale_subtitle_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.85))
 	finale_subtitle_label.add_theme_constant_override("shadow_offset_x", 2)
@@ -762,7 +762,7 @@ func _build_gameover_layer() -> void:
 	gameover_label = Label.new()
 	gameover_label.text = "GAME OVER"
 	gameover_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	gameover_label.add_theme_font_size_override("font_size", 86)
+	FontScale.set_size(gameover_label, 86)
 	gameover_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
 	gameover_label.add_theme_color_override("font_shadow_color", Color(0.45, 0.72, 1.0, 0.95))
 	gameover_label.add_theme_constant_override("shadow_offset_x", 4)
@@ -772,7 +772,7 @@ func _build_gameover_layer() -> void:
 	var thanks: Label = Label.new()
 	thanks.text = "agradecemos por sua aventura neste Desafio!"
 	thanks.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	thanks.add_theme_font_size_override("font_size", 24)
+	FontScale.set_size(thanks, 24)
 	thanks.add_theme_color_override("font_color", Color(0.78, 0.82, 0.92))
 	box.add_child(thanks)
 
@@ -808,7 +808,7 @@ func _add_credit_label(text_value: String, font_size: int, color: Color) -> void
 	label.text = text_value
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.add_theme_font_size_override("font_size", font_size)
+	FontScale.set_size(label, font_size)
 	label.add_theme_color_override("font_color", color)
 	credits_box.add_child(label)
 
