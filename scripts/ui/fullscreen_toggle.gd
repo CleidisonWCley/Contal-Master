@@ -13,14 +13,16 @@ extends Button
 ## da tela cheia com ESC sem o jogo saber, entao o texto e sincronizado por sinal de redimensionamento + checagem leve
 ## (4x por segundo). Depois de um clique mostramos o estado PEDIDO por um instante, para o texto mudar na hora.
 
-const TEXT_ON: String = "Tela cheia - ON"
-const TEXT_OFF: String = "Tela cheia - OFF"
+# V0.16.9.4: botao COMPACTO ("TELA: ON" / "TELA: OFF"): ocupa menos da tela (libera o topo para HUDs e perguntas), e o estado
+# continua dito com palavras + icone. A dica (tooltip) explica a acao por extenso.
+const TEXT_ON: String = "TELA: ON"
+const TEXT_OFF: String = "TELA: OFF"
 ## load() em vez de preload(): se os icones ainda nao foram importados (primeira abertura do projeto), o script nao quebra.
 const ICON_ENTER_PATH: String = "res://assets/icons/ui/icon_fullscreen.svg"
 const ICON_EXIT_PATH: String = "res://assets/icons/ui/icon_fullscreen_exit.svg"
 
-const BUTTON_SIZE: Vector2 = Vector2(206.0, 42.0)
-const FONT_SIZE: int = 16
+const BUTTON_SIZE: Vector2 = Vector2(0.0, 38.0)   # largura = a do conteudo (icone + texto), cresce com a fonte
+const FONT_SIZE: int = 15
 ## Margens do canto (px na base 1280x720). Alinhadas com o score do Desvio Logico.
 const MARGIN_LEFT: float = 22.0
 const MARGIN_TOP: float = 14.0
@@ -53,8 +55,9 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_TOP_LEFT)
 	offset_left = MARGIN_LEFT
 	offset_top = MARGIN_TOP
-	offset_right = MARGIN_LEFT + BUTTON_SIZE.x
+	offset_right = MARGIN_LEFT   # largura vem do tamanho minimo do conteudo (BUTTON_SIZE.x = 0)
 	offset_bottom = MARGIN_TOP + BUTTON_SIZE.y
+	grow_horizontal = Control.GROW_DIRECTION_END
 	icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	expand_icon = false
 	# Sem foco: Enter/Espaco durante uma partida nunca podem "apertar" este botao sem querer. Mouse e toque funcionam normal.
@@ -83,6 +86,15 @@ func _process(delta: float) -> void:
 
 # ---------------------------------------------------------------- acao
 func _on_pressed() -> void:
+	# V0.16.9.4 (celular/tablet no itch.io): o navegador ja abre o jogo ocupando a tela (sem a Fullscreen API). O botao ja mostra ON;
+	# um clique so tenta a tela cheia "de verdade" (se o aparelho permitir) e NUNCA vira OFF nesse caso.
+	if OS.has_feature("web") and _web_fs_state() == 2:
+		_apply_mode(true)
+		_shown_fullscreen = true
+		_grace_until_msec = Time.get_ticks_msec() + REQUEST_GRACE_MSEC
+		_refresh_visuals()
+		_play_click()
+		return
 	# Durante a janela de graca vale o estado PEDIDO (cliques seguidos nao brigam com o navegador).
 	var currently_fullscreen: bool = _shown_fullscreen if _in_grace() else _is_real_fullscreen()
 	var target_fullscreen: bool = not currently_fullscreen
@@ -121,7 +133,34 @@ func _in_grace() -> bool:
 	return Time.get_ticks_msec() < _grace_until_msec
 
 
+## 0 = janela normal | 1 = Fullscreen API ativa | 2 = o jogo ja ocupa a tela (celular/tablet/PWA), sem a API.
+## Mesma regra do WebBridge (window.__cmFsState).
+const JS_FS_STATE: String = """
+(function () {
+  var d = document;
+  if (d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement) { return 1; }
+  var mm = function (q) { try { return window.matchMedia(q).matches; } catch (e) { return false; } };
+  if (mm('(display-mode: fullscreen)') || mm('(display-mode: standalone)') || mm('(display-mode: minimal-ui)') || window.navigator.standalone === true) { return 2; }
+  var coarse = mm('(pointer: coarse)') || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+  if (!coarse) { return 0; }
+  var vv = window.visualViewport;
+  var w = vv ? vv.width : window.innerWidth, h = vv ? vv.height : window.innerHeight;
+  var big = Math.max(screen.width, screen.height), small = Math.min(screen.width, screen.height);
+  var land = w >= h;
+  var tw = land ? big : small, th = land ? small : big;
+  return (w >= tw * 0.92 && h >= th * 0.80) ? 2 : 0;
+})()
+"""
+
+func _web_fs_state() -> int:
+	if not OS.has_feature("web"):
+		return 0
+	return int(JavaScriptBridge.eval(JS_FS_STATE, true))
+
+
 func _is_real_fullscreen() -> bool:
+	if OS.has_feature("web"):
+		return _web_fs_state() > 0
 	var mode: DisplayServer.WindowMode = DisplayServer.window_get_mode()
 	return mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
 

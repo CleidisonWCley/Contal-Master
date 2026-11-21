@@ -7,11 +7,11 @@ const TOTAL_ROUNDS := 6
 const DRIVE_DURATION_SECONDS := 22.0
 const BACKGROUNDS := Paths.DL_BACKGROUNDS
 const STAGE_NAMES := ["Amanhecer", "Manhã", "Tarde", "Entardecer", "Anoitecer", "Noite"]
-const PLAYER_CAR_DISPLAY_NAME := "Bionix"
 const CAR_SPRITES := Paths.DL_CAR_SPRITES
 const NPC_SPRITES := Paths.DL_NPC_SPRITES
-const PROP_POST := "post"
-const PROP_POST_LEFT := "post_left"
+# V0.16.11: postes removidos. TRAIL_* sao so as trilhas (markers PostLeft*/PostRight* da cena) usadas pelas listras do gramado.
+const PROP_TRAIL_LEFT := "trail_left"
+const PROP_TRAIL_RIGHT := "trail_right"
 const PROP_SIGN := "sign"
 const PROP_CYCLIST := "cyclist"
 const PROP_SPRITES := Paths.DL_PROP_SPRITES
@@ -21,12 +21,9 @@ const DEBUG_WATER_POINTS := false
 # 0 = desligado, 1 = leve/visível, 2 = médio.
 const WATER_EFFECT_QUALITY := 1
 const WATER_REDRAW_INTERVAL := 0.0334  # na web o DesvioLogico usa WebLite.water_interval()
-const WATER_USE_MASK_SHADER := false
 const TUTORIAL_ARROW_SPRITES := Paths.DL_TUTORIAL_ARROWS
 const ENGINE_ACCELERATION_SOUND := Paths.SFX_CAR_ACCELERATION
 const ENGINE_LOOP_SOUND := Paths.SFX_CAR_ENGINE_LOOP
-const ENGINE_ACCELERATION_SFX_KEY := "car_acceleration"
-const ENGINE_LOOP_SFX_KEY := "car_engine_loop"
 const ENGINE_ACCELERATION_LOOP_ID := "desvio_velox_acceleration"
 const ENGINE_LOOP_ID := "desvio_velox_engine"
 # V0.13.9.5: áudio limpo, sem filtros extras. Os volumes abaixo foram preservados
@@ -34,8 +31,6 @@ const ENGINE_LOOP_ID := "desvio_velox_engine"
 const DESVIO_MUSIC_VOLUME_DB := -1.0
 const ENGINE_ACCELERATION_VOLUME_DB := -4.0
 const ENGINE_LOOP_VOLUME_DB := -7.0
-const VELOX_SFX_BUS := &"VeloxSFX"
-const VELOX_SFX_BUS_SEND := &"Master"
 const ENGINE_ACCELERATION_DURATION_BY_DIFFICULTY := {
 	"facil": 3.2,
 	"normal": 3.8,
@@ -88,16 +83,13 @@ const NPC_FINAL_SPAWN_CUTOFF_SECONDS := {
 # V0.13.8.6: colisão visual precisa acompanhar o Bionix em toda a subida.
 # O grace antigo era longo demais: quando o Velox estava alto, o NPC passava pela
 # área visual do carro ainda protegido e só podia causar dano quando já tinha descido.
-const NPC_DAMAGE_GRACE_SECONDS := 0.18
 const NPC_INITIAL_DAMAGE_GRACE_SECONDS := 0.48
 const NPC_SWEPT_COLLISION_PADDING_Y := 10.0
-const LANE_COUNT := 2
 const LANE_LEFT := 0
 const LANE_RIGHT := 1
 const LANE_CENTER := -1
 const PLAYABLE_LANES := [LANE_LEFT, LANE_RIGHT]
 const MAX_ACTIVE_NPCS := 2
-const INITIAL_TRAFFIC_COUNT := 1
 # V0.13.13.2: distribuição fixa de tráfego por ondas com abertura guiada.
 # A fase real abre sempre com 1 NPC na direita e depois 1 NPC na esquerda,
 # ambos com distância segura. Depois disso entram ondas fixas por dificuldade.
@@ -121,11 +113,32 @@ const SPAWN_HORIZON_SAFETY_OPPOSITE_RATIO := {
 	"normal": 0.185,
 	"dificil": 0.205
 }
-const SIDE_PROP_COUNT := 9
-const LEFT_POST_RETRY_DELAY := 1.85
-const LEFT_POST_VISIBLE_MAX_T := 0.92
-# V0.14.2: apenas 2 postes por lado, com distancia bem visivel entre eles (eram 3). Ciclista inalterado.
-const POST_DEPTH_SLOTS := [0.12, 0.62]
+# V0.16.11: o fundo e 100% ESTATICO (sem zoom, sem ondulacao, sem faixa do horizonte crescendo) e nao ha mais postes.
+# Referencia de perspectiva das listras decorativas do gramado: linha de fuga e distancia calcada -> centro do gramado,
+# em px por px de profundidade abaixo de GRASS_VANISH_Y.
+const GRASS_VANISH_Y := 190.0
+const GRASS_LINES_OFFSET_PER_DEPTH := 0.135
+# V0.16.9.6: luzes dos carros por horario (indice = current_round). Lanternas vermelhas atras de TODOS os carros (NPCs e Bionix)
+# a partir do Entardecer; farol do Bionix (cone de luz a frente) so nos horarios noturnos.
+const CAR_TAILLIGHT_BY_ROUND := [0.0, 0.0, 0.0, 0.65, 0.90, 1.0]
+# V0.16.11: farol removido. No lugar, uma AUREOLA de luz branca suave a frente do Bionix (so horarios noturnos), sem feixes nem pontos.
+# ============================================================================
+# LUZ A FRENTE DO BIONIX (aureola) - e AQUI que voce ajusta nos testes. So aparece nos horarios noturnos.
+# Tamanhos em fracao do sprite do carro (largura = 1.0 / altura = 1.0). Opacidades de 0.0 (invisivel) a 1.0.
+# ============================================================================
+# 1) INTENSIDADE POR HORARIO (multiplica TUDO abaixo). Ordem: Amanhecer, Manha, Tarde, Entardecer, Anoitecer, Noite.
+const CAR_HEADLIGHT_BY_ROUND := [0.0, 0.0, 0.0, 0.0, 0.70, 1.0]
+# 2) CONE de luz (abre do capo para frente, some na ponta)
+const AURA_CONE_LENGTH := 0.62          # comprimento do cone. Maior = luz chega mais longe
+const AURA_CONE_NEAR_HALF_W := 0.26     # meia-largura junto ao carro
+const AURA_CONE_FAR_HALF_W := 0.48      # meia-largura na ponta (maior = cone mais aberto)
+const AURA_CONE_ALPHA := 0.20           # brilho do cone junto ao carro. 0.10 bem sutil | 0.30 forte
+const AURA_CONE_START_Y := 0.22         # onde o cone nasce, a partir do topo do sprite (maior = nasce mais "dentro" do carro)
+# 3) POCA de luz no asfalto (so aparelho forte; aparelho fraco desenha so o cone)
+const AURA_POOL_ALPHA := 0.16           # brilho da poca. 0.0 desliga
+const AURA_POOL_WIDTH := 0.95           # largura da poca
+const AURA_POOL_HEIGHT := 0.34          # altura da poca
+const AURA_POOL_Y := -0.36              # posicao da poca (negativo = mais a frente do carro)
 const STATE_TUTORIAL_INTRO := "tutorial_intro"
 const STATE_TUTORIAL_LEFT := "tutorial_left"
 const STATE_TUTORIAL_RIGHT := "tutorial_right"

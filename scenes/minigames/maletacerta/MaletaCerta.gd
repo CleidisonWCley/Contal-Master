@@ -57,6 +57,8 @@ const ALL_CHALLENGES := {
 }
 
 var root_margin: MarginContainer
+var top_icons: Array = []
+var layout_fit: DynamicLayout           # V0.16.7: padrao unico de layout dinamico (scripts/ui/DynamicLayout.gd)
 var particles_layer: Control
 var title_label: Label
 var challenge_counter_label: Label
@@ -67,6 +69,8 @@ var options_box: GridContainer
 var feedback_layer: Control
 var feedback_title_label: Label
 var feedback_body_label: Label
+var feedback_body_scroll: ScrollContainer   # V0.16.4: texto do feedback rola se a fonte for muito grande
+var feedback_panel: PanelContainer
 var feedback_continue_button: Button
 var finish_layer: Control
 var finish_score_label: Label
@@ -84,6 +88,8 @@ var correct_answers_count: int = 0
 func _ready() -> void:
 	randomize()
 	_build_scene()
+	get_viewport().size_changed.connect(_refit_options)
+	FontScale.scale_changed.connect(_on_font_scale_changed)
 	pause_menu = MinigamePause.attach(self)
 	_connect_score_signal()
 	_prepare_challenges()
@@ -171,6 +177,7 @@ func _build_scene() -> void:
 	main_box.add_child(top_row)
 
 	top_row.add_child(_create_mala_icon(Vector2(72, 72)))
+	top_icons.append(top_row.get_child(top_row.get_child_count() - 1))
 
 	title_label = Label.new()
 	title_label.name = "TitleLabel"
@@ -184,6 +191,7 @@ func _build_scene() -> void:
 	top_row.add_child(title_label)
 
 	top_row.add_child(_create_mala_icon(Vector2(72, 72)))
+	top_icons.append(top_row.get_child(top_row.get_child_count() - 1))
 
 	var status_row := HBoxContainer.new()
 	status_row.name = "StatusRow"
@@ -256,6 +264,15 @@ func _build_scene() -> void:
 	hint_label.add_theme_color_override("font_color", Color(0.86, 0.92, 1.0, 0.92))
 	main_box.add_child(hint_label)
 
+
+	layout_fit = DynamicLayout.new(self, root_margin, main_box, 32)
+	layout_fit.add_gap(main_box, "separation", 16).add_gap(options_box, "v_separation", 14)
+	layout_fit.add_min_height(problem_panel, 160.0)
+	for icon in top_icons:
+		if is_instance_valid(icon):
+			layout_fit.add_icon(icon as Control, Vector2(72, 72))
+	layout_fit.add_optional(hint_label)
+	layout_fit.set_buttons(Callable(self, "_fit_buttons_scaled"))
 
 	_build_feedback_layer()
 	_build_finish_layer()
@@ -333,6 +350,8 @@ func _build_feedback_layer() -> void:
 	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.92, 0.94, 1.0))
 	box.add_child(feedback_body_label)
+	feedback_body_scroll = AnswerLayout.install_body_scroll(box, feedback_body_label)
+	feedback_panel = panel
 	_create_feedback_continue_button(box)
 
 func _create_feedback_continue_button(parent: VBoxContainer) -> void:
@@ -468,6 +487,29 @@ func _load_challenge(index: int) -> void:
 		button.pressed.connect(_on_option_pressed.bind(option_text, button))
 		options_box.add_child(button)
 		option_buttons.append(button)
+	_refit_options()
+
+## V0.16.4: respostas quebram linha e crescem em altura conforme a fonte (antes: altura fixa cortava o texto na fonte Extra grande).
+func _refit_options() -> void:
+	if layout_fit != null and is_inside_tree():
+		layout_fit.schedule()
+
+func _fit_buttons_scaled(k: float) -> void:
+	# V0.16.9.2: o icone da maleta tem tamanho PROPRIO (antes expandia ate a largura do botao ~115 px e, com texto de 2 linhas
+	# em fonte Extra grande, sobrepunha "MALETA n"). A altura do botao reserva exatamente icone + texto, e o texto fica
+	# CENTRALIZADO (combina com o icone centralizado no topo).
+	var icon_px: float = maxf(26.0, 48.0 * k)
+	var button_w: float = (get_viewport_rect().size.x - 92.0 - 44.0) / 3.0
+	for button in option_buttons:
+		if is_instance_valid(button):
+			button.add_theme_constant_override("icon_max_width", int(round(icon_px)))
+	AnswerLayout.fit_option_buttons(option_buttons, button_w, 132.0 * k, 0.0, icon_px + 8.0)
+	for button in option_buttons:
+		if is_instance_valid(button):
+			button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func _on_font_scale_changed(_level: String) -> void:
+	_refit_options()
 
 func _clear_options() -> void:
 	for child in options_box.get_children():
@@ -529,6 +571,7 @@ func _show_feedback(is_correct: bool, selected_text: String, correct_text: Strin
 		var why_not: String = FeedbackText.why_not_line(FeedbackText.reason_for_text(current_challenge.get("motivos_texto", {}), selected_text), "Essa opção não resolve bem o cenário apresentado.")
 		feedback_body_label.text = "Você escolheu: %s\n%s\n\nSolução correta: %s\n%s%s\nPontuação perdida: %s" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
+	AnswerLayout.fit_feedback(feedback_panel, feedback_body_scroll, feedback_body_label, 720.0)
 	await _wait_for_feedback_continue()
 
 func _clean_feedback_explanation(answer_text: String, explanation_text: String) -> String:

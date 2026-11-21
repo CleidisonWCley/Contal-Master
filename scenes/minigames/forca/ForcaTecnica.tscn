@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" uid="uid://byef6105pesjw" path="res://scenes/minigames/forca/ForcaTecnica.gd" id="1"]
+[ext_resource type="Script" uid="uid://ftsbr3xe9lobo" path="res://scenes/minigames/forca/ForcaTecnica.gd" id="1"]
 
 [node name="ForcaTecnica" type="Control"]
 layout_mode = 3

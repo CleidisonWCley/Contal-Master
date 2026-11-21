@@ -1,35 +1,7 @@
-# ==========================================
-# ContalMaster .gitignore
-# ==========================================
-
-# Exportações do jogo e executáveis compilados
-*.translation
-*.html
-!web/shell.html
-*.pck
-*.zip
-*.tar.gz
-*.apk
-*.aab
-*.ipa
-*.exe
-*.dll
-*.so
-*.dylib
-*.dmg
-*.app
-*.iso
-
-# Arquivos de editores e IDEs
-.vscode/
-.idea/
-*.swp
-*~
-
-# Arquivos temporários do sistema operacional
-.DS_Store
-.DS_Store?
-ehthumbs.db
-Thumbs.db
+# Godot 4
 .godot/
-/android/
+*.translation
+# Export web (itch.io): gerado pelo Godot, nao deve ir para o versionamento (~110 MB; index.pck e index.wasm ficam desatualizados)
+build/
+# Preset local (Android/keystore)
+export_presets.cfg

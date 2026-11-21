@@ -70,6 +70,8 @@ var finish_visible := false
 var damage_count: int = 0
 
 var root_margin: MarginContainer
+var top_icons: Array = []
+var layout_fit: DynamicLayout           # V0.16.7: padrao unico de layout dinamico (scripts/ui/DynamicLayout.gd)
 var road_layer: Control
 var top_siren: ColorRect
 var bottom_siren: ColorRect
@@ -84,6 +86,8 @@ var options_box: HBoxContainer
 var feedback_layer: Control
 var feedback_title_label: Label
 var feedback_body_label: Label
+var feedback_body_scroll: ScrollContainer   # V0.16.4: texto do feedback rola se a fonte for muito grande
+var feedback_panel: PanelContainer
 var feedback_continue_button: Button
 var finish_layer: Control
 var finish_score_label: Label
@@ -91,6 +95,8 @@ var finish_score_label: Label
 func _ready() -> void:
 	randomize()
 	_build_scene()
+	get_viewport().size_changed.connect(_refit_options)
+	FontScale.scale_changed.connect(_on_font_scale_changed)
 	pause_menu = MinigamePause.attach(self)
 	_connect_score_signal()
 	_prepare_incidents()
@@ -208,6 +214,7 @@ func _build_scene() -> void:
 	main_box.add_child(top_row)
 
 	top_row.add_child(_create_icon(LOCK_ICON_PATH, Vector2(62, 62)))
+	top_icons.append(top_row.get_child(top_row.get_child_count() - 1))
 
 	title_label = Label.new()
 	title_label.name = "TitleLabel"
@@ -221,6 +228,7 @@ func _build_scene() -> void:
 	top_row.add_child(title_label)
 
 	top_row.add_child(_create_icon(LOCK_ICON_PATH, Vector2(62, 62)))
+	top_icons.append(top_row.get_child(top_row.get_child_count() - 1))
 
 	var status_row := HBoxContainer.new()
 	status_row.name = "StatusRow"
@@ -313,9 +321,21 @@ func _build_scene() -> void:
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	FontScale.set_size(hint_label, 17)
+	# V0.16.9.1: largura minima propria. Label com autowrap e SEM largura minima mede altura de "1 letra por linha"
+	# (ate ~3500 px) no primeiro layout, e o DynamicLayout achava que o jogo nao cabia na tela em nenhum nivel.
+	hint_label.custom_minimum_size = Vector2(420, 0)
 	hint_label.add_theme_color_override("font_color", Color(0.90, 0.94, 1.0, 0.92))
 	main_box.add_child(hint_label)
 
+
+	layout_fit = DynamicLayout.new(self, root_margin, main_box, 30)
+	layout_fit.add_gap(main_box, "separation", 14).add_gap(options_box, "separation", 34)
+	layout_fit.add_min_height(incident_panel, 174.0).add_min_height(timer_progress, 22.0, 12.0)
+	for icon in top_icons:
+		if is_instance_valid(icon):
+			layout_fit.add_icon(icon as Control, Vector2(62, 62))
+	layout_fit.add_optional(hint_label)
+	layout_fit.set_buttons(Callable(self, "_fit_buttons_scaled"))
 
 	_build_feedback_layer()
 	_build_finish_layer()
@@ -390,6 +410,8 @@ func _build_feedback_layer() -> void:
 	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
 	box.add_child(feedback_body_label)
+	feedback_body_scroll = AnswerLayout.install_body_scroll(box, feedback_body_label)
+	feedback_panel = panel
 	_create_feedback_continue_button(box)
 
 func _create_feedback_continue_button(parent: VBoxContainer) -> void:
@@ -526,6 +548,7 @@ func _load_incident(index: int) -> void:
 		button.pressed.connect(_on_option_pressed.bind(option_text, button))
 		options_box.add_child(button)
 		option_buttons.append(button)
+	_refit_options()
 	_update_timer()
 
 func _get_two_safe_options(current_incident: Dictionary) -> Array:
@@ -559,6 +582,17 @@ func _get_two_safe_options(current_incident: Dictionary) -> Array:
 		result.append("Ignorar o incidente")
 	result.shuffle()
 	return result.slice(0, 2)
+
+## V0.16.4: respostas quebram linha e crescem em altura conforme a fonte (antes: altura fixa cortava o texto na fonte Extra grande).
+func _refit_options() -> void:
+	if layout_fit != null and is_inside_tree():
+		layout_fit.schedule()
+
+func _fit_buttons_scaled(k: float) -> void:
+	AnswerLayout.fit_option_buttons(option_buttons, (get_viewport_rect().size.x - 92.0 - 34.0) / 2.0, 118.0 * k, 64.0, 0.0)
+
+func _on_font_scale_changed(_level: String) -> void:
+	_refit_options()
 
 func _clear_options() -> void:
 	for child in options_box.get_children():
@@ -627,6 +661,7 @@ func _show_feedback(is_correct: bool, selected_text: String, correct_text: Strin
 			var why_not: String = FeedbackText.why_not_line(FeedbackText.reason_for_text(current_incident.get("motivos_texto", {}), selected_text), "Essa decisão aumenta o risco do incidente.")
 			feedback_body_label.text = "Você escolheu: %s\n%s\n\nAção segura: %s\n%s%s\n%s pontos" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
+	AnswerLayout.fit_feedback(feedback_panel, feedback_body_scroll, feedback_body_label, 760.0)
 	await _wait_for_feedback_continue()
 
 func _clean_feedback_explanation(answer_text: String, explanation_text: String) -> String:

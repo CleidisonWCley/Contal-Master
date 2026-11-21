@@ -241,8 +241,6 @@ const DL_NPC_YELLOW := "res://assets/sprites/desvio_logico/carro_npc_amarelo.png
 const DL_NPC_GREEN := "res://assets/sprites/desvio_logico/carro_npc_verde.png"
 const DL_NPC_ORANGE := "res://assets/sprites/desvio_logico/carro_npc_laranja_queimado.png"
 const DL_NPC_SILVER := "res://assets/sprites/desvio_logico/carro_npc_cinza_prata.png"
-const DL_PROP_POST := "res://assets/sprites/desvio_logico/props/poste_lateral.png"
-const DL_PROP_POST_LEFT := "res://assets/sprites/desvio_logico/props/poste_lateral_esquerdo.png"
 const DL_PROP_SIGN := "res://assets/sprites/desvio_logico/props/placa_bifurcacao_y.png"
 const DL_PROP_CYCLIST := "res://assets/sprites/desvio_logico/props/ciclista_lateral.png"
 const DL_TUTORIAL_ARROW_LEFT := "res://assets/sprites/desvio_logico/tutorial_seta_esquerda.png"
@@ -329,7 +327,7 @@ const SAVE_SETTINGS := "user://settings.json"
 const DL_BACKGROUNDS := [BG_DL_AMANHECER, BG_DL_MANHA, BG_DL_TARDE, BG_DL_ENTARDECER, BG_DL_ANOITECER, BG_DL_NOITE]
 const DL_CAR_SPRITES := {"reto": DL_CAR_STRAIGHT, "esquerda": DL_CAR_LEFT, "direita": DL_CAR_RIGHT, "lateral_esquerda": DL_CAR_SIDE_LEFT, "lateral_direita": DL_CAR_SIDE_RIGHT}
 const DL_NPC_SPRITES := [DL_NPC_RED, DL_NPC_YELLOW, DL_NPC_GREEN, DL_NPC_ORANGE, DL_NPC_SILVER]
-const DL_PROP_SPRITES := {"post": DL_PROP_POST, "post_left": DL_PROP_POST_LEFT, "sign": DL_PROP_SIGN, "cyclist": DL_PROP_CYCLIST}
+const DL_PROP_SPRITES := {"sign": DL_PROP_SIGN, "cyclist": DL_PROP_CYCLIST}
 const DL_TUTORIAL_ARROWS := {"left": DL_TUTORIAL_ARROW_LEFT, "right": DL_TUTORIAL_ARROW_RIGHT}
 
 # ---- BANCO DE PERGUNTAS (auditoria / NBC PA 11) -------------------

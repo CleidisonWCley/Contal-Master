@@ -34,8 +34,9 @@ const TOP_LEFT_RESERVED := 62.0  # V0.16.0: faixa do botao global "Tela cheia" (
 ## real do personagem (CharacterHeights.bust_scale) e o ajuste "fit" de cada um.
 const PORTRAIT_OVERFLOW_BOTTOM := 34.0  # cartao embaixo: a cabeca passa do topo do cartao por ~34 px
 const PORTRAIT_OVERFLOW_TOP := -8.0  # cartao no topo: a cabeca fica um pouco DENTRO do cartao
-const PORTRAIT_FOOT_GAP := 4.0  # folga entre a base do desenho e a base do cartao
-const SCREEN_SAFE_MARGIN := 4.0  # o desenho nunca encosta/passa da borda da tela
+const PORTRAIT_FOOT_GAP := 3.0  # base do desenho (corte na cintura) = borda interna do cartao (borda de 3 px fica visivel)
+const SCREEN_SAFE_MARGIN := 14.0
+const TOP_BAR_RESERVED := 68.0  # V0.16.6: faixa dos botoes Tela cheia/Pausar (ate y ~ 64): a cabeca do sprite nunca passa dela  # o desenho nunca encosta/passa da borda da tela
 const DIM_COLOR := Color(0.035, 0.02, 0.08, 0.72)
 const DIMMED_PORTRAIT := Color(0.34, 0.32, 0.44, 1.0)
 
@@ -62,6 +63,7 @@ var _back_button: Button
 var _next_button: Button
 var _skip_button: Button
 var _portraits: Dictionary = {}
+var _portrait_clip: Control  # V0.16.9: recorta os retratos na base do cartao (o corte da cintura fica rente ao cartao)
 
 var _current_step: Dictionary = {}
 var _speaker_id: String = ""
@@ -339,7 +341,13 @@ func _build_ui() -> void:
 		var portrait: TextureRect = _make_portrait(str(character_id))
 		if portrait != null:
 			_portraits[str(character_id)] = portrait
-			_root.add_child(portrait)
+			if _portrait_clip == null:
+				_portrait_clip = Control.new()
+				_portrait_clip.name = "PortraitClip"
+				_portrait_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				_portrait_clip.clip_contents = true
+				_root.add_child(_portrait_clip)
+			_portrait_clip.add_child(portrait)
 
 
 func _make_portrait(character_id: String) -> TextureRect:
@@ -366,30 +374,47 @@ func _layout(place: bool = true) -> void:
 	var compact: bool = ScreenTools.is_compact(self)
 	var narrow: bool = view.x < NARROW_WIDTH
 	var coach: bool = mode == Mode.COACH  # dica compacta: nao pode cobrir a pista
-	var card_w: float = minf(view.x * 0.94, 820.0 if coach else 1060.0)
+	# V0.16.9: cartao mais largo (1060 -> 1140): o texto flui em menos linhas e o retrato invade menos.
+	# V0.16.9.3: com fonte Grande/Extra grande o cartao cresce PARA OS LADOS (largura base x fator da fonte, ate 94% da tela):
+	# o texto quebra em menos linhas e o cartao nao cresce tanto para baixo (nem cobre as respostas do jogo).
+	var font_grow: float = maxf(FontScale.get_factor(), 1.0)
+	var card_w: float = minf(view.x * 0.94, (820.0 if coach else 1140.0) * font_grow)
 	var base_card_h: float = (140.0 if compact else 166.0) if coach else (166.0 if compact else 190.0)
-	var shift: float = clampf((view.x - card_w) * 0.5, 0.0, 56.0)
-	# a area reservada ao retrato vem da LARGURA REAL do desenho de cada personagem (host a direita,
-	# parceiro a esquerda), na altura minima do cartao. Antes era uma largura unica calculada pelo canvas.
-	var estimate_h: float = base_card_h + PORTRAIT_OVERFLOW_BOTTOM
-	var reserve_right: float = 0.0 if narrow else _portrait_reserve(host_id, estimate_h, shift)
-	var reserve_left: float = 0.0 if narrow else _portrait_reserve(partner_id, estimate_h, shift)
 	var text_size: int = 17 if compact else 21
-
 	var has_partner: bool = partner_id != "" and partner_id != host_id and _portraits.has(partner_id)
-	_margin.add_theme_constant_override("margin_left", (22 if (coach or not has_partner) else int(reserve_left) + 14))
-	_margin.add_theme_constant_override("margin_right", int(reserve_right) + 14)
-	_margin.add_theme_constant_override("margin_top", 12)
-	_margin.add_theme_constant_override("margin_bottom", 10)
-	# Label com autowrap precisa de largura minima: sem ela o minimo de altura explode e o cartao estoura a tela.
-	var label_margin_left: float = 22.0 if (coach or not has_partner) else reserve_left + 14.0
-	_text_label.custom_minimum_size = Vector2(maxf(card_w - 6.0 - label_margin_left - (reserve_right + 14.0), 120.0), 0.0)
-	_card.clip_contents = true
-	FontScale.set_size(_text_label, text_size)
-	FontScale.set_size(_name_label, 18 if compact else 20)
-	_style_buttons(compact)
-	# V0.11.1: a altura do cartao ACOMPANHA o texto (antes o cartao crescia e o retrato ficava preso na altura antiga).
-	var card_h: float = _refit_card(view, card_w, base_card_h, text_size, compact, label_margin_left, reserve_right + 14.0)
+	# V0.16.9: a area reservada ao retrato depende da altura do cartao (o retrato cresce junto com ele), e a altura do
+	# cartao depende do texto, que depende da area reservada. Antes a reserva usava so a altura MINIMA do cartao: com fonte
+	# grande o cartao crescia, o retrato tambem, e invadia o texto e o botao "Proximo". Agora repete ate estabilizar (3x).
+	var card_x: float = (view.x - card_w) * 0.5
+	var shift: float = clampf(card_x, 0.0, 56.0)
+	# deslocamento EFETIVO do retrato para fora do cartao (a tela limita: ele nunca passa de SCREEN_SAFE_MARGIN da borda)
+	var shift_right: float = clampf(minf(shift, view.x - SCREEN_SAFE_MARGIN - (card_x + card_w)), 0.0, shift)
+	var shift_left: float = clampf(minf(shift, card_x - SCREEN_SAFE_MARGIN), 0.0, shift)
+	var card_h: float = base_card_h
+	var reserve_right: float = 0.0
+	var reserve_left: float = 0.0
+	for _pass in 3:
+		var estimate_h: float = card_h + PORTRAIT_OVERFLOW_BOTTOM
+		var new_right: float = 0.0 if narrow else _portrait_reserve(host_id, estimate_h, shift_right)
+		var new_left: float = 0.0 if narrow else _portrait_reserve(partner_id, estimate_h, shift_left)
+		var stable: bool = _pass > 0 and absf(new_right - reserve_right) < 1.0 and absf(new_left - reserve_left) < 1.0
+		reserve_right = new_right
+		reserve_left = new_left
+		_margin.add_theme_constant_override("margin_left", (22 if (coach or not has_partner) else int(reserve_left) + 14))
+		_margin.add_theme_constant_override("margin_right", int(reserve_right) + 14)
+		_margin.add_theme_constant_override("margin_top", 12)
+		_margin.add_theme_constant_override("margin_bottom", 10)
+		# Label com autowrap precisa de largura minima: sem ela o minimo de altura explode e o cartao estoura a tela.
+		var label_margin_left: float = 22.0 if (coach or not has_partner) else reserve_left + 14.0
+		_text_label.custom_minimum_size = Vector2(maxf(card_w - 6.0 - label_margin_left - (reserve_right + 14.0), 120.0), 0.0)
+		_card.clip_contents = true
+		FontScale.set_size(_text_label, text_size)
+		FontScale.set_size(_name_label, 18 if compact else 20)
+		_style_buttons(compact)
+		# V0.11.1: a altura do cartao ACOMPANHA o texto (antes o cartao crescia e o retrato ficava preso na altura antiga).
+		card_h = _refit_card(view, card_w, base_card_h, text_size, compact, label_margin_left, reserve_right + 14.0)
+		if stable:
+			break
 	if place:
 		_place_card(_target_card_y(view, card_h), view, card_h, reserve_right, narrow, compact)
 
@@ -397,13 +422,18 @@ func _layout(place: bool = true) -> void:
 ## Altura que o cartao precisa para mostrar nome + texto inteiro + botoes (minimo = altura base).
 ## Mede o texto com a fonte real, entao funciona antes do Godot recalcular o layout.
 func _needed_card_height(card_w: float, base_h: float, text_size: int, compact: bool, margin_left: float, margin_right: float, view_h: float) -> float:
+	# V0.16.8: mede com o tamanho de fonte REAL (FontScale). Antes media com o tamanho base (Media): com fonte Grande/Extra grande
+	# o texto real era mais alto, o cartao crescia sozinho por baixo e o retrato ficava "flutuando" acima da base do cartao.
 	var font: Font = _text_label.get_theme_font("font")
 	var inner_w: float = maxf(card_w - 6.0 - margin_left - margin_right, 120.0)
+	var real_text_size: int = FontScale.px(text_size)
 	var text_h: float = 0.0
 	if font != null and _text_label.text != "":
-		text_h = font.get_multiline_string_size(_text_label.text, HORIZONTAL_ALIGNMENT_LEFT, inner_w, text_size).y + 4.0
-	var name_h: float = (18.0 if compact else 20.0) + 12.0
-	var buttons_h: float = 38.0 if compact else 44.0
+		var measured: Vector2 = font.get_multiline_string_size(_text_label.text, HORIZONTAL_ALIGNMENT_LEFT, inner_w, real_text_size)
+		var line_count: float = maxf(1.0, round(measured.y / maxf(font.get_height(real_text_size), 1.0)))
+		text_h = (measured.y + 3.0 * (line_count - 1.0)) * 1.04 + 4.0
+	var name_h: float = float(FontScale.px(18 if compact else 20)) * 1.35 + 6.0
+	var buttons_h: float = maxf(38.0 if compact else 44.0, float(FontScale.px(15 if compact else 18)) * 1.35 + 18.0)
 	var needed: float = 12.0 + 10.0 + 6.0 + name_h + 6.0 + text_h + 6.0 + buttons_h
 	return clampf(maxf(base_h, needed), base_h, view_h * 0.62)
 
@@ -413,6 +443,13 @@ func _refit_card(view: Vector2, card_w: float, base_h: float, text_size: int, co
 	var card_h: float = _needed_card_height(card_w, base_h, text_size, compact, margin_left, margin_right, view.y)
 	_card.custom_minimum_size = Vector2(card_w, card_h)
 	_card.size = Vector2(card_w, card_h)
+	# Rede de seguranca: se o conteudo REAL pedir mais altura que a estimativa, o cartao e o retrato usam a altura real
+	# (o retrato e posicionado pela base do cartao, entao nunca fica solto).
+	var real_h: float = _card.get_combined_minimum_size().y
+	if real_h > card_h + 0.5:
+		card_h = minf(real_h, view.y * 0.62)
+		_card.custom_minimum_size = Vector2(card_w, card_h)
+		_card.size = Vector2(card_w, card_h)
 	return card_h
 
 
@@ -425,13 +462,14 @@ func _style_buttons(compact: bool) -> void:
 
 
 func _target_card_y(view: Vector2, card_h: float) -> float:
-	var bottom_gap: float = 14.0 if ScreenTools.is_compact(self) else 24.0
+	# V0.16.5: folga maior no rodape (antes 14/24 px: barras do sistema e janelas maiores que a tela cortavam os botoes).
+	var bottom_gap: float = 40.0 if ScreenTools.is_compact(self) else 56.0
 	# V0.16.0: o botao global "Tela cheia" (FullscreenOverlay) ocupa o canto superior esquerdo ate y = 60. O cartao no topo
 	# nunca sobe acima disso, senao o botao cobre o nome do personagem (Natalia, Cleiton, Anderson...).
 	var top_gap: float = view.y * 0.105 if mode == Mode.COACH else (14.0 if ScreenTools.is_compact(self) else 22.0)
 	top_gap = maxf(top_gap, TOP_LEFT_RESERVED)
 	if _current_step.has("card_y"):
-		return view.y * clampf(float(_current_step["card_y"]), 0.0, 0.9)
+		return minf(view.y * clampf(float(_current_step["card_y"]), 0.0, 0.9), view.y - card_h - bottom_gap)
 	return view.y - card_h - bottom_gap if _card_at_bottom else top_gap
 
 
@@ -449,9 +487,15 @@ func _place_card(card_y: float, view: Vector2, card_h: float, _reserve: float, n
 		visible_heights[character_id] = h
 		tallest = maxf(tallest, h)
 	# Conjunto: se o mais alto nao cabe na tela (cartao la em cima), TODOS encolhem juntos e a proporcao entre eles se mantem.
-	var max_visible_h: float = card_y + card_h - PORTRAIT_FOOT_GAP - SCREEN_SAFE_MARGIN
+	var head_limit: float = maxf(SCREEN_SAFE_MARGIN, TOP_BAR_RESERVED)
+	var max_visible_h: float = card_y + card_h - PORTRAIT_FOOT_GAP - head_limit
 	var group_k: float = 1.0 if (tallest <= max_visible_h or tallest <= 0.0) else max_visible_h / tallest
 	var shift: float = clampf(_card.position.x, 0.0, 56.0)
+	# O recorte fica na ponta da base do cartao: o que um sprite "afundar" abaixo dela some, e o corte da cintura vira uma
+	# linha reta rente ao cartao (so a Aline usa "sink": o desenho dela termina numa curva que parecia uma borda solta).
+	if _portrait_clip != null:
+		_portrait_clip.position = Vector2.ZERO
+		_portrait_clip.size = Vector2(view.x, maxf(card_y + card_h - PORTRAIT_FOOT_GAP + 1.0, 0.0))
 	for character_id in _portraits.keys():
 		var portrait: TextureRect = _portraits[character_id] as TextureRect
 		var geometry: Dictionary = _portrait_geometry(str(character_id), float(visible_heights[character_id]) * group_k)
@@ -465,7 +509,8 @@ func _place_card(card_y: float, view: Vector2, card_h: float, _reserve: float, n
 		else:
 			var right_edge: float = minf(_card.position.x + _card.size.x + shift, view.x - SCREEN_SAFE_MARGIN)
 			portrait_x = right_edge - art.end.x
-		var portrait_y: float = card_y + card_h - PORTRAIT_FOOT_GAP - art.end.y
+		var sink: float = float(_portrait_frame(str(character_id)).get("sink", 0.0)) * canvas_size.y
+		var portrait_y: float = card_y + card_h - PORTRAIT_FOOT_GAP - art.end.y + sink
 		portrait.size = canvas_size
 		portrait.pivot_offset = Vector2(art.position.x + art.size.x * 0.5, art.end.y)  # escala (fala) apoiada nos pes/base do desenho
 		portrait.position = Vector2(portrait_x, portrait_y)

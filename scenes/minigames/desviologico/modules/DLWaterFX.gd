@@ -10,7 +10,6 @@ func _init(game: DesvioLogicoGame) -> void:
 # ---- estado ----
 var water_time: float = 0.0
 var water_redraw_accumulator: float = 0.0
-var water_mask_shader_layer: ColorRect
 
 func _water_x_range_at_y(side: int, y: float, viewport_size: Vector2) -> Vector2:
 	# V0.13.12.6: máscara ainda mais restritiva para o background único.
@@ -35,64 +34,6 @@ func _water_x_range_at_y(side: int, y: float, viewport_size: Vector2) -> Vector2
 	var start_x: float = viewport_size.x * (1.0 - inner_ratio) + safety_px
 	start_x = clampf(start_x, viewport_size.x * 0.615, viewport_size.x - edge_margin - min_width)
 	return Vector2(start_x, viewport_size.x - edge_margin)
-
-func _create_water_mask_shader_material() -> ShaderMaterial:
-	var shader := Shader.new()
-	shader.code = """
-shader_type canvas_item;
-render_mode blend_mix;
-
-uniform float water_time = 0.0;
-uniform float intensity = 1.0;
-
-float water_mask(vec2 uv) {
-	float horizon_y = 0.382;
-	float max_y = 0.715;
-	float depth_t = clamp((uv.y - horizon_y) / max(max_y - horizon_y, 0.001), 0.0, 1.0);
-	float y_mask = smoothstep(horizon_y, horizon_y + 0.018, uv.y) * (1.0 - smoothstep(max_y - 0.018, max_y, uv.y));
-	float curve_to_road = pow(depth_t, 0.70);
-	float lower_lock = pow(depth_t, 1.72);
-	float mid_guard = sin(clamp(depth_t, 0.0, 1.0) * 3.14159265) * 0.050;
-	float inner_ratio = mix(0.430, 0.030, curve_to_road);
-	float safety_ratio = mix(0.048, 0.150, lower_lock) + mid_guard;
-	float edge_margin = 0.014;
-	float left_inner = clamp(inner_ratio - safety_ratio, edge_margin + 0.030, 0.385);
-	float right_inner = clamp(1.0 - inner_ratio + safety_ratio, 0.615, 1.0 - edge_margin - 0.030);
-	float left_mask = step(edge_margin, uv.x) * (1.0 - step(left_inner, uv.x));
-	float right_mask = step(right_inner, uv.x) * (1.0 - step(1.0 - edge_margin, uv.x));
-	return y_mask * max(left_mask, right_mask);
-}
-
-void fragment() {
-	vec2 uv = UV;
-	float mask = water_mask(uv);
-	if (mask <= 0.001) {
-		COLOR = vec4(0.0);
-		return;
-	}
-	float depth = clamp((uv.y - 0.382) / max(0.715 - 0.382, 0.001), 0.0, 1.0);
-	float horizontal_lines = smoothstep(0.955, 1.0, sin(uv.y * 720.0 * mix(0.34, 0.62, depth) + water_time * 2.15 + sin(uv.x * 28.0) * 0.55));
-	float broken = smoothstep(0.34, 0.96, sin(uv.x * 86.0 + water_time * 0.82 + sin(uv.y * 18.0) * 1.6));
-	float sparkle = smoothstep(0.90, 1.0, sin((uv.x + uv.y) * 115.0 + water_time * 1.75));
-	float pulse = 0.58 + 0.42 * sin(water_time * 1.05 + uv.x * 8.0 + uv.y * 6.0);
-	float alpha = mask * intensity * (horizontal_lines * broken * 0.105 + sparkle * 0.030) * pulse;
-	alpha *= mix(1.10, 0.55, depth);
-	vec3 water_light = mix(vec3(0.20, 0.88, 1.0), vec3(0.70, 0.98, 1.0), horizontal_lines);
-	COLOR = vec4(water_light, clamp(alpha, 0.0, 0.18));
-}
-"""
-	var material := ShaderMaterial.new()
-	material.shader = shader
-	material.set_shader_parameter("water_time", 0.0)
-	material.set_shader_parameter("intensity", 0.0)
-	return material
-
-func _update_water_mask_shader() -> void:
-	# Shader cancelado; garante que a camada de brilhos por linhas continue ativa.
-	if water_mask_shader_layer != null:
-		water_mask_shader_layer.visible = false
-	if g.water_layer != null:
-		g.water_layer.visible = true
 
 func _on_water_layer_draw() -> void:
 	if DLConfig.WATER_EFFECT_QUALITY <= 0:
@@ -326,30 +267,6 @@ func _draw_water_peripheral_shimmers(side: int, viewport_size: Vector2, horizon_
 			var short_end: float = minf(short_start + short_len, x_range.y)
 			if short_end > short_start + 2.0:
 				g.water_layer.draw_line(Vector2(short_start, line_y + 2.0 * scale_factor), Vector2(short_end, line_y + 2.0 * scale_factor), _water_glint_color(alpha * 0.50), maxf(0.38, lerpf(0.48, 0.18, depth_t) * scale_factor))
-
-func _draw_water_broken_wave(start_x: float, end_x: float, base_y: float, amplitude: float, phase: float, color: Color, width: float, piece_count: int) -> void:
-	var span: float = end_x - start_x
-	if span <= 3.0:
-		return
-	var pieces: int = clampi(piece_count, 1, 4)
-	for piece in range(pieces):
-		var piece_span: float = span / float(pieces)
-		var gap_ratio: float = 0.42 if pieces > 1 else 0.0
-		var piece_start: float = start_x + piece_span * float(piece) + piece_span * gap_ratio * 0.5
-		var piece_end: float = minf(start_x + piece_span * float(piece + 1) - piece_span * gap_ratio * 0.5, end_x)
-		if piece_end > piece_start + 3.0:
-			_draw_water_poly_wave(piece_start, piece_end, base_y, amplitude, phase + float(piece) * 0.47, color, width)
-
-func _draw_water_poly_wave(start_x: float, end_x: float, base_y: float, amplitude: float, phase: float, color: Color, width: float) -> void:
-	var points := PackedVector2Array()
-	var segments: int = 4
-	var span: float = end_x - start_x
-	for p_i in range(segments + 1):
-		var t: float = float(p_i) / float(segments)
-		var x: float = start_x + span * t
-		var y: float = base_y + sin(phase + t * TAU) * amplitude
-		points.append(Vector2(x, y))
-	g.water_layer.draw_polyline(points, color, width, not WebLite.lite())
 
 ## V0.14.5: quantidade de elementos da agua ajustada ao perfil (web = 60 %, aparelho fraco = 35 %), com minimo.
 func _lod(base: int, minimum: int) -> int:

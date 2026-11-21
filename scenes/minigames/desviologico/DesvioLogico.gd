@@ -52,6 +52,8 @@ var side_props_layer: Control
 var obstacles_layer: Control
 var lane_click_layer: Control
 var car_rect: TextureRect
+var car_lights_head: DLCarLights   # V0.16.11: aureola de luz branca a frente do Bionix (so horarios noturnos)
+var car_lights_tail: DLCarLights   # V0.16.9.6: lanternas vermelhas do Bionix (a partir do Entardecer)
 var hud_layer: Control
 var route_progress_hud: Control
 var route_car_texture: Texture2D
@@ -70,6 +72,8 @@ var answers_box: HBoxContainer
 var feedback_layer: Control
 var feedback_title_label: Label
 var feedback_body_label: Label
+var feedback_body_scroll: ScrollContainer   # V0.16.4: texto do feedback rola se a fonte for muito grande
+var feedback_panel: PanelContainer
 var feedback_continue_button: Button
 var finish_layer: Control
 var finish_title_label: Label
@@ -77,7 +81,8 @@ var finish_body_label: Label
 var finish_continue_button: Button
 var damage_hud: Control
 var damage_car_texture: Texture2D
-var score_hud: Control
+var score_hud: Control   # (legado: nao e mais criado; o score agora fica no card de status)
+var score_value_label: Label   # V0.16.9.3: "SCORE: n" na linha do titulo do card inferior esquerdo
 var pause_button: Button
 var pause_layer: Control
 var pause_menu: MinigamePause
@@ -93,6 +98,7 @@ func _ready() -> void:
 	_build_scene()
 	_prepare_questions()
 	get_viewport().size_changed.connect(_on_display_changed)
+	FontScale.scale_changed.connect(func(_level: String) -> void: _on_display_changed())   # V0.16.9.2: fonte trocada no pause
 	if has_node("/root/WebBridge") and WebBridge.has_signal("display_refit"):
 		WebBridge.display_refit.connect(_on_display_changed)
 	if has_node("/root/AudioManager"):
@@ -116,7 +122,6 @@ func _process(delta: float) -> void:
 	var is_motion_state: bool = state == DLConfig.STATE_ACCELERATION or state == DLConfig.STATE_DRIVE or _is_tutorial_state()
 	if is_motion_state:
 		road_time += motion_delta
-		_update_background_motion_fx(motion_delta)
 		_update_car_motion_fx(motion_delta)
 		if state == DLConfig.STATE_ACCELERATION or state == DLConfig.STATE_DRIVE:
 			sideprops.side_prop_time += motion_delta
@@ -137,8 +142,7 @@ func _process(delta: float) -> void:
 			side_props_layer.queue_redraw()
 	if route_progress_hud != null:
 		route_progress_hud.queue_redraw()
-	if score_hud != null:
-		score_hud.queue_redraw()
+	_refresh_score_label()
 	if damage_hud != null:
 		damage_hud.queue_redraw()
 	if state == DLConfig.STATE_DRIVE and not input_locked and not was_accelerating:
@@ -147,7 +151,6 @@ func _process(delta: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_update_stage_transform()
-		_update_background_motion_fx(0.0)
 		_layout_car(false)
 	elif what == NOTIFICATION_EXIT_TREE:
 		_clear_obstacles()
@@ -202,7 +205,7 @@ func _build_scene() -> void:
 	bg_fill.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg_fill.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	bg_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg_fill.modulate = Color(0.30, 0.30, 0.36, 1.0)
+	bg_fill.modulate = Color(0.55, 0.55, 0.62, 1.0)   # V0.16.9.4: mais claro (antes 0.30: parecia uma faixa preta)
 	bg_fill.visible = false
 	add_child(bg_fill)
 
@@ -272,6 +275,14 @@ func _build_scene() -> void:
 	car_rect.z_index = 20
 	car_rect.texture = _load_texture(DLConfig.CAR_SPRITES["reto"])
 	stage.add_child(car_rect)
+	# V0.16.9.6: luzes sao filhas do carro (herdam posicao/escala/rotacao/transparencia). Os feixes do farol passam do retangulo do carro.
+	car_rect.clip_contents = false
+	car_lights_head = DLCarLights.new()
+	car_lights_head.setup(DLCarLights.KIND_HEAD, current_round)
+	car_rect.add_child(car_lights_head)
+	car_lights_tail = DLCarLights.new()
+	car_lights_tail.setup(DLCarLights.KIND_TAIL, current_round)
+	car_rect.add_child(car_lights_tail)
 
 	_build_lane_click_layer()
 	_build_hud()
@@ -289,7 +300,6 @@ func _build_hud() -> void:
 	add_child(hud_layer)
 
 	_build_route_progress_hud()
-	_build_score_hud()
 	_build_question_panel()
 	_build_status_panel()
 	_build_damage_hud()
@@ -308,38 +318,12 @@ func _build_route_progress_hud() -> void:
 	route_progress_hud.draw.connect(_on_route_progress_hud_draw)
 	hud_layer.add_child(route_progress_hud)
 
-func _build_score_hud() -> void:
-	score_hud = Control.new()
-	score_hud.name = "ScoreHUD"
-	# V0.16.0: o botao global "Tela cheia" (FullscreenOverlay, layer 100) ocupa o canto superior esquerdo ate y = 60.
-	# O score agora fica ABAIXO dele, alinhado a mesma margem esquerda (22 px).
-	score_hud.anchor_left = 0.0
-	score_hud.anchor_top = 0.0
-	score_hud.anchor_right = 0.0
-	score_hud.anchor_bottom = 0.0
-	score_hud.offset_left = 22.0
-	score_hud.offset_top = 62.0
-	score_hud.offset_right = 22.0 + 205.0
-	score_hud.offset_bottom = 62.0 + 42.0
-	score_hud.z_index = 38
-	score_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	score_hud.draw.connect(_on_score_hud_draw)
-	hud_layer.add_child(score_hud)
-
-func _on_score_hud_draw() -> void:
-	if score_hud == null:
+## V0.16.9.3: placar dentro do card de status (embaixo, a esquerda). Atualiza o texto "SCORE: n".
+func _refresh_score_label() -> void:
+	if score_value_label == null:
 		return
-	var hud_size: Vector2 = score_hud.size
-	if hud_size.x <= 0.0 or hud_size.y <= 0.0:
-		return
-	var panel_rect := Rect2(Vector2.ZERO, hud_size)
-	score_hud.draw_rect(panel_rect, Color(0.01, 0.025, 0.060, 0.18), true)
-	score_hud.draw_rect(panel_rect, Color(0.0, 0.92, 1.0, 0.48), false, 1.0)
-	var font: Font = get_theme_default_font()
 	var score_value: int = ScoreManager.get_score() if has_node("/root/ScoreManager") else local_points
-	var text := "Score: %s pts" % score_value
-	score_hud.draw_string(font, Vector2(12.0, 27.0) + Vector2(1.5, 1.5), text, HORIZONTAL_ALIGNMENT_LEFT, hud_size.x - 22.0, 15, Color(0.0, 0.0, 0.0, 0.58))
-	score_hud.draw_string(font, Vector2(12.0, 27.0), text, HORIZONTAL_ALIGNMENT_LEFT, hud_size.x - 22.0, 15, Color(0.78, 1.0, 0.88, 0.96))
+	score_value_label.text = "SCORE: %d" % score_value
 
 func _build_question_panel() -> void:
 	question_panel = PanelContainer.new()
@@ -373,10 +357,14 @@ func _build_status_panel() -> void:
 	status_panel.anchor_top = 1.0
 	status_panel.anchor_right = 0.025
 	status_panel.anchor_bottom = 1.0
+	# V0.16.4: card PEQUENO e padronizado (nome do minigame, desafio + cenario, bolinhas e dificuldade). Sem texto de
+	# narracao: a altura vem do conteudo e o card cresce para cima/para a direita (fonte maior nao corta nem sobrepoe).
 	status_panel.offset_left = 0.0
-	status_panel.offset_top = -220.0
-	status_panel.offset_right = 320.0
+	status_panel.offset_top = -64.0
+	status_panel.offset_right = 300.0
 	status_panel.offset_bottom = -64.0
+	status_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	status_panel.grow_horizontal = Control.GROW_DIRECTION_END
 	status_panel.z_index = 34
 	status_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	status_panel.add_theme_stylebox_override("panel", _make_hud_card_style(Color(0.01, 0.025, 0.060, 0.12), Color(0.0, 0.92, 1.0, 0.64), 16, 1))
@@ -393,8 +381,18 @@ func _build_status_panel() -> void:
 	box.add_theme_constant_override("separation", 4)
 	margin.add_child(box)
 
+	# V0.16.9.3: "DESVIO LÓGICO | SCORE: n" na mesma linha (o score saiu do topo da tela, que fica livre para a pergunta).
+	var title_row := HBoxContainer.new()
+	title_row.add_theme_constant_override("separation", 8)
+	box.add_child(title_row)
 	title_label = _make_label("DESVIO LÓGICO", 16, Color(0.0, 0.95, 1.0), HORIZONTAL_ALIGNMENT_LEFT)
-	box.add_child(title_label)
+	title_row.add_child(title_label)
+	var score_sep: Label = _make_label("|", 16, Color(0.0, 0.95, 1.0, 0.55), HORIZONTAL_ALIGNMENT_LEFT)
+	title_row.add_child(score_sep)
+	score_value_label = _make_label("SCORE: 0", 16, Color(0.78, 1.0, 0.88, 0.98), HORIZONTAL_ALIGNMENT_LEFT)
+	score_value_label.name = "ScoreValue"
+	title_row.add_child(score_value_label)
+	_refresh_score_label()
 
 	# V0.14.2: "Desafio X/6 • Horário" e as bolinhas de tráfego (azul → amarelo → vermelho) na MESMA linha.
 	var round_row := HBoxContainer.new()
@@ -413,6 +411,7 @@ func _build_status_panel() -> void:
 
 	score_label = _make_label("Dificuldade: Normal", 15, Color(0.93, 0.98, 1.0), HORIZONTAL_ALIGNMENT_LEFT)
 	DifficultyManager.apply_difficulty_chip(score_label, difficulty, 15)
+	score_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN   # V0.16.4: chip so do tamanho do texto
 	box.add_child(score_label)
 
 	timer_label = _make_label("", 14, Color(0.74, 0.95, 1.0), HORIZONTAL_ALIGNMENT_LEFT)
@@ -421,6 +420,9 @@ func _build_status_panel() -> void:
 
 	status_label = _make_label("Dirija até a decisão.", 13, Color(0.84, 0.90, 1.0, 0.88), HORIZONTAL_ALIGNMENT_LEFT)
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# V0.16.4: o texto de narracao (\"Bionix em velocidade de rota...\") saiu do card. O label continua existindo (o jogo e o
+	# tutorial ainda gravam mensagens nele), mas fica oculto e fora do layout.
+	status_label.visible = false
 	box.add_child(status_label)
 
 func _dot(center: Vector2, radius: float, color: Color, alpha: float) -> void:
@@ -543,7 +545,7 @@ func _build_decision_layer() -> void:
 
 	# V0.14.2: as respostas ficam numa linha centralizada ABAIXO do painel da pergunta (antes ficavam
 	# em ancoras fixas e a pergunta, com z maior, cobria os botoes). A largura cresce pros lados conforme o texto.
-	decision_layer.z_index = 68
+	decision_layer.z_index = 69   # V0.16.9.2: sempre A FRENTE dos cards do desafio e do acelerador (z 64-68); o fim de jogo usa 70
 	answers_box = HBoxContainer.new()
 	answers_box.name = "AnswersBox"
 	answers_box.anchor_left = 0.02
@@ -565,9 +567,33 @@ func _build_decision_layer() -> void:
 	option_b_button.pressed.connect(_on_choice_pressed.bind("B"))
 	answers_box.add_child(option_b_button)
 
+## V0.16.9.2: painel da pergunta ACOMPANHA a fonte, como nos outros minigames: com fonte Grande/Extra grande ele fica mais LARGO
+## (o texto quebra menos e nao cresce tanto para baixo), continua CENTRALIZADO e desce para fora da faixa dos botoes
+## "Tela cheia"/"Pausar" e do placar (antes a pergunta ficava por baixo deles e cortava a primeira linha).
+func _layout_question_panel() -> void:
+	if question_panel == null:
+		return
+	var vp: Vector2 = get_viewport_rect().size
+	var grow: float = maxf(FontScale.get_factor(), 1.0)
+	var t: float = clampf((grow - 1.0) / 0.4, 0.0, 1.0)   # 0 = Media ... 1 = Extra grande
+	var side: float = lerpf(0.11, 0.03, t) * vp.x
+	var top: float = 0.025 * vp.y
+	if grow > 1.1:
+		top = 70.0   # abaixo de Tela cheia / Pausar (o Score saiu do topo)
+	question_panel.anchor_left = 0.0
+	question_panel.anchor_right = 1.0
+	question_panel.anchor_top = 0.0
+	question_panel.anchor_bottom = 0.0
+	question_panel.offset_left = side
+	question_panel.offset_right = -side
+	question_panel.offset_top = top
+	question_panel.offset_bottom = top + 1.0   # a altura vem do texto (nunca menor que o minimo abaixo)
+	question_panel.custom_minimum_size.y = 0.13 * vp.y
+
 func _layout_decision_answers() -> void:
 	if answers_box == null or option_a_button == null or question_panel == null or not decision_layer.visible:
 		return
+	_layout_question_panel()
 	var vp: Vector2 = get_viewport_rect().size
 	var font: Font = option_a_button.get_theme_font("font")
 	var fsize: int = option_a_button.get_theme_font_size("font_size")
@@ -576,7 +602,11 @@ func _layout_decision_answers() -> void:
 		for line in (button as Button).text.split("\n"):
 			widest = maxf(widest, font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, fsize).x)
 	# Cresce pros lados com o texto; limitado a ~46% da tela cada (depois disso quebra linha).
-	var max_w: float = maxf(120.0, vp.x * 0.46)
+	var big_font: bool = FontScale.get_factor() > 1.1
+	# Fonte grande: respostas mais largas, MAS com um vao central de ~120 px para o Bionix continuar visivel entre A e B.
+	var gap_px: float = 120.0 if big_font else 28.0
+	var max_w: float = maxf(120.0, (vp.x * 0.97 - gap_px) * 0.5) if big_font else maxf(120.0, vp.x * 0.46)
+	answers_box.add_theme_constant_override("separation", int(gap_px))
 	var want: float = minf(maxf(widest + 108.0, minf(300.0, max_w)), max_w)
 	for button in [option_a_button, option_b_button]:
 		var b: Button = button as Button
@@ -612,6 +642,7 @@ func _schedule_decision_layout() -> void:
 ## V0.14.4: tela cheia / rotacao / barra de endereco (web) mudam o tamanho: refaz a linha de respostas.
 func _on_display_changed(_size: Vector2 = Vector2.ZERO) -> void:
 	_update_stage_transform()
+	sideprops._invalidate_path_cache()   # V0.16.9.5: trilhas do gramado ficam em cache; relê os markers se a janela mudar
 	if decision_layer != null and decision_layer.visible:
 		_schedule_decision_layout()
 
@@ -619,14 +650,14 @@ func _build_feedback_layer() -> void:
 	feedback_layer = Control.new()
 	feedback_layer.name = "FeedbackLayer"
 	feedback_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	feedback_layer.z_index = 60
+	feedback_layer.z_index = 75   # V0.16.9.3: acima do HUD (cards do desafio/acelerador, z 64-68) e das respostas (69)
 	feedback_layer.visible = false
 	feedback_layer.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(feedback_layer)
 
 	var overlay := ColorRect.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.color = Color(0.0, 0.0, 0.0, 0.24)
+	overlay.color = Color(0.0, 0.0, 0.0, 0.42)
 	feedback_layer.add_child(overlay)
 
 	var center := CenterContainer.new()
@@ -638,7 +669,7 @@ func _build_feedback_layer() -> void:
 
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(650, 286)
-	panel.add_theme_stylebox_override("panel", _make_hud_card_style(Color(0.02, 0.025, 0.055, 0.62), Color(0.0, 0.88, 1.0, 0.86), 20, 2))
+	panel.add_theme_stylebox_override("panel", _make_hud_card_style(Color(0.02, 0.025, 0.055, 0.94), Color(0.0, 0.88, 1.0, 0.86), 20, 2))
 	center.add_child(panel)
 
 	var margin := MarginContainer.new()
@@ -660,6 +691,9 @@ func _build_feedback_layer() -> void:
 	feedback_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	feedback_body_label.custom_minimum_size = Vector2(580, 108)
 	box.add_child(feedback_body_label)
+	feedback_body_scroll = AnswerLayout.install_body_scroll(box, feedback_body_label)
+	feedback_body_label.custom_minimum_size = Vector2.ZERO
+	feedback_panel = panel
 
 	feedback_continue_button = Button.new()
 	feedback_continue_button.text = "Continuar"
@@ -674,7 +708,7 @@ func _build_finish_layer() -> void:
 	finish_layer = Control.new()
 	finish_layer.name = "FinishLayer"
 	finish_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	finish_layer.z_index = 70
+	finish_layer.z_index = 80   # acima do feedback (75)
 	finish_layer.visible = false
 	finish_layer.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(finish_layer)
@@ -784,6 +818,10 @@ func _start_round(index: int) -> void:
 		question_label.text = ""
 	_set_background(index)
 	_set_car_sprite("reto")
+	if car_lights_head != null:
+		car_lights_head.set_round(current_round)
+	if car_lights_tail != null:
+		car_lights_tail.set_round(current_round)
 	car_rect.scale = Vector2.ONE
 	car_rect.rotation_degrees = 0.0
 	car_rect.modulate = Color.WHITE
@@ -1055,6 +1093,7 @@ func _show_feedback(is_correct: bool, choice: String, q: Dictionary, route_damag
 	if pause_button != null:
 		pause_button.visible = false
 	feedback_layer.visible = true
+	AnswerLayout.fit_feedback(feedback_panel, feedback_body_scroll, feedback_body_label, 650.0, 44.0)
 
 func _on_feedback_continue_pressed() -> void:
 	if has_node("/root/AudioManager"):
@@ -1139,10 +1178,6 @@ func _on_pause_main_menu_pressed() -> void:
 	engineaudio._clear_desvio_music_audio_profile()
 	GameManager.go_to_main_menu()
 
-func _resume_game() -> void:
-	if pause_menu != null:
-		pause_menu.close()
-
 func _can_pause_game() -> bool:
 	return state == DLConfig.STATE_ACCELERATION or state == DLConfig.STATE_DRIVE or state == DLConfig.STATE_DECISION
 
@@ -1157,12 +1192,17 @@ func _update_stage_transform() -> void:
 	var vp: Vector2 = get_viewport_rect().size
 	if vp.x <= 1.0 or vp.y <= 1.0:
 		vp = STAGE_SIZE
-	var k: float = minf(vp.x / STAGE_SIZE.x, vp.y / STAGE_SIZE.y)
+	# V0.16.9.4: o palco PREENCHE a tela (escala "cobrir") em vez de deixar faixas escuras nas laterais quando a janela nao e 16:9
+	# (ex.: 1280x670). O corte vertical e limitado a ~10% da altura do palco (cenario/ceu e chao: HUD, perguntas e carro ficam
+	# fora da area cortada); alem disso volta a escala "conter" e a faixa decorativa (mais clara que antes) cobre o resto.
+	var k_contain: float = minf(vp.x / STAGE_SIZE.x, vp.y / STAGE_SIZE.y)
+	var k_cover: float = maxf(vp.x / STAGE_SIZE.x, vp.y / STAGE_SIZE.y)
+	var k: float = clampf(k_cover, k_contain, maxf(k_contain, vp.y / (STAGE_SIZE.y * 0.90)))
 	stage.scale = Vector2(k, k)
 	stage.position = ((vp - STAGE_SIZE * k) * 0.5).round()
 	if bg_fill != null:
-		# So desenha a faixa decorativa quando a janela nao e exatamente 16:9.
-		bg_fill.visible = absf(vp.x - STAGE_SIZE.x * k) > 1.0 or absf(vp.y - STAGE_SIZE.y * k) > 1.0
+		# So desenha a faixa decorativa se o palco nao cobrir a tela inteira.
+		bg_fill.visible = STAGE_SIZE.x * k < vp.x - 0.5 or STAGE_SIZE.y * k < vp.y - 0.5
 
 func _stage_scale() -> float:
 	return stage.scale.x if stage != null else 1.0
@@ -1345,26 +1385,6 @@ func _animate_turn_exit(choice: String) -> void:
 		car_rect.modulate = Color(1.0, 1.0, 1.0, 0.28)
 		if fade_rect != null:
 			fade_rect.color = Color(0, 0, 0, 0.82)
-
-func _update_background_motion_fx(_delta: float) -> void:
-	if background_rect == null:
-		return
-	var viewport_size: Vector2 = STAGE_SIZE
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		viewport_size = Vector2(1280, 720)
-	background_rect.pivot_offset = viewport_size * 0.5
-	if state == DLConfig.STATE_ACCELERATION or state == DLConfig.STATE_DRIVE or _is_tutorial_state():
-		# Micro zoom + ondulação vertical: simula subida/descida da pista sem deformar o background.
-		# Na V0.13.8, a força desse movimento acompanha a aceleração do Bionix.
-		var motion_ratio: float = _current_motion_ratio()
-		var slope_wave: float = sin(road_time * 0.42)
-		var fast_wave: float = sin(road_time * 1.05)
-		var zoom: float = lerpf(1.0, 1.024, motion_ratio) + slope_wave * 0.006 * motion_ratio + fast_wave * 0.002 * motion_ratio
-		background_rect.scale = Vector2(zoom, zoom)
-		background_rect.position = Vector2(0.0, (slope_wave * 3.8 + fast_wave * 1.2) * motion_ratio)
-	else:
-		background_rect.scale = Vector2.ONE
-		background_rect.position = Vector2.ZERO
 
 func _update_car_motion_fx(delta: float) -> void:
 	if car_rect == null or state == DLConfig.STATE_DECISION or state == DLConfig.STATE_FEEDBACK or state == DLConfig.STATE_FINISH or state == DLConfig.STATE_FAILURE:
@@ -1668,8 +1688,7 @@ func _apply_score_delta(delta_points: int) -> void:
 	if has_node("/root/ScoreManager"):
 		ScoreManager.add_points(delta_points)
 	_spawn_score_delta_popup(delta_points)
-	if score_hud != null:
-		score_hud.queue_redraw()
+	_refresh_score_label()
 
 func _spawn_score_delta_popup(delta_points: int) -> void:
 	if hud_layer == null:
@@ -1687,8 +1706,9 @@ func _spawn_score_delta_popup(delta_points: int) -> void:
 	label.add_theme_color_override("font_color", Color(0.45, 1.0, 0.58, 1.0) if positive else Color(1.0, 0.30, 0.24, 1.0))
 	label.size = Vector2(90, 30)
 	var start_pos := Vector2(226.0, 32.0)
-	if score_hud != null:
-		start_pos = score_hud.global_position + Vector2(score_hud.size.x + 8.0, 6.0)
+	if score_value_label != null:
+		# "+10" sobe a partir do fim do texto "SCORE: n"
+		start_pos = score_value_label.global_position + Vector2(score_value_label.size.x + 6.0, -6.0)
 	hud_layer.add_child(label)
 	label.global_position = start_pos
 	if _animations_enabled():
@@ -1747,10 +1767,6 @@ func _obstacle_speed() -> float:
 
 func _world_speed() -> float:
 	return float(_rules().get("world_speed", 270.0)) + float(current_round) * 10.0
-
-func _lane_x(lane: int) -> float:
-	var viewport_height: float = maxf(STAGE_SIZE.y, 720.0)
-	return _lane_x_at_y(lane, viewport_height * car_y_ratio)
 
 func _lane_from_x(x: float) -> int:
 	var viewport_width: float = maxf(get_viewport_rect().size.x, 1.0)
@@ -1898,19 +1914,25 @@ func _draw_road_motion(viewport_size: Vector2) -> void:
 
 	# Linhas discretas no gramado, usando trilhas editáveis no Godot.
 	for side in [-1, 1]:
-		var prop_type: String = DLConfig.PROP_POST_LEFT if side < 0 else DLConfig.PROP_POST
+		var prop_type: String = DLConfig.PROP_TRAIL_LEFT if side < 0 else DLConfig.PROP_TRAIL_RIGHT
 		for k in range(12):
 			var y: float = road_top + float(k) * 74.0 + offset
 			while y > road_bottom:
 				y -= road_span
 			var t: float = clampf((y - road_top) / road_span, 0.0, 1.0)
 			var grass_x: float = sideprops._side_prop_path_x_at_y(prop_type, side, y)
-			if grass_x < 0.0:
+			# V0.16.9.5: x negativo e valido (borda da tela); "sem trilha" agora e DLSideProps.NO_PATH_X (antes -1.0).
+			if grass_x <= DLSideProps.NO_PATH_X:
 				grass_x = sideprops._side_grass_x_at_y(side, y, viewport_size)
+			else:
+				# V0.16.9.6: a trilha e a CALCADA; as listras decorativas continuam no gramado (mais para fora).
+				grass_x += float(side) * DLConfig.GRASS_LINES_OFFSET_PER_DEPTH * maxf(y - DLConfig.GRASS_VANISH_Y, 0.0)
 			var marker_alpha: float = lerpf(0.035, 0.14, t)
 			var marker_length: float = lerpf(10.0, 38.0, t)
 			var marker_width: float = lerpf(1.0, 2.2, t)
-			road_layer.draw_line(Vector2(grass_x, y), Vector2(grass_x + float(side) * marker_length, y + lerpf(4.0, 18.0, t)), Color(0.78, 1.0, 0.36, marker_alpha * effect_alpha), marker_width)
+			# V0.16.9.5: a trilha agora e o CENTRO do gramado; o traco e centralizado nela (antes saia da borda rumo a agua).
+			var dash_x: float = grass_x - float(side) * marker_length * 0.5
+			road_layer.draw_line(Vector2(dash_x, y), Vector2(dash_x + float(side) * marker_length, y + lerpf(4.0, 18.0, t)), Color(0.78, 1.0, 0.36, marker_alpha * effect_alpha), marker_width)
 
 	var center_shadow: Rect2 = Rect2(viewport_size.x * 0.39, road_top, viewport_size.x * 0.22, road_span)
 	road_layer.draw_rect(center_shadow, Color(0.0, 0.0, 0.0, 0.022 * effect_alpha), true)
@@ -2056,14 +2078,6 @@ func _bionix_current_speed_kmh() -> float:
 	if state == DLConfig.STATE_DECISION:
 		return 0.0
 	return 0.0
-
-func _fit_rect_into(container_rect: Rect2, content_size: Vector2) -> Rect2:
-	if content_size.x <= 0.0 or content_size.y <= 0.0:
-		return container_rect
-	var scale_factor: float = minf(container_rect.size.x / content_size.x, container_rect.size.y / content_size.y)
-	var fitted_size: Vector2 = content_size * scale_factor
-	var fitted_position: Vector2 = container_rect.position + (container_rect.size - fitted_size) * 0.5
-	return Rect2(fitted_position, fitted_size)
 
 func _integrity_color() -> Color:
 	if integrity >= 70.0:

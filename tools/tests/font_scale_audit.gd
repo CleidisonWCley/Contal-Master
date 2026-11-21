@@ -15,6 +15,11 @@ var _levels: Array[String] = LEVELS_ALL
 var _wait_frames: int = 14
 var _report: Array[String] = []
 var _pause_settings: bool = false
+var _debug_geo: bool = false
+var _drive_only: bool = false
+var _drive_frames: int = 90
+var _tutorial_on: bool = false
+var _desvio_feedback: bool = false
 
 func _ready() -> void:
 	for arg in OS.get_cmdline_user_args():
@@ -26,6 +31,13 @@ func _ready() -> void:
 			_levels = []
 			for l in arg.substr(7).split(","):
 				_levels.append(l)
+		elif arg.begins_with("drive="):
+			_drive_only = true
+			_drive_frames = int(arg.substr(6))
+		elif arg == "feedback":
+			_desvio_feedback = true
+		elif arg == "tutorial":
+			_tutorial_on = true
 		elif arg == "pause":
 			_pause_settings = true
 		elif arg.begins_with("wait="):
@@ -73,8 +85,8 @@ func _prepare(mode: String) -> void:
 				GameManager.campaign_index = i
 
 func _run() -> void:
-	SettingsManager.set_setting("animations_enabled", false)
-	SettingsManager.set_setting("tutorials_enabled", false)
+	SettingsManager.set_setting("animations_enabled", _drive_only)
+	SettingsManager.set_setting("tutorials_enabled", _tutorial_on)
 	for target in _targets():
 		var tname: String = target[0]
 		if _only != "" and not tname.contains(_only):
@@ -128,6 +140,42 @@ func _audit_scene(tname: String, path: String, mode: String, level: String) -> v
 
 ## Gancho para abrir estados especificos (ex.: pause/configuracoes aberto, feedback visivel).
 func _extra_setup(tname: String, scene: Node) -> void:
+	# Maleta Certa: respostas LONGAS (2+ linhas em Extra grande), como no print do usuario.
+	if tname == "MaletaCerta":
+		var texts: Array = ["Aceitar com o aval de um cliente que ja revisa a propria firma", "Aceitar e ser revisada depois da proxima revisao pelos pares", "Recusar: ainda nao pode revisar nenhuma outra firma"]
+		var btns: Array = scene.get("option_buttons")
+		for i in range(mini(btns.size(), 3)):
+			(btns[i] as Button).text = "MALETA %d\n%s" % [i + 1, texts[i]]
+		scene.call("_refit_options")
+		for i in range(8):
+			await get_tree().process_frame
+	# Desvio Logico: forca a fase de DECISAO com pergunta/respostas LONGAS (pior caso, igual ao print do usuario).
+	if tname == "DesvioLogico" and _drive_only:
+		scene.set("state", DLConfig.STATE_DRIVE)
+		for i in range(_drive_frames):
+			await get_tree().process_frame
+		return
+	if tname == "DesvioLogico":
+		scene.set("state", DLConfig.STATE_DRIVE)
+		scene.call("_enter_decision_phase")
+		for i in range(4):
+			await get_tree().process_frame
+		(scene.get("question_label") as Label).text = "A firma Sol não auditou nada no ano anterior à indicação. Qual ano será o ano-base da revisão dela?"
+		(scene.get("option_a_button") as Button).text = "ROTA A\nO ano antecedente ao anterior"
+		(scene.get("option_b_button") as Button).text = "ROTA B\nO ano da própria indicação"
+		scene.call("_schedule_decision_layout")
+		for i in range(6):
+			await get_tree().process_frame
+		if _desvio_feedback:
+			# mostra o feedback de "ROTA CORRETA" (pior caso: texto longo) por cima do HUD
+			var q: Dictionary = scene.call("_current_question")
+			scene.call("_show_feedback", true, str(q.get("resposta", "A")), q)
+			for i in range(8):
+				await get_tree().process_frame
+	if tname == "Perseguicao" and _debug_geo:
+		var mb: Control = scene.find_child("MainLayout", true, false)
+		var rm: Control = mb.get_parent()
+		print("GEO rm pos=%s size=%s min=%s | mb pos=%s size=%s min=%s align=%s | scene pos=%s size=%s" % [rm.position, rm.size, rm.get_combined_minimum_size(), mb.position, mb.size, mb.get_combined_minimum_size(), (mb as BoxContainer).alignment, (scene as Control).position, (scene as Control).size])
 	# Pause aberto na tela de configuracoes (seletor "Fonte" dentro do pause).
 	if tname == "ShowDoBilhao" and _pause_settings:
 		var pause: Node = scene.get("pause_menu")

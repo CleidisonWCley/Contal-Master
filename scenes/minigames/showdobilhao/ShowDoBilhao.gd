@@ -139,6 +139,9 @@ var background_rect: TextureRect
 var dimmer: ColorRect
 var particles_layer: Control
 var root_margin: MarginContainer
+var layout_box: VBoxContainer          # V0.16.6: coluna principal (medida para caber na altura da tela)
+var top_icons: Array = []               # icones de dinheiro do titulo
+var layout_fit: DynamicLayout           # V0.16.7: padrao unico de layout dinamico (scripts/ui/DynamicLayout.gd)
 var question_counter_label: Label
 var title_label: Label
 var score_label: Label
@@ -149,6 +152,8 @@ var options_box: VBoxContainer
 var feedback_layer: Control
 var feedback_title_label: Label
 var feedback_body_label: Label
+var feedback_body_scroll: ScrollContainer   # V0.16.4: texto do feedback rola se a fonte for muito grande
+var feedback_panel: PanelContainer
 var feedback_continue_button: Button
 var finish_layer: Control
 var finish_score_label: Label
@@ -156,6 +161,8 @@ var finish_score_label: Label
 func _ready() -> void:
 	randomize()
 	_build_scene()
+	get_viewport().size_changed.connect(_refit_options)
+	FontScale.scale_changed.connect(_on_font_scale_changed)
 	pause_menu = MinigamePause.attach(self)
 	_connect_score_signal()
 	_prepare_questions()
@@ -236,6 +243,7 @@ func _build_scene() -> void:
 	main_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	main_box.add_theme_constant_override("separation", 16)
 	root_margin.add_child(main_box)
+	layout_box = main_box
 
 	var top_row := HBoxContainer.new()
 	top_row.name = "TopRow"
@@ -246,6 +254,7 @@ func _build_scene() -> void:
 
 	var left_icon := _create_money_icon()
 	top_row.add_child(left_icon)
+	top_icons.append(left_icon)
 
 	title_label = Label.new()
 	title_label.name = "TitleLabel"
@@ -260,6 +269,7 @@ func _build_scene() -> void:
 
 	var right_icon := _create_money_icon()
 	top_row.add_child(right_icon)
+	top_icons.append(right_icon)
 
 	var status_row := HBoxContainer.new()
 	status_row.name = "StatusRow"
@@ -279,7 +289,7 @@ func _build_scene() -> void:
 
 	question_panel = PanelContainer.new()
 	question_panel.name = "QuestionPanel"
-	question_panel.custom_minimum_size = Vector2(780, 150)
+	question_panel.custom_minimum_size = Vector2(780, 120)
 	question_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	question_panel.add_theme_stylebox_override("panel", _make_panel_style(Color(0.04, 0.06, 0.12, 0.84), Color(1.0, 0.82, 0.0), 18, 2))
 	main_box.add_child(question_panel)
@@ -308,6 +318,15 @@ func _build_scene() -> void:
 	options_box.add_theme_constant_override("separation", 12)
 	main_box.add_child(options_box)
 
+
+	# V0.16.7: medidas ORIGINAIS deste minigame; o DynamicLayout reduz tudo junto, em niveis, so se nao couber na altura.
+	layout_fit = DynamicLayout.new(self, root_margin, main_box, 34)
+	layout_fit.add_gap(main_box, "separation", 16).add_gap(options_box, "separation", 12)
+	layout_fit.add_min_height(question_panel, 120.0)
+	for icon in top_icons:
+		if is_instance_valid(icon):
+			layout_fit.add_icon(icon as Control, Vector2(70, 70))
+	layout_fit.set_buttons(Callable(self, "_fit_buttons_scaled"))
 
 	_build_feedback_layer()
 	_build_finish_layer()
@@ -381,6 +400,8 @@ func _build_feedback_layer() -> void:
 	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
 	box.add_child(feedback_body_label)
+	feedback_body_scroll = AnswerLayout.install_body_scroll(box, feedback_body_label)
+	feedback_panel = panel
 	_create_feedback_continue_button(box)
 
 func _create_feedback_continue_button(parent: VBoxContainer) -> void:
@@ -535,6 +556,20 @@ func _load_question(index: int) -> void:
 		button.pressed.connect(_on_option_pressed.bind(option_text, button))
 		options_box.add_child(button)
 		option_buttons.append(button)
+	_refit_options()
+
+## V0.16.4: respostas quebram linha e crescem em altura conforme a fonte (antes: altura fixa cortava o texto na fonte Extra grande).
+func _refit_options() -> void:
+	if not is_inside_tree():
+		return
+	if layout_fit != null:
+		layout_fit.schedule()
+
+func _fit_buttons_scaled(k: float) -> void:
+	AnswerLayout.fit_option_buttons(option_buttons, get_viewport_rect().size.x - 92.0, 62.0 * k, 0.0, 0.0)
+
+func _on_font_scale_changed(_level: String) -> void:
+	_refit_options()
 
 func _clear_options() -> void:
 	for child in options_box.get_children():
@@ -597,6 +632,7 @@ func _show_feedback(is_correct: bool, selected_text: String, correct_text: Strin
 		var why_not: String = FeedbackText.why_not_line(FeedbackText.reason_for_text(current_question.get("motivos_texto", {}), selected_text), "Essa opção não responde corretamente ao conceito pedido.")
 		feedback_body_label.text = "Você escolheu: %s\n%s\n\nResposta correta: %s\n%s%s\nPontuação perdida: %s" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
+	AnswerLayout.fit_feedback(feedback_panel, feedback_body_scroll, feedback_body_label, 760.0)
 	await _wait_for_feedback_continue()
 
 func _clean_feedback_explanation(answer_text: String, explanation_text: String) -> String:

@@ -54,7 +54,15 @@ Depois: criar o doc `docs/versionamento/V<versão>_<assunto>.md`, atualizar **es
 | 0.14.4.1 | Hotfix "WebGL context lost" no Desvio Lógico (web): água em densidade reduzida, tela de recarregar no lugar do alert, log de VRAM/desenhos | `V0_14_4_1_HOTFIX_WEBGL_CONTEXT_LOST.md` |
 | 0.14.4.2 | STOP: título "STOP - CONTROLE NORMATIVO", 6 opções fixas (3×2) sempre da mesma letra, limpeza do script (conteúdo de TI removido) e termos extras no dicionário | `V0_14_4_2_STOP_TITULO_6_OPCOES_LIMPEZA.md` |
 | **0.16.2** | **Limite dinâmico nos 8 minigames (Roleta e Naval), conteúdo sem repetição, feedback didático "Na prática", novels mais enxutas** | `V0_16_2_LIMITE_DINAMICO_8_MINIGAMES_E_FEEDBACK.md` |
-| **0.16.4** | **Roleta de Risco volta a 1 giro (bônus) em qualquer modo; limite dinâmico 2–10 só em Show do Bilhão, Maleta Certa, Perseguição, STOP e Forca Técnica** | `V0_16_4_ROLETA_1_GIRO_LIMITE_DINAMICO_5_MINIGAMES.md` |
+| 0.16.3 | Acessibilidade: opção de tamanho da fonte (Pequena · Média · Grande · Extra grande) | `V0_16_3_ACESSIBILIDADE_FONTE.md` |
+| 0.16.4 (colega) | Roleta de Risco: 1 giro fixo; limite dinâmico só em 5 minigames | `V0_16_4_ROLETA_1_GIRO_LIMITE_DINAMICO_5_MINIGAMES.md` |
+| **0.16.4** | **Ajustes da fonte Extra grande: respostas/feedback crescem para os lados, card do Desvio Lógico enxuto, botão de pausa apagado/aceso, selo de versão mais alto** | `V0_16_4_AJUSTES_FONTE_EXTRA_GRANDE_E_HUD.md` |
+| **0.16.5** | **Hotfix: respostas não estouram mais a tela, tutoriais com folga no rodapé, selo do menu mais baixo** | `V0_16_5_HOTFIX_ALTURA_RESPOSTAS_TUTORIAL_E_SELO.md` |
+| **0.16.6** | **Show do Bilhão se auto-ajusta à altura da tela; sprites do tutorial não cobrem Tela cheia/Pausar** | `V0_16_6_AUTOAJUSTE_ALTURA_E_SPRITES_TUTORIAL.md` |
+| **0.16.7** | **Padrão único de layout dinâmico (`DynamicLayout`) aplicado em Show do Bilhão, Perseguição e Maleta Certa** | `V0_16_7_PADRAO_LAYOUT_DINAMICO.md` |
+| **0.16.8** | **Roleta de Risco volta a 1 giro (reaplicada sobre a base atual); retrato do tutorial preso à base real do card em qualquer fonte; DynamicLayout alinha ao topo quando não cabe** | `V0_16_8_ROLETA_1_GIRO_TUTORIAL_RETRATO_BASE.md` |
+| **0.16.9** (a 0.16.9.6) | **Linha unificada: tutorial sem invasão de retrato, hotfix da Perseguição, Desvio Lógico (fonte grande, score no card, laterais, postes por script e na calçada, luzes dos carros), botão TELA e tela cheia no celular** | `V0_16_9_UNIFICADO.md` |
+| **0.16.10** | **Desvio Lógico: farol do Bionix pequeno e discreto, fundos a 1920 e guia do editor sem custo no jogo (−26 MB de textura), remoção de código morto e constantes sem uso, `.gitignore`/`.gdignore` do `build/`** | `V0_16_10_DESVIO_FAROIS_E_LIMPEZA.md` |
 
 ### Observações do histórico
 

@@ -195,10 +195,23 @@ func _install_display_hooks() -> void:
   if (window.__cmDisplayHooked) { return; }
   window.__cmDisplayHooked = true;
   var timers = [];
-  function isFs() {
-	return !!(document.fullscreenElement || document.webkitFullscreenElement ||
-			  document.mozFullScreenElement || document.msFullscreenElement);
+  // V0.16.9.4: "tela cheia" tambem vale quando o jogo ja ocupa a tela inteira SEM a Fullscreen API (celular/tablet no itch.io,
+  // PWA). Antes so a API contava e o jogo mostrava "OFF" mesmo ja estando em tela cheia. 0 = janela | 1 = API | 2 = ocupa a tela.
+  function fsState() {
+	var d = document;
+	if (d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement) { return 1; }
+	var mm = function (q) { try { return window.matchMedia(q).matches; } catch (e) { return false; } };
+	if (mm('(display-mode: fullscreen)') || mm('(display-mode: standalone)') || mm('(display-mode: minimal-ui)') || window.navigator.standalone === true) { return 2; }
+	var coarse = mm('(pointer: coarse)') || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+	if (!coarse) { return 0; }
+	var vv = window.visualViewport;
+	var w = vv ? vv.width : window.innerWidth, h = vv ? vv.height : window.innerHeight;
+	var big = Math.max(screen.width, screen.height), small = Math.min(screen.width, screen.height);
+	var land = w >= h;
+	var tw = land ? big : small, th = land ? small : big;
+	return (w >= tw * 0.92 && h >= th * 0.80) ? 2 : 0;
   }
+  function isFs() { return fsState() > 0; }
   // Os navegadores atualizam innerWidth/innerHeight DEPOIS do evento (sair da tela cheia, barra de enderecos do
   // celular, girar o aparelho). Re-medimos em varios instantes: o evento 'resize' sintetico faz o Godot ler o
   // tamanho novo, e o jogo recebe o estado real da tela cheia.

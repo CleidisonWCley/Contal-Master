@@ -21,7 +21,9 @@ const PRACTICE_TARGET_COUNT := 16
 var events: Array[Dictionary] = []
 ## V0.16.2 (limite dinamico): a Roleta passa a ter N giros (2/4/8/10, opcao "Duracao dos minigames").
 ## Cada giro monta uma roda NOVA, sem nenhum evento ja sorteado antes (nesta partida ou nas recentes).
-## V0.16.4: bonus da campanha/modo livre = sempre 1 giro (nao segue a configuracao de questoes 2-10).
+## V0.16.4 (colega) / reaplicado na V0.16.8: a Roleta e o minigame BONUS da campanha e tem SEMPRE 1 giro, independente da
+## configuracao de duracao (que vale so para Show do Bilhao, Maleta, Perseguicao, STOP e Forca). O codigo de varios giros
+## ficou dormente: basta mudar FIXED_SPINS para reativar.
 const FIXED_SPINS: int = 1
 var spins_total: int = FIXED_SPINS
 var spins_done: int = 0
@@ -59,6 +61,8 @@ var result_layer: Control
 var result_title_label: Label
 var result_name_label: Label
 var result_description_label: Label
+var result_description_scroll: ScrollContainer   # V0.16.4
+var result_panel: PanelContainer
 var result_impact_label: Label
 var continue_button: Button
 
@@ -222,6 +226,7 @@ func _prepare_practice_event(raw: Dictionary) -> Dictionary:
 		effect = low_bonus
 	elif strength == "high":
 		effect = high_penalty
+	# V0.16.4: sem multiplicador por N giros (1 giro = pontos originais de bonus/penalidade).
 	return {
 		"id": str(raw.get("id", raw.get("name", ""))),
 		"name": str(raw.get("name", "Evento técnico")),
@@ -363,8 +368,8 @@ func _build_scene() -> void:
 	DifficultyManager.apply_difficulty_chip(difficulty_label, "", 18)
 	status_row.add_child(difficulty_label)
 
-	# V0.16.4: com 1 giro unico o contador "GIRO 1/1" nao agrega nada; so aparece se FIXED_SPINS for > 1.
-	if spins_total > 1:
+	# Com 1 giro nao ha contador "GIRO x/N" (so existe se FIXED_SPINS > 1).
+	if FIXED_SPINS > 1:
 		spin_counter_label = _create_chip_label("GIRO 1/%d" % spins_total, 18, Color(0.04, 0.05, 0.12, 0.94), Color(1.0, 1.0, 1.0))
 		status_row.add_child(spin_counter_label)
 
@@ -595,6 +600,8 @@ func _build_result_layer() -> void:
 	FontScale.set_size(result_description_label, 22)
 	result_description_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
 	box.add_child(result_description_label)
+	result_description_scroll = AnswerLayout.install_body_scroll(box, result_description_label)
+	result_panel = panel
 
 	result_impact_label = Label.new()
 	result_impact_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -665,6 +672,7 @@ func _show_result_overlay() -> void:
 	result_impact_label.add_theme_color_override("font_color", COLOR_GOOD if good_result else COLOR_BAD)
 	_set_sector_labels_visible(false)
 	result_layer.visible = true
+	AnswerLayout.fit_feedback(result_panel, result_description_scroll, result_description_label, 720.0)
 	_set_status("Resultado definido. Toque em continuar para seguir.")
 
 func _get_result_learning(good_result: bool) -> String:

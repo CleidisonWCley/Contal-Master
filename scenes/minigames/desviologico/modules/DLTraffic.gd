@@ -316,14 +316,6 @@ func _active_threat_count() -> int:
 			count += 1
 	return count
 
-func _active_obstacle_count() -> int:
-	var count := 0
-	for data in g.obstacle_data:
-		var node: Control = data.get("node", null)
-		if node != null and is_instance_valid(node):
-			count += 1
-	return count
-
 func _spawn_has_player_clearance(lane: int, spawn_y: float) -> bool:
 	var viewport_height: float = maxf(g.STAGE_SIZE.y, 720.0)
 	var player_center_y: float = _player_current_center_y()
@@ -399,6 +391,11 @@ func _make_npc_obstacle(base_size: Vector2) -> Control:
 	sprite.texture = g._load_texture(_pick_npc_sprite_path())
 	sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(sprite)
+	# V0.16.9.6: lanternas vermelhas a partir do Entardecer (nao cria o no nos horarios sem luz: custo zero de dia).
+	if DLCarLights.round_intensity(DLCarLights.KIND_TAIL, g.current_round) > 0.01:
+		var tail_lights: DLCarLights = DLCarLights.new()
+		tail_lights.setup(DLCarLights.KIND_TAIL, g.current_round)
+		root.add_child(tail_lights)
 	return root
 
 func _pick_npc_sprite_path() -> String:

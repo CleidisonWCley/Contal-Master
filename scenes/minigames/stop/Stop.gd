@@ -49,6 +49,8 @@ var options_grid: GridContainer
 var feedback_layer: Control
 var feedback_title_label: Label
 var feedback_body_label: Label
+var feedback_body_scroll: ScrollContainer   # V0.16.4
+var feedback_panel: PanelContainer
 var feedback_continue_button: Button
 var finish_layer: Control
 var finish_score_label: Label
@@ -335,6 +337,8 @@ func _build_feedback_layer() -> void:
 	FontScale.set_size(feedback_body_label, 22)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.94, 0.96, 1.0))
 	box.add_child(feedback_body_label)
+	feedback_body_scroll = AnswerLayout.install_body_scroll(box, feedback_body_label)
+	feedback_panel = box.get_parent().get_parent() as PanelContainer
 
 	feedback_continue_button = Button.new()
 	feedback_continue_button.text = "Continuar"
@@ -571,6 +575,7 @@ func _show_feedback(is_correct: bool, selected_text: String, correct_text: Strin
 			why_not = "%s é outro conceito: %s" % [selected_text, chosen_meaning]
 		feedback_body_label.text = "Você escolheu: %s\n%s\n\nResposta correta: %s\n%s%s\nPontuação perdida: %s" % [selected_text, why_not, correct_text, explanation, practice, wrong_points]
 	feedback_layer.visible = true
+	AnswerLayout.fit_feedback(feedback_panel, feedback_body_scroll, feedback_body_label, 760.0)
 	feedback_continue_button.disabled = false
 	feedback_continue_button.call_deferred("grab_focus")
 	await feedback_continue_button.pressed

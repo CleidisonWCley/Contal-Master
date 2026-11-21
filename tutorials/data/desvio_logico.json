@@ -126,7 +126,7 @@
       "card": "top",
       "pointer": "none",
       "phase": "decision",
-      "card_y": 0.42,
+      "card_y": 0.54,
       "outline": false,
       "skip_label": "Continuar"
     }

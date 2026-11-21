@@ -63,6 +63,8 @@ var info_label: Label
 var feedback_layer: Control
 var feedback_title_label: Label
 var feedback_body_label: Label
+var feedback_body_scroll: ScrollContainer   # V0.16.4: texto do feedback rola se a fonte for muito grande
+var feedback_panel: PanelContainer
 var feedback_continue_button: Button
 var finish_layer: Control
 var finish_score_label: Label
@@ -419,6 +421,7 @@ func _show_feedback(is_threat: bool, main_text: String, secondary_text: String, 
 		feedback_title_label.add_theme_color_override("font_color", Color(0.50, 0.74, 1.0))
 		feedback_body_label.text = "%s\nEssa coordenada não tinha ameaça; continue procurando riscos reais no tabuleiro.\n%s pontos" % [secondary_text, wrong_points]
 	feedback_layer.visible = true
+	AnswerLayout.fit_feedback(feedback_panel, feedback_body_scroll, feedback_body_label, 760.0, 72.0)
 	await _wait_for_feedback_continue()
 
 func _clean_feedback_explanation(answer_text: String, explanation_text: String) -> String:
@@ -487,6 +490,8 @@ func _build_feedback_layer() -> void:
 	FontScale.set_size(feedback_body_label, 23)
 	feedback_body_label.add_theme_color_override("font_color", Color(0.93, 0.97, 1.0))
 	box.add_child(feedback_body_label)
+	feedback_body_scroll = AnswerLayout.install_body_scroll(box, feedback_body_label)
+	feedback_panel = panel
 	_create_feedback_continue_button(box)
 
 func _build_finish_layer() -> void:

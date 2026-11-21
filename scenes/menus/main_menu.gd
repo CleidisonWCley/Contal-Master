@@ -109,8 +109,11 @@ func _apply_version_badge_layout() -> void:
 	version_label.anchor_bottom = 1.0
 	version_label.offset_left = -260.0 if compact else -300.0
 	version_label.offset_right = -18.0 if compact else -28.0
-	version_label.offset_top = -38.0 if compact else -44.0
-	version_label.offset_bottom = -12.0 if compact else -16.0
+	# V0.16.4: selo subiu (antes colava no rodape e era cortado por barras do sistema / janelas maiores que a tela).
+	# A altura cresce PARA CIMA, entao uma fonte maior nunca desce para fora da tela.
+	version_label.offset_top = -62.0 if compact else -70.0
+	version_label.offset_bottom = -28.0 if compact else -34.0
+	version_label.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	BrandText.set_font_size(version_label, 14 if compact else 16)
 
 func _connect_settings_signal() -> void:

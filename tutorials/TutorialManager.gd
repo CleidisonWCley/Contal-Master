@@ -141,6 +141,8 @@ const BUST_ASPECT := 0.80
 ##    PNG for reexportado em outra resolucao com o mesmo enquadramento. Se o desenho for REFEITO, remeça (ver
 ##    docs/TABELA_TAMANHOS_PERSONAGENS.md) ou apague a entrada: sem ela, o jogo mede o PNG sozinho (bust_frame).
 ##  - "fit"  = ajuste manual de tamanho no card (1.0 = padrao; 1.1 = 10% maior; 0.9 = 10% menor).
+##  - "sink" = (opcional, V0.16.9) fracao da ALTURA do canvas que o desenho "afunda" abaixo da base do cartao, onde e recortado.
+##    Usado quando a base do desenho e curva (Aline) e aparece como uma borda solta; 0 = sem ajuste.
 ## A diferenca de altura entre personagens (CharacterHeights.bust_scale) continua sendo aplicada por cima.
 const BUST_FRAMES := {
 	"jales": {"rect": Rect2(0.0875, 0.1093, 0.7991, 0.8493), "fit": 1.0},
@@ -150,7 +152,7 @@ const BUST_FRAMES := {
 	"julios": {"rect": Rect2(0.1125, 0.0367, 0.7937, 0.9300), "fit": 1.0},
 	"ariel": {"rect": Rect2(0.0955, 0.0367, 0.8152, 0.9213), "fit": 1.0},
 	"cleiton": {"rect": Rect2(0.0500, 0.2013, 0.9000, 0.7573), "fit": 1.0},
-	"aline": {"rect": Rect2(0.0500, 0.1900, 0.9000, 0.7687), "fit": 1.0},
+	"aline": {"rect": Rect2(0.0500, 0.1900, 0.9000, 0.7687), "fit": 1.0, "sink": 0.07},
 	"natalia": {"rect": Rect2(0.0705, 0.0507, 0.8875, 0.9467), "fit": 1.0}
 }
 

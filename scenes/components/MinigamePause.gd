@@ -46,6 +46,11 @@ var _novel_click_button: Button
 var _settings_back_button: Button
 var _font_selector: FontSizeSelector   # V0.16.3: acessibilidade - tamanho da fonte
 var _grabber: Texture2D
+var _pause_alpha_tween: Tween   # V0.16.4
+
+## V0.16.4: mesmo tratamento do botao "Tela cheia": apagado no canto (ainda visivel) e acende quando o jogador vai pausar.
+const PAUSE_IDLE_ALPHA: float = 0.42
+const PAUSE_ACTIVE_ALPHA: float = 1.0
 
 static func attach(host: Node, options: Dictionary = {}) -> MinigamePause:
 	var instance := MinigamePause.new()
@@ -107,6 +112,8 @@ func close() -> void:
 		get_tree().paused = false
 	overlay.visible = false
 	pause_button.visible = true
+	pause_button.release_focus()
+	pause_button.self_modulate.a = PAUSE_ACTIVE_ALPHA if pause_button.is_hovered() else PAUSE_IDLE_ALPHA
 	resumed.emit()
 
 func set_button_visible(value: bool) -> void:
@@ -142,7 +149,29 @@ func _build_button() -> void:
 	for state in ["font_pressed_color", "icon_pressed_color"]:
 		pause_button.add_theme_color_override(state, UiPalette.TEXT_ON_BRIGHT)
 	pause_button.pressed.connect(open)
+	# Acende com mouse, toque (button_down) ou foco de teclado; volta a ficar apagado ao sair.
+	pause_button.self_modulate = Color(1.0, 1.0, 1.0, PAUSE_IDLE_ALPHA)
+	pause_button.mouse_entered.connect(_set_pause_alpha.bind(PAUSE_ACTIVE_ALPHA))
+	pause_button.mouse_exited.connect(_on_pause_pointer_left)
+	pause_button.button_down.connect(_set_pause_alpha.bind(PAUSE_ACTIVE_ALPHA))
+	pause_button.focus_entered.connect(_set_pause_alpha.bind(PAUSE_ACTIVE_ALPHA))
+	pause_button.focus_exited.connect(_set_pause_alpha.bind(PAUSE_IDLE_ALPHA))
 	add_child(pause_button)
+
+func _on_pause_pointer_left() -> void:
+	# Com foco de teclado o botao continua aceso; sem foco, apaga.
+	if pause_button != null and pause_button.has_focus():
+		return
+	_set_pause_alpha(PAUSE_IDLE_ALPHA)
+
+func _set_pause_alpha(alpha: float) -> void:
+	if pause_button == null:
+		return
+	if _pause_alpha_tween != null and _pause_alpha_tween.is_valid():
+		_pause_alpha_tween.kill()
+	# process_always: o pause da arvore nao pode congelar a animacao de brilho.
+	_pause_alpha_tween = pause_button.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_pause_alpha_tween.tween_property(pause_button, "self_modulate:a", alpha, 0.12)
 
 func _build_overlay() -> void:
 	overlay = Control.new()
