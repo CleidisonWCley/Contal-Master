@@ -195,21 +195,18 @@ func _install_display_hooks() -> void:
   if (window.__cmDisplayHooked) { return; }
   window.__cmDisplayHooked = true;
   var timers = [];
-  // V0.16.9.4: "tela cheia" tambem vale quando o jogo ja ocupa a tela inteira SEM a Fullscreen API (celular/tablet no itch.io,
-  // PWA). Antes so a API contava e o jogo mostrava "OFF" mesmo ja estando em tela cheia. 0 = janela | 1 = API | 2 = ocupa a tela.
-  function fsState() {
+  // V0.16.11.1: "tela cheia" = Fullscreen API ativa OU app instalado (PWA/standalone). O palpite por TAMANHO da tela (V0.16.9.4) foi
+  // removido: no celular ele marcava ON com a tela ainda fora da tela cheia, o botao nao deixava entrar e nao voltava depois de sair.
+  // 0 = janela | 1 = Fullscreen API | 2 = app instalado (sem API; nao ha como sair).
+  function fsActive() {
 	var d = document;
-	if (d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement) { return 1; }
+	return !!(d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement);
+  }
+  function fsState() {
+	if (fsActive()) { return 1; }
 	var mm = function (q) { try { return window.matchMedia(q).matches; } catch (e) { return false; } };
 	if (mm('(display-mode: fullscreen)') || mm('(display-mode: standalone)') || mm('(display-mode: minimal-ui)') || window.navigator.standalone === true) { return 2; }
-	var coarse = mm('(pointer: coarse)') || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
-	if (!coarse) { return 0; }
-	var vv = window.visualViewport;
-	var w = vv ? vv.width : window.innerWidth, h = vv ? vv.height : window.innerHeight;
-	var big = Math.max(screen.width, screen.height), small = Math.min(screen.width, screen.height);
-	var land = w >= h;
-	var tw = land ? big : small, th = land ? small : big;
-	return (w >= tw * 0.92 && h >= th * 0.80) ? 2 : 0;
+	return 0;
   }
   function isFs() { return fsState() > 0; }
   // Os navegadores atualizam innerWidth/innerHeight DEPOIS do evento (sair da tela cheia, barra de enderecos do
@@ -224,6 +221,43 @@ func _install_display_hooks() -> void:
 	  }, ms);
 	});
   }
+  // V0.16.11.1: entrar/sair da tela cheia DIRETO pela Fullscreen API do navegador (o DisplayServer do Godot guarda um estado proprio: depois que o
+  // jogador saia pelo gesto do celular/Esc, o Godot achava que ainda estava em tela cheia e ignorava o pedido para voltar).
+  // O pedido e "armado" no toque (button_down) e executado no proprio gesto (pointerup/touchend/click), que e o que o celular exige.
+  var armed = null, armedAt = 0, doneAt = 0, doneWant = null;
+  function runFs(want) {
+	var d = document, el = d.documentElement;
+	doneAt = Date.now();
+	doneWant = !!want;
+	try {
+	  if (want) {
+		if (fsActive()) { nudge(); return; }
+		var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+		if (fn) { var r = fn.call(el); if (r && r.catch) { r.catch(function () {}); } }
+	  } else {
+		if (!fsActive()) { nudge(); return; }
+		var ex = d.exitFullscreen || d.webkitExitFullscreen || d.mozCancelFullScreen || d.msExitFullscreen;
+		if (ex) { var r2 = ex.call(d); if (r2 && r2.catch) { r2.catch(function () {}); } }
+	  }
+	} catch (e) {}
+	nudge();
+  }
+  window.__cmArmFs = function (want) { armed = !!want; armedAt = Date.now(); };
+  window.__cmSetFs = function (want) {
+	// Chamado pelo jogo no clique. Se o gesto nativo ja executou o pedido armado, nao repete.
+	armed = null;
+	if (doneWant === !!want && Date.now() - doneAt < 1500) { return; }
+	runFs(!!want);
+  };
+  var onGesture = function () {
+	if (armed === null || Date.now() - armedAt > 2500) { return; }
+	var want = armed;
+	armed = null;
+	runFs(want);
+  };
+  ['pointerup', 'touchend', 'mouseup'].forEach(function (name) {
+	document.addEventListener(name, onGesture, true);
+  });
   ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(function (name) {
 	document.addEventListener(name, nudge);
   });

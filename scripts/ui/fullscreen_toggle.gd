@@ -68,6 +68,7 @@ func _ready() -> void:
 	mouse_entered.connect(_set_alpha.bind(ACTIVE_ALPHA))
 	mouse_exited.connect(_set_alpha.bind(IDLE_ALPHA))
 	button_down.connect(_set_alpha.bind(ACTIVE_ALPHA))
+	button_down.connect(_on_button_down_arm)
 	button_up.connect(_set_alpha.bind(IDLE_ALPHA))
 	self_modulate = Color(1.0, 1.0, 1.0, IDLE_ALPHA)
 	get_window().size_changed.connect(_sync_from_display)
@@ -86,23 +87,27 @@ func _process(delta: float) -> void:
 
 # ---------------------------------------------------------------- acao
 func _on_pressed() -> void:
-	# V0.16.9.4 (celular/tablet no itch.io): o navegador ja abre o jogo ocupando a tela (sem a Fullscreen API). O botao ja mostra ON;
-	# um clique so tenta a tela cheia "de verdade" (se o aparelho permitir) e NUNCA vira OFF nesse caso.
-	if OS.has_feature("web") and _web_fs_state() == 2:
-		_apply_mode(true)
-		_shown_fullscreen = true
-		_grace_until_msec = Time.get_ticks_msec() + REQUEST_GRACE_MSEC
-		_refresh_visuals()
-		_play_click()
-		return
+	# V0.16.11.1 (celular/tablet): o estado vem SEMPRE do navegador (Fullscreen API). Quem saiu da tela cheia pelo gesto do aparelho
+	# agora ve OFF e o clique volta a entrar (antes o botao nao respondia e parecia travado).
 	# Durante a janela de graca vale o estado PEDIDO (cliques seguidos nao brigam com o navegador).
 	var currently_fullscreen: bool = _shown_fullscreen if _in_grace() else _is_real_fullscreen()
 	var target_fullscreen: bool = not currently_fullscreen
+	# App instalado (PWA, estado 2) nao tem como sair: o clique so tenta entrar na tela cheia de verdade.
+	if OS.has_feature("web") and not _in_grace() and _web_fs_state() == 2:
+		target_fullscreen = true
 	_apply_mode(target_fullscreen)
 	_shown_fullscreen = target_fullscreen
 	_grace_until_msec = Time.get_ticks_msec() + REQUEST_GRACE_MSEC
 	_refresh_visuals()
 	_play_click()
+
+
+## Web: "arma" o pedido assim que o dedo toca. O JS executa a Fullscreen API no proprio gesto (soltar o dedo), que o celular exige.
+func _on_button_down_arm() -> void:
+	if not OS.has_feature("web"):
+		return
+	var currently_fullscreen: bool = _shown_fullscreen if _in_grace() else _is_real_fullscreen()
+	JavaScriptBridge.eval("window.__cmArmFs && window.__cmArmFs(%s)" % ("false" if currently_fullscreen else "true"), true)
 
 
 func _apply_mode(fullscreen: bool) -> void:
@@ -133,22 +138,15 @@ func _in_grace() -> bool:
 	return Time.get_ticks_msec() < _grace_until_msec
 
 
-## 0 = janela normal | 1 = Fullscreen API ativa | 2 = o jogo ja ocupa a tela (celular/tablet/PWA), sem a API.
-## Mesma regra do WebBridge (window.__cmFsState).
+## 0 = janela normal | 1 = Fullscreen API ativa | 2 = app instalado (PWA), sem a API.
+## V0.16.11.1: sem palpite por tamanho de tela (marcava ON no celular fora da tela cheia). Mesma regra do WebBridge.
 const JS_FS_STATE: String = """
 (function () {
   var d = document;
   if (d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement) { return 1; }
   var mm = function (q) { try { return window.matchMedia(q).matches; } catch (e) { return false; } };
   if (mm('(display-mode: fullscreen)') || mm('(display-mode: standalone)') || mm('(display-mode: minimal-ui)') || window.navigator.standalone === true) { return 2; }
-  var coarse = mm('(pointer: coarse)') || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
-  if (!coarse) { return 0; }
-  var vv = window.visualViewport;
-  var w = vv ? vv.width : window.innerWidth, h = vv ? vv.height : window.innerHeight;
-  var big = Math.max(screen.width, screen.height), small = Math.min(screen.width, screen.height);
-  var land = w >= h;
-  var tw = land ? big : small, th = land ? small : big;
-  return (w >= tw * 0.92 && h >= th * 0.80) ? 2 : 0;
+  return 0;
 })()
 """
 

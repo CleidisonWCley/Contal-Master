@@ -30,7 +30,7 @@ editor_description = "Placa fixa de bifurcação: posicione este ponto na divisa
 position = Vector2(639, 264)
 
 [node name="SidePropMarkers" type="Node2D" parent="."]
-editor_description = "Markers editáveis dos objetos laterais do Desvio Lógico. Arraste cada ponto sobre o gramado do cenário. V0.16.11: os postes foram removidos. Os markers PostLeft*/PostRight* agora so guiam as listras decorativas do gramado (trilha pela CALCADA)."
+editor_description = "Markers editáveis dos objetos laterais do Desvio Lógico. Arraste cada ponto sobre o gramado do cenário. V0.16.11.1: os markers PostLeft*/PostRight* (Start = perto da placa, Mid = meio, End = canto inferior) sao os pontos dos 6 POSTES FIXOS na calçada (o lado direito é espelhado do esquerdo) e também guiam as listras do gramado."
 
 [node name="PostRightStart" type="Marker2D" parent="SidePropMarkers"]
 editor_description = "Trilha direita distante. Trilha das listras do gramado (V0.16.11: nao ha mais poste). Ponto sobre o CENTRO DA CALCADA (faixa cinza/roxa entre o gramado e o asfalto)."
@@ -45,12 +45,12 @@ editor_description = "Trilha direita proximo. Trilha das listras do gramado (V0.
 position = Vector2(1281, 640)
 
 [node name="CyclistLeftStart" type="Marker2D" parent="SidePropMarkers"]
-editor_description = "Ciclista: início da trilha no lado esquerdo, fora da pista."
-position = Vector2(559, 268)
+editor_description = "Ciclista: início da trilha no lado esquerdo. V0.16.11.1: fica na linha LATERAL DA PISTA (asfalto, rente a calçada), sem invadir a calçada onde ficam os postes."
+position = Vector2(560, 268)
 
 [node name="CyclistLeftEnd" type="Marker2D" parent="SidePropMarkers"]
-editor_description = "Ciclista: fim da trilha no lado esquerdo, fora da pista e fora do alcance dos carros."
-position = Vector2(-70, 715)
+editor_description = "Ciclista: fim da trilha no lado esquerdo. V0.16.11.1: segue a linha lateral da pista e sai pela borda da tela, longe das faixas dos carros."
+position = Vector2(-13, 715)
 
 [node name="PostLeftStart" type="Marker2D" parent="SidePropMarkers"]
 editor_description = "Trilha esquerda distante. Trilha das listras do gramado (V0.16.11: nao ha mais poste). Ponto sobre o CENTRO DA CALCADA (faixa cinza/roxa entre o gramado e o asfalto)."

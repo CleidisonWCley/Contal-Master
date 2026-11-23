@@ -5,6 +5,7 @@ class_name DLCarLights
 ##   KIND_HEAD: V0.16.11 - sem farois. Uma AUREOLA de luz branca suave a frente do Bionix (so nos horarios noturnos,
 ##              DLConfig.CAR_HEADLIGHT_BY_ROUND). Todos os ajustes em DLConfig.AURA_* (bloco "LUZ A FRENTE DO BIONIX").
 ## O no e FILHO do carro: herda posicao, escala, rotacao e transparencia (fade-out da saida, perspectiva dos NPCs).
+## V0.16.11.1: a aureola ficou MINUSCULA (cone curto + poca pequena): so representa que o Bionix esta de luz acesa ao desviar dos cones.
 ## Nao ha trabalho por quadro no Bionix (desenha uma vez e so redesenha se o tamanho mudar).
 
 const KIND_TAIL: int = 0
@@ -103,17 +104,19 @@ func _draw_headlights(area: Rect2) -> void:
 	var y1: float = y0 - h * DLConfig.AURA_CONE_LENGTH
 	var a_near: float = DLConfig.AURA_CONE_ALPHA * intensity
 	var white := Color(0.97, 0.98, 1.0)
-	# duas camadas (larga e fraca + estreita e mais forte) dao borda suave sem textura nova
-	for layer in [[1.30, 0.45], [0.85, 1.0]]:
-		var k: float = float(layer[0])
-		var near_w: float = w * DLConfig.AURA_CONE_NEAR_HALF_W * k
-		var far_w: float = w * DLConfig.AURA_CONE_FAR_HALF_W * k
-		var c_near := Color(white.r, white.g, white.b, a_near * float(layer[1]))
-		var c_far := Color(white.r, white.g, white.b, 0.0)
-		draw_polygon(PackedVector2Array([
-			Vector2(cx - near_w, y0), Vector2(cx + near_w, y0),
-			Vector2(cx + far_w, y1), Vector2(cx - far_w, y1)
-		]), PackedColorArray([c_near, c_near, c_far, c_far]))
+	# V0.16.11.1c: UM cone de luz so (como na V0.16.11), com densidade menor (AURA_CONE_ALPHA 0.20 -> 0.15).
+	for beam_x in [0.0]:
+		var bx: float = cx + w * float(beam_x)
+		for layer in [[1.30, 0.45], [0.85, 1.0]]:
+			var k: float = float(layer[0])
+			var near_w: float = w * DLConfig.AURA_CONE_NEAR_HALF_W * k
+			var far_w: float = w * DLConfig.AURA_CONE_FAR_HALF_W * k
+			var c_near := Color(white.r, white.g, white.b, a_near * float(layer[1]))
+			var c_far := Color(white.r, white.g, white.b, 0.0)
+			draw_polygon(PackedVector2Array([
+				Vector2(bx - near_w, y0), Vector2(bx + near_w, y0),
+				Vector2(bx + far_w, y1), Vector2(bx - far_w, y1)
+			]), PackedColorArray([c_near, c_near, c_far, c_far]))
 	if not WebLite.low_end() and DLConfig.AURA_POOL_ALPHA > 0.001:
 		var pw: float = w * DLConfig.AURA_POOL_WIDTH
 		var ph: float = h * DLConfig.AURA_POOL_HEIGHT

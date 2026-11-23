@@ -128,11 +128,7 @@ func _process(delta: float) -> void:
 			sideprops._update_side_motion_props(motion_delta)
 	if _is_tutorial_car_state():
 		_update_obstacles(delta)
-	if water_layer != null and WebLite.water_quality(DLConfig.WATER_EFFECT_QUALITY) > 0:
-		waterfx.water_redraw_accumulator += delta
-		if waterfx.water_redraw_accumulator >= WebLite.water_interval(DLConfig.WATER_REDRAW_INTERVAL):
-			waterfx.water_redraw_accumulator = 0.0
-			water_layer.queue_redraw()
+	waterfx.update_overlay()
 	# V0.14.1 (web): estrada e adereços redesenham em quadros alternados (metade do custo de desenho).
 	_frame_toggle = not _frame_toggle
 	if not WebLite.lite() or _frame_toggle:
@@ -231,18 +227,8 @@ func _build_scene() -> void:
 	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stage.add_child(dimmer)
 
-	# V1.0.2.5.1: shader/máscara d'água removido após teste visual.
-	# Mantemos apenas os brilhos horizontais desenhados pela camada WaterSurfaceOverlay.
-
-	# V0.13.12.2: camada própria de mar vivo.
-	# Ela fica acima do background/dimmer para aparecer, mas abaixo de pista/postes/carros/HUD.
-	# Assim os postes dinâmicos continuam limpos e o efeito não vira filtro global.
-	water_layer = Control.new()
-	water_layer.name = "WaterSurfaceOverlay"
-	water_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	water_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	water_layer.draw.connect(waterfx._on_water_layer_draw)
-	stage.add_child(water_layer)
+	# V0.16.12: agua por shader (GPU). Fica acima do fundo e abaixo de pista/carros/HUD; so atua na area do mar.
+	water_layer = waterfx.build_overlay(stage)
 
 	road_layer = Control.new()
 	road_layer.name = "LaneOverlay"
@@ -788,12 +774,7 @@ func _start_round(index: int) -> void:
 	car_y_ratio = DLConfig.CAR_DRIVE_START_Y_RATIO
 	car_visual_bob = 0.0
 	current_lane = DLConfig.LANE_RIGHT
-	traffic.last_spawn_lane = DLConfig.LANE_LEFT
-	traffic.last_combo_lane = DLConfig.LANE_RIGHT
-	traffic.traffic_safe_opening_done = false
-	traffic.traffic_opening_step = 0
-	traffic.traffic_wave_count_bag.clear()
-	traffic.traffic_wave_lane_bags.clear()
+	traffic._reset_traffic_wave_distribution()
 	route_result_applied = false
 	wrong_route_damage_applied_this_question = false
 	last_route_damage_loss = 0.0
@@ -898,6 +879,7 @@ func _set_background(index: int) -> void:
 	background_rect.texture = resource as Texture2D
 	if bg_fill != null:
 		bg_fill.texture = background_rect.texture
+	waterfx.set_background_texture(background_rect.texture)
 
 func _update_drive(delta: float) -> void:
 	drive_elapsed += delta
@@ -936,9 +918,13 @@ func _player_car_y_ratio_for_progress(progress: float) -> float:
 	# o "boom"/salto visual entre o fim da rota e a placa da bifurcação.
 	progress = clampf(progress, 0.0, 1.0)
 	var hold_start: float = _route_hold_start_progress()
-	var final_start: float = maxf(_route_final_advance_progress(), hold_start + 0.04)
+	# V0.16.11.1: a reta final do carro e a desaceleracao do cenario comecam JUNTAS (mesmo instante) e terminam JUNTAS em progress = 1.0,
+	# ou seja, exatamente em DRIVE_DURATION_SECONDS. O carro para no meio da pista (CAR_DECISION_STOP_Y_RATIO), sem precisar encostar na placa.
+	var final_start: float = maxf(_final_deceleration_start_progress(), hold_start + 0.04)
 	var safe_y: float = DLConfig.CAR_ROUTE_SAFE_HOLD_Y_RATIO
-	var pre_final_y: float = maxf(DLConfig.CAR_DRIVE_END_Y_RATIO, safe_y - DLConfig.CAR_ROUTE_SAFE_HOLD_DRIFT)
+	var stop_y: float = _car_decision_stop_y_ratio()
+	var mid_stop_y: float = maxf(stop_y, DLConfig.CAR_PRE_STOP_Y_RATIO)
+	var pre_final_y: float = maxf(mid_stop_y, safe_y - DLConfig.CAR_ROUTE_SAFE_HOLD_DRIFT)
 	if progress <= hold_start:
 		var t_to_hold: float = clampf(progress / maxf(hold_start, 0.01), 0.0, 1.0)
 		var eased_to_hold: float = t_to_hold * t_to_hold * (3.0 - 2.0 * t_to_hold)
@@ -947,12 +933,18 @@ func _player_car_y_ratio_for_progress(progress: float) -> float:
 		var t_hold: float = clampf((progress - hold_start) / maxf(final_start - hold_start, 0.01), 0.0, 1.0)
 		var eased_hold: float = t_hold * t_hold * (3.0 - 2.0 * t_hold)
 		return lerpf(safe_y, pre_final_y, eased_hold)
-	var t_final: float = clampf((progress - final_start) / maxf(1.0 - final_start, 0.01), 0.0, 1.0)
-	var eased_final: float = t_final * t_final * (3.0 - 2.0 * t_final)
-	return lerpf(pre_final_y, _car_decision_stop_y_ratio(), eased_final)
+	# V0.16.11.1b: freada ate o meio da pista e, SO nos ultimos CAR_SIGN_APPROACH_SECONDS (1-2 s), o carro chega perto da placa.
+	# Tudo termina junto em progress = 1.0 (18,0 s).
+	var approach_start: float = clampf(1.0 - DLConfig.CAR_SIGN_APPROACH_SECONDS / maxf(_drive_duration(), 1.0), final_start + 0.02, 0.99)
+	if progress < approach_start:
+		var t_brake: float = clampf((progress - final_start) / maxf(approach_start - final_start, 0.01), 0.0, 1.0)
+		return lerpf(pre_final_y, mid_stop_y, 1.0 - pow(1.0 - t_brake, 3.0))
+	var t_app: float = clampf((progress - approach_start) / maxf(1.0 - approach_start, 0.01), 0.0, 1.0)
+	return lerpf(mid_stop_y, stop_y, t_app * t_app * (3.0 - 2.0 * t_app))
 
 func _car_decision_stop_y_ratio() -> float:
-	return clampf(DLConfig.CAR_APPROACH_Y_RATIO + DLConfig.CAR_DECISION_STOP_Y_OFFSET_RATIO, 0.365, DLConfig.CAR_APPROACH_Y_RATIO)
+	# V0.16.11.1: ponto de parada proprio (mais baixo que a placa). A saida A/B parte daqui.
+	return clampf(DLConfig.CAR_DECISION_STOP_Y_RATIO, 0.365, DLConfig.CAR_ROUTE_SAFE_HOLD_Y_RATIO)
 
 func _route_hold_start_progress() -> float:
 	return float(DLConfig.CAR_ROUTE_HOLD_START_BY_DIFFICULTY.get(difficulty, 0.70))
@@ -966,8 +958,11 @@ func _decision_center_blend_start_progress() -> float:
 func _decision_center_blend_ratio(progress: float) -> float:
 	if state != DLConfig.STATE_DRIVE:
 		return 0.0
-	var blend_start: float = clampf(_decision_center_blend_start_progress(), 0.0, 0.98)
-	var t: float = clampf((progress - blend_start) / maxf(1.0 - blend_start, 0.01), 0.0, 1.0)
+	# V0.16.11.1f: centraliza ANTES da parada (termina CENTER_DONE_BEFORE_END_SECONDS antes do fim), para o carro chegar reto na placa.
+	var dur: float = maxf(_drive_duration(), 1.0)
+	var blend_start: float = clampf(1.0 - DLConfig.CENTER_BLEND_LEAD_SECONDS / dur, 0.0, 0.98)
+	var blend_end: float = clampf(1.0 - DLConfig.CENTER_DONE_BEFORE_END_SECONDS / dur, blend_start + 0.01, 1.0)
+	var t: float = clampf((progress - blend_start) / maxf(blend_end - blend_start, 0.01), 0.0, 1.0)
 	return t * t * (3.0 - 2.0 * t)
 
 func _final_deceleration_start_progress() -> float:
@@ -985,11 +980,12 @@ func _final_deceleration_ratio(progress: float = -1.0) -> float:
 		progress = _route_progress_ratio()
 	var start: float = _final_deceleration_start_progress()
 	var t: float = clampf((progress - start) / maxf(1.0 - start, 0.01), 0.0, 1.0)
-	var eased: float = t * t * (3.0 - 2.0 * t)
-	return clampf(1.0 - eased, 0.0, 1.0)
+	# V0.16.11.1: (1-t)^2 em vez de suavizacao dupla: a velocidade so chega a zero EM 18,0 s (antes "parava" ~1 s antes, com cauda longa).
+	return clampf(pow(1.0 - t, 2.0), 0.0, 1.0)
 
 func _player_car_depth_progress() -> float:
-	var distance: float = maxf(DLConfig.CAR_DRIVE_START_Y_RATIO - DLConfig.CAR_DRIVE_END_Y_RATIO, 0.001)
+	# V0.16.14: 0 no inicio da subida, 1 na altura da parada: o Bionix encolhe continuamente ate parar
+	var distance: float = maxf(DLConfig.CAR_DRIVE_START_Y_RATIO - _car_decision_stop_y_ratio(), 0.001)
 	return clampf((DLConfig.CAR_DRIVE_START_Y_RATIO - car_y_ratio) / distance, 0.0, 1.0)
 
 func _enter_decision_phase() -> void:
@@ -1005,7 +1001,8 @@ func _enter_decision_phase() -> void:
 	_reset_car_lane_tilt()
 	_snap_bionix_to_decision_point()
 	state = DLConfig.STATE_DECISION
-	input_locked = false
+	# V0.16.11.1f: carro parado + velocimetro 0 ANTES de a pergunta aparecer (pausa curta, sem entrada de resposta).
+	input_locked = true
 	_apply_route_reached_bonus_once()
 	_clear_obstacles()
 	engineaudio._stop_engine_audio()
@@ -1013,8 +1010,8 @@ func _enter_decision_phase() -> void:
 	if route_progress_hud != null:
 		route_progress_hud.visible = false
 	if question_panel != null:
-		question_panel.visible = true
-	decision_layer.visible = true
+		question_panel.visible = false
+	decision_layer.visible = false
 	var q: Dictionary = _current_question()
 	var opts: Dictionary = q.get("opcoes", {})
 	# V0.15.6: setas como ICONES (a fonte da web nao desenha ← →); o texto fica so com ASCII.
@@ -1027,6 +1024,15 @@ func _enter_decision_phase() -> void:
 	_set_car_sprite("reto")
 	_layout_car(false)
 	_schedule_decision_layout()
+	if _animations_enabled():
+		await get_tree().create_timer(DLConfig.DECISION_STOP_HOLD_SECONDS).timeout
+		if not is_inside_tree() or state != DLConfig.STATE_DECISION:
+			return
+	input_locked = false
+	if question_panel != null:
+		question_panel.visible = true
+	decision_layer.visible = true
+	_schedule_decision_layout()   # refaz o layout agora que as respostas estao visiveis
 	tutorial.on_decision_phase()
 
 func _on_choice_pressed(choice: String) -> void:

@@ -34,6 +34,8 @@ var host_node: Node
 var _main_box: VBoxContainer
 var _settings_scroll: ScrollContainer
 var _settings_box: VBoxContainer
+var _settings_left: VBoxContainer    # V0.16.11.1d: configuracoes em 2 colunas (menos rolagem, botoes mais largos)
+var _settings_right: VBoxContainer
 var _in_settings: bool = false
 var _music_slider: HSlider
 var _sfx_slider: HSlider
@@ -131,10 +133,10 @@ func _build_button() -> void:
 	pause_button.tooltip_text = "Pausar (Esc)"
 	pause_button.anchor_left = 1.0
 	pause_button.anchor_right = 1.0
-	pause_button.offset_left = -144.0
+	pause_button.offset_left = -176.0
 	pause_button.offset_right = -18.0
 	pause_button.offset_top = 14.0
-	pause_button.offset_bottom = 60.0
+	pause_button.offset_bottom = 68.0
 	pause_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	FontScale.set_size(pause_button, 18)
 	FontScale.set_icon_ratio(pause_button, 20.0 / 18.0)
@@ -192,10 +194,10 @@ func _build_overlay() -> void:
 	overlay.add_child(center)
 
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(460, 0)
+	panel.custom_minimum_size = Vector2(1080, 0)   # V0.16.11.1e: o container cresce para os lados (menos rolagem vertical)
 	panel.add_theme_stylebox_override("panel", UiKit.card_style(24))
 	center.add_child(panel)
-	var pad := UiKit.margin(30, 30, 26, 22)
+	var pad := UiKit.margin(38, 38, 30, 26)
 	panel.add_child(pad)
 	var stack := VBoxContainer.new()
 	pad.add_child(stack)
@@ -203,7 +205,7 @@ func _build_overlay() -> void:
 	# ---- Visao principal: Continuar / Configuracoes / Menu principal
 	_main_box = VBoxContainer.new()
 	_main_box.name = "MainView"
-	_main_box.add_theme_constant_override("separation", 14)
+	_main_box.add_theme_constant_override("separation", 18)
 	stack.add_child(_main_box)
 
 	var title_row := HBoxContainer.new()
@@ -241,8 +243,8 @@ func _build_settings_view(stack: VBoxContainer) -> void:
 	stack.add_child(_settings_scroll)
 
 	_settings_box = VBoxContainer.new()
-	_settings_box.add_theme_constant_override("separation", 10)
-	_settings_box.custom_minimum_size = Vector2(430, 0)
+	_settings_box.add_theme_constant_override("separation", 14)
+	_settings_box.custom_minimum_size = Vector2(1000, 0)
 	_settings_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_settings_scroll.add_child(_settings_box)
 
@@ -252,9 +254,20 @@ func _build_settings_view(stack: VBoxContainer) -> void:
 	title_row.add_child(UiIcons.make_rect("settings", 30, UiPalette.HIGHLIGHT))
 	title_row.add_child(UiKit.label("CONFIGURAÇÕES", 28, UiPalette.TEXT_ON_DARK))
 	_settings_box.add_child(title_row)
+	var cols := HBoxContainer.new()
+	cols.add_theme_constant_override("separation", 56)
+	_settings_box.add_child(cols)
+	_settings_left = VBoxContainer.new()
+	_settings_left.add_theme_constant_override("separation", 14)
+	_settings_left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cols.add_child(_settings_left)
+	_settings_right = VBoxContainer.new()
+	_settings_right.add_theme_constant_override("separation", 14)
+	_settings_right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cols.add_child(_settings_right)
 
 	# ---- Volume
-	_settings_box.add_child(_section_header("ÁUDIO"))
+	_settings_left.add_child(_section_header("ÁUDIO"))
 	var music_row: Array = _make_slider_row("music", "Música")
 	_music_slider = music_row[0] as HSlider
 	_music_value = music_row[1] as Label
@@ -265,19 +278,20 @@ func _build_settings_view(stack: VBoxContainer) -> void:
 	_sfx_slider.value_changed.connect(_on_sfx_changed)
 
 	# ---- Jogo
-	_settings_box.add_child(_section_header("JOGO"))
+	_settings_left.add_child(_section_header("JOGO"))
 	_animations_button = Button.new()
 	_animations_button.name = "AnimationsToggle"
 	_animations_button.pressed.connect(_on_animations_pressed)
-	_settings_box.add_child(_animations_button)
+	_settings_left.add_child(_animations_button)
 	_tutorials_button = Button.new()
 	_tutorials_button.name = "TutorialsToggle"
 	_tutorials_button.pressed.connect(_on_tutorials_pressed)
-	_settings_box.add_child(_tutorials_button)
+	_settings_left.add_child(_tutorials_button)
 
+	_settings_right.add_child(_section_header("NOVEL"))
 	var novel_row := HBoxContainer.new()
 	novel_row.add_theme_constant_override("separation", 10)
-	_settings_box.add_child(novel_row)
+	_settings_right.add_child(novel_row)
 	var novel_label_box := HBoxContainer.new()
 	novel_label_box.custom_minimum_size = Vector2(120, 0)
 	novel_label_box.add_theme_constant_override("separation", 10)
@@ -302,7 +316,7 @@ func _build_settings_view(stack: VBoxContainer) -> void:
 	novel_row.add_child(_novel_click_button)
 
 	# ---- Acessibilidade (V0.16.3): tamanho da fonte, na hora, tambem durante a partida.
-	_settings_box.add_child(_section_header("ACESSIBILIDADE"))
+	_settings_right.add_child(_section_header("ACESSIBILIDADE"))
 	var font_title := HBoxContainer.new()
 	font_title.name = "FontTitleRow"
 	font_title.add_theme_constant_override("separation", 10)
@@ -312,17 +326,17 @@ func _build_settings_view(stack: VBoxContainer) -> void:
 	var font_label: Label = UiKit.label("Fonte", 19, UiPalette.TEXT_ON_DARK)
 	font_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	font_title.add_child(font_label)
-	_settings_box.add_child(font_title)
-	_font_selector = FontSizeSelector.create(2, 48.0, 17)
-	_settings_box.add_child(_font_selector)
+	_settings_right.add_child(font_title)
+	_font_selector = FontSizeSelector.create(2, 58.0, 18)
+	_settings_right.add_child(_font_selector)
 	FontScale.scale_changed.connect(_on_font_scale_changed)
 
 	# ---- Dificuldade: so informativa (bloqueada durante a partida)
 	var difficulty_label := UiKit.label("Dificuldade: %s (não pode ser alterada durante a partida)" % DifficultyManager.get_label(), 15, UiPalette.TEXT_MUTED, HORIZONTAL_ALIGNMENT_CENTER)
 	difficulty_label.name = "DifficultyLockedLabel"
 	difficulty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	difficulty_label.custom_minimum_size = Vector2(430, 0)
-	_settings_box.add_child(difficulty_label)
+	difficulty_label.custom_minimum_size = Vector2(0, 0)
+	_settings_right.add_child(difficulty_label)
 
 	_settings_back_button = _make_menu_button("Voltar", "back", "ui_ghost")
 	_settings_back_button.name = "SettingsBackButton"
@@ -347,10 +361,10 @@ func _section_header(text_value: String) -> VBoxContainer:
 func _make_slider_row(icon_name: String, text_value: String) -> Array:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
-	_settings_box.add_child(row)
+	_settings_left.add_child(row)
 
 	var label_box := HBoxContainer.new()
-	label_box.custom_minimum_size = Vector2(120, 0)
+	label_box.custom_minimum_size = Vector2(150, 0)
 	label_box.add_theme_constant_override("separation", 10)
 	var icon := UiIcons.make_rect(icon_name, 24, UiPalette.TEXT_ON_DARK)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -366,7 +380,7 @@ func _make_slider_row(icon_name: String, text_value: String) -> Array:
 	slider.step = 0.01
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	slider.custom_minimum_size = Vector2(140, 32)
+	slider.custom_minimum_size = Vector2(180, 36)
 	var rail := StyleBoxFlat.new()
 	rail.bg_color = UiPalette.with_alpha(UiPalette.BG, 0.85)
 	rail.border_color = UiPalette.with_alpha(UiPalette.HIGHLIGHT, 0.30)
@@ -400,7 +414,7 @@ func _make_menu_button(text_value: String, icon_name: String, variant: String) -
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.expand_icon = false
-	ButtonStyles.apply(button, variant, Vector2(380, 54), 20)
+	ButtonStyles.apply(button, variant, Vector2(0, 64), 21)
 	return button
 
 # ---------------------------------------------------------------- acoes
@@ -474,12 +488,12 @@ func _set_toggle(button: Button, icon_name: String, label_text: String, enabled:
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.expand_icon = false
-	ButtonStyles.apply(button, "ui_toggle_on" if enabled else "ui_ghost", Vector2(380, 50), 18)
+	ButtonStyles.apply(button, "ui_toggle_on" if enabled else "ui_ghost", Vector2(0, 60), 19)
 
 func _set_choice(button: Button, label_text: String, selected: bool) -> void:
 	button.text = label_text
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ButtonStyles.apply(button, "ui_toggle_on" if selected else "ui_ghost", Vector2(0, 50), 18)
+	ButtonStyles.apply(button, "ui_toggle_on" if selected else "ui_ghost", Vector2(0, 60), 19)
 
 func _on_music_changed(value: float) -> void:
 	SettingsManager.set_music_volume(value)

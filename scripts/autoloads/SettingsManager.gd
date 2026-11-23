@@ -237,6 +237,11 @@ func get_difficulty() -> String:
 	return value
 
 func apply_window_settings() -> void:
+	# V0.16.11.1 (web): tela cheia pedida direto ao navegador (WebBridge: window.__cmSetFs). O DisplayServer do Godot guarda um estado proprio
+	# e ignorava o pedido quando o jogador tinha saido da tela cheia pelo gesto do celular. Sem o JS pronto, cai no caminho antigo.
+	if OS.has_feature("web") and bool(JavaScriptBridge.eval("typeof window.__cmSetFs === 'function'", true)):
+		JavaScriptBridge.eval("window.__cmSetFs(%s)" % ("true" if is_fullscreen() else "false"), true)
+		return
 	if is_fullscreen():
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:

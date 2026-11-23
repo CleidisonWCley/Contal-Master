@@ -63,6 +63,10 @@ Depois: criar o doc `docs/versionamento/V<versão>_<assunto>.md`, atualizar **es
 | **0.16.8** | **Roleta de Risco volta a 1 giro (reaplicada sobre a base atual); retrato do tutorial preso à base real do card em qualquer fonte; DynamicLayout alinha ao topo quando não cabe** | `V0_16_8_ROLETA_1_GIRO_TUTORIAL_RETRATO_BASE.md` |
 | **0.16.9** (a 0.16.9.6) | **Linha unificada: tutorial sem invasão de retrato, hotfix da Perseguição, Desvio Lógico (fonte grande, score no card, laterais, postes por script e na calçada, luzes dos carros), botão TELA e tela cheia no celular** | `V0_16_9_UNIFICADO.md` |
 | **0.16.10** | **Desvio Lógico: farol do Bionix pequeno e discreto, fundos a 1920 e guia do editor sem custo no jogo (−26 MB de textura), remoção de código morto e constantes sem uso, `.gitignore`/`.gdignore` do `build/`** | `V0_16_10_DESVIO_FAROIS_E_LIMPEZA.md` |
+| **0.16.11** (a 0.16.11.1f) | **Desvio Lógico para o web: sem postes por script nas versões antigas, fundo 100% estático, aura de luz do Bionix, postes fixos, ciclista, parada em tempo exato e animação final da bifurcação; pause espaçoso e botão TELA direto na Fullscreen API** | `V_0_16_11_limpeza_web_aureola_fundo_estatico.md` |
+| **0.16.12** | **Desvio Lógico: Bionix sobe mais rápido e chega perto da bifurcação, cone do farol mais curto (mesma largura) e água do fundo por shader (GPU) no lugar das linhas desenhadas** | `V_0_16_12_bionix_farol_agua_shader.md` |
+| **0.16.13** | **Desvio Lógico: diretor dinâmico de NPCs (ondas de 1 ou 2, faixa sorteada com pesos pelo movimento do jogador, sem seca por faixa, últimos carros saem de vista antes da parada; corrige o spawn que parava na metade) e água com faixas de luz visíveis também em água escura** | `V_0_16_13_trafego_dinamico_e_agua.md` |
+| **0.16.14** | **Desvio Lógico: Bionix encolhe de forma contínua ao subir até a bifurcação (0,50), tráfego do Fácil mais ativo com duplas e mais variedade de faixas** | `V_0_16_14_bionix_encolhe_e_facil.md` |
 
 ### Observações do histórico
 
