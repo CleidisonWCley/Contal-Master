@@ -67,6 +67,9 @@ Depois: criar o doc `docs/versionamento/V<versão>_<assunto>.md`, atualizar **es
 | **0.16.12** | **Desvio Lógico: Bionix sobe mais rápido e chega perto da bifurcação, cone do farol mais curto (mesma largura) e água do fundo por shader (GPU) no lugar das linhas desenhadas** | `V_0_16_12_bionix_farol_agua_shader.md` |
 | **0.16.13** | **Desvio Lógico: diretor dinâmico de NPCs (ondas de 1 ou 2, faixa sorteada com pesos pelo movimento do jogador, sem seca por faixa, últimos carros saem de vista antes da parada; corrige o spawn que parava na metade) e água com faixas de luz visíveis também em água escura** | `V_0_16_13_trafego_dinamico_e_agua.md` |
 | **0.16.14** | **Desvio Lógico: Bionix encolhe de forma contínua ao subir até a bifurcação (0,50), tráfego do Fácil mais ativo com duplas e mais variedade de faixas** | `V_0_16_14_bionix_encolhe_e_facil.md` |
+| **0.16.15** | **Forca Técnica: teclado filtrado (12 a 15 teclas), "Já sei o termo!" com 3 opções, pistas em camadas e pedido de pista à Aline, letras-âncora, acento/cedilha automáticos e interface no estilo da Aline** | `V_0_16_15_FORCA_TECNICA.md` |
+| **0.16.16** | **Forca Técnica: layout sem cortes em todas as fontes, só um rosto da Aline, botões de pista/chute no painel lateral com cartão da Aline e letra animada, chutes parecidos por dificuldade e ajustes de desempenho no navegador** | `V_0_16_16_FORCA_TECNICA_LAYOUT.md` |
+| **0.16.17** | **Forca Técnica: rebalanceamento (sem letras reveladas, alfabeto completo, pista −15% dos pontos), cartão da Aline sempre visível, área da palavra menor e teclado/botões laterais maiores** | `V_0_16_17_FORCA_TECNICA_BALANCEAMENTO.md` |
 
 ### Observações do histórico
 

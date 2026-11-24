@@ -5,14 +5,14 @@
   "host": "aline",
   "partner": "",
   "cta": "Começar!",
-  "notes": "4 quadros (integridade e a regra mais complexa).",
+  "notes": "main = 4 quadros do início; phase pista/chute = cartões da Aline ao clicar nos botões (V0.16.16).",
   "steps": [
     {
       "id": "como_jogar",
       "kind": "mecanica",
       "speaker": "aline",
       "title": "Letra por letra",
-      "text": "Descubra o termo clicando nas letras da tela ou usando o teclado. Letra certa aparece na palavra. São {rounds} termos.",
+      "text": "Escolha letras do alfabeto para revelar o termo. Acento e cedilha eu preencho sozinha: clicou A, valem Á, Ã e Â. São {rounds} termos.",
       "modes": [
         "campaign"
       ],
@@ -25,7 +25,7 @@
       "kind": "mecanica",
       "speaker": "aline",
       "title": "Letra por letra",
-      "text": "Sou a Aline. Descubra o termo no teclado da tela ou no seu. Letra certa aparece na palavra. São {rounds} termos valendo recorde.",
+      "text": "Sou a Aline. Escolha letras do alfabeto para revelar o termo; acento e cedilha eu preencho sozinha. São {rounds} termos valendo recorde.",
       "modes": [
         "free"
       ],
@@ -34,35 +34,65 @@
       ]
     },
     {
-      "id": "integridade",
-      "kind": "aviso",
+      "id": "pistas",
+      "kind": "estrategia",
       "speaker": "aline",
-      "title": "Integridade",
-      "text": "Cada letra errada derruba a integridade. Você aguenta {errors} erros por termo; no limite, o termo se revela e a rodada se perde.",
+      "title": "Pistas em camadas",
+      "text": "Leia a categoria, o tamanho e a definição. Nada vem revelado de graça. Travou? Peça uma pista: dou uma dica e revelo uma letra, mas cada pista tira {hintcost}% dos pontos da rodada.",
       "targets": [
-        "integrity_bar",
-        "integrity_label"
+        "area_label",
+        "hint_label",
+        "hint_button"
       ]
     },
     {
-      "id": "pontuacao",
+      "id": "ja_sei",
+      "kind": "mecanica",
+      "speaker": "aline",
+      "title": "Já sei o termo!",
+      "text": "Com {quick}% do termo revelado, libera o chute rápido: 3 opções e 1 chance por rodada. Acertou, vence na hora com até {speed} pontos de bônus. Errou, perde 1 de integridade.",
+      "targets": [
+        "quick_guess_button"
+      ]
+    },
+    {
+      "id": "integridade",
       "kind": "pontuacao",
       "speaker": "aline",
-      "title": "Quanto sobrou?",
-      "text": "Termo resolvido vale {base} pontos mais até {bonus} pela integridade que sobrou. Quem erra pouco ganha mais.",
+      "title": "Integridade e pontos",
+      "text": "Você aguenta {errors} erros por termo; no limite, o termo se revela e a rodada se perde. Termo resolvido vale {base} pontos mais até {bonus} pela integridade que sobrou.",
       "targets": [
+        "integrity_bar",
+        "integrity_label",
         "score_label"
       ]
     },
     {
-      "id": "estrategia",
+      "id": "pista_card",
+      "phase": "pista",
       "kind": "estrategia",
       "speaker": "aline",
-      "title": "Comece pelas vogais",
-      "text": "Comece pelas vogais, depois deduza pela categoria e pela dica. Erre as letras e verá seu prestígio enforcado.",
+      "title": "Uma pista, só uma",
+      "text": "{pista}\n\nIsso tira {hintcost}% dos pontos desta rodada.",
+      "next_label": "Revelar a letra",
+      "skip_label": "Deixa pra lá",
+      "card": "bottom",
       "targets": [
-        "word_label",
-        "hint_label"
+        "word_label"
+      ]
+    },
+    {
+      "id": "chute_card",
+      "phase": "chute",
+      "kind": "aviso",
+      "speaker": "aline",
+      "title": "Já sabe, é?",
+      "text": "{provoca}",
+      "next_label": "Mostrar as opções",
+      "skip_label": "Ainda não",
+      "card": "bottom",
+      "targets": [
+        "word_label"
       ]
     }
   ]

@@ -389,6 +389,7 @@ static func _build_dicionario(data: Dictionary) -> void:
 			"area": categoria,
 			"hint": str(it.get("dica", "")),
 			"pratica": pratica,
+			"pista_aline": str(it.get("pista_aline", "")),   # V0.16.15: frase de associacao da Aline (botao Pedir pista)
 			"explanation": definicao,
 			"referencia": str(it.get("referencia", "")),
 		})
